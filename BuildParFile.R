@@ -2,6 +2,8 @@
 # Build .par file from posterior.sso
 # Data from MCMC OM posterior.sso to
 # create .par file for step-2 OM
+# UPDATE TO CONDENSE BuildParFiles
+#   6/2020
 ####################################
 
 #### already done in big function ####
@@ -16,7 +18,7 @@
 
 
 
-BuildParFile = function(MCMCdir, mcmc, i, OMdirs=list()){
+BuildParFile = function(MCMCdir, mcmc, i, OMdirs=list(), SR="LFSR"){
   
   # Can optionally put in more than one OM directory in the form of a list to save the ss.par file in each OMdir (for multiple HCRs)
   
@@ -28,18 +30,45 @@ BuildParFile = function(MCMCdir, mcmc, i, OMdirs=list()){
   
   #### Biological/ Life History Parameters ####
   # NOTE: Check these on and off as appropriate...
-  newpar[which(newpar=="# MGparm[1]:")+1] = mcmc[i,"L_at_Amin_Fem_GP_1"]
-  newpar[which(newpar=="# MGparm[2]:")+1] = mcmc[i,"L_at_Amax_Fem_GP_1"]
-  newpar[which(newpar=="# MGparm[3]:")+1] = mcmc[i,"VonBert_K_Fem_GP_1"]
-  # newpar[which(newpar=="# MGparm[6]:")+1] = mcmc[i,"Wtlen_1_Fem_GP_1"]
-  newpar[which(newpar=="# MGparm[7]:")+1] = mcmc[i,"Wtlen_2_Fem_GP_1"]
-  newpar[which(newpar=="# SR_parm[1]:")+1] = mcmc[i,"SR_LN(R0)"]
+  
   #LFSR
-  newpar[which(newpar=="# SR_parm[2]:")+1] = mcmc[i,"SR_surv_zfrac"]
-  newpar[which(newpar=="# SR_parm[3]:")+1] = mcmc[i,"SR_surv_Beta"]
-  # newpar[which(newpar=="# SR_parm[4]:")+1] = mcmc[i,"SR_autocorr"]
+  if(SR=="LFSR"){
+    newpar[which(newpar=="# MGparm[1]:")+1] = mcmc[i,"L_at_Amin_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[2]:")+1] = mcmc[i,"L_at_Amax_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[3]:")+1] = mcmc[i,"VonBert_K_Fem_GP_1"]
+    # newpar[which(newpar=="# MGparm[6]:")+1] = mcmc[i,"Wtlen_1_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[7]:")+1] = mcmc[i,"Wtlen_2_Fem_GP_1"]
+    newpar[which(newpar=="# SR_parm[1]:")+1] = mcmc[i,"SR_LN(R0)"]
+    newpar[which(newpar=="# SR_parm[2]:")+1] = mcmc[i,"SR_surv_zfrac"]
+    newpar[which(newpar=="# SR_parm[3]:")+1] = mcmc[i,"SR_surv_Beta"]
+    # newpar[which(newpar=="# SR_parm[4]:")+1] = mcmc[i,"SR_autocorr"]
+  }
+
   #BH
-  # newpar[which(newpar=="# SR_parm[2]:")+1] = mcmc[i,"SR_BH_steep"]
+  if(SR=="BH"){
+    newpar[which(newpar=="# MGparm[1]:")+1] = mcmc[i,"L_at_Amin_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[2]:")+1] = mcmc[i,"L_at_Amax_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[3]:")+1] = mcmc[i,"VonBert_K_Fem_GP_1"]
+    # newpar[which(newpar=="# MGparm[6]:")+1] = mcmc[i,"Wtlen_1_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[7]:")+1] = mcmc[i,"Wtlen_2_Fem_GP_1"]
+    newpar[which(newpar=="# SR_parm[1]:")+1] = mcmc[i,"SR_LN(R0)"]
+    # newpar[which(newpar=="# SR_parm[2]:")+1] = mcmc[i,"SR_BH_steep"]
+    # newpar[which(newpar=="# SR_parm[4]:")+1] = mcmc[i,"SR_autocorr"]
+  }
+  
+  # lnR0
+  if(SR=="lnR0"){
+    newpar[which(newpar=="# MGparm[1]:")+1] = mcmc[i,"L_at_Amin_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[2]:")+1] = mcmc[i,"L_at_Amax_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[3]:")+1] = mcmc[i,"VonBert_K_Fem_GP_1"]
+    # newpar[which(newpar=="# MGparm[6]:")+1] = mcmc[i,"Wtlen_1_Fem_GP_1"]
+    newpar[which(newpar=="# MGparm[7]:")+1] = mcmc[i,"Wtlen_2_Fem_GP_1"]
+    # newpar[which(newpar=="# SR_parm[1]:")+1] = mcmc[i,"SR_LN(R0)"]
+    newpar[which(newpar=="# SR_parm[2]:")+1] = mcmc[i,"SR_surv_zfrac"]
+    newpar[which(newpar=="# SR_parm[3]:")+1] = mcmc[i,"SR_surv_Beta"]
+    # newpar[which(newpar=="# SR_parm[4]:")+1] = mcmc[i,"SR_autocorr"]
+  }
+
   
   
   #### Recruitment deviations ####

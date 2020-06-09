@@ -71,15 +71,8 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
   #-------------------------------------------------------------------------------------------------------------
   
   # Use the source() file to read in functions from other r.scripts
-  if(SR=="LFSR"){
-    source(file.path(sourcedir,"BuildParFile.R")) # BuildParFile
-  }
-  if(SR=="BH"){
-    source(file.path(sourcedir,"BuildParFile_BH.R")) # BuildParFile
-  }
-  if(SR=="lnR0"){
-    source(file.path(sourcedir,"BuildParFile_lnR0.R")) # BuildParFile
-  }
+  source(file.path(sourcedir,"BuildParFile.R")) # BuildParFile
+  
   source(file.path(sourcedir,"RunOM_NoHess.R")) # RunOM_NoHess
   source(file.path(sourcedir,"BuildEMDatFile.R")) # BuildEMDatFile
   source(file.path(sourcedir,"UpdateEMDatFile.R")) # UpdateEMDatFile
@@ -129,7 +122,7 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
       #-------------------------------------------------------------------------------------------------------------
       # Build Par File
       #-------------------------------------------------------------------------------------------------------------
-      BuildParFile(MCMCdir,mcmc,i,OMdirs=list(OMdir) )
+      BuildParFile(MCMCdir,mcmc,i,OMdirs=list(OMdir) , SR=SR)
     } # End if BuildPar==T
 
     
