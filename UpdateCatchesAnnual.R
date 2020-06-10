@@ -1,31 +1,37 @@
 ###############################################
 # UPDATE CATCHES ANNUALLY BETWEEN ASSESSMENTS
+# June 2020
 ###############################################
-hcr
-tt
-modEM
-OMdir
-i
-seed=430
-F1catch=ComCat$F1catch[yt]
-F2catch=ComCat$F2catch[yt]
-NsampF1=ComCat$NsampF1[yt]
-NsampF2=ComCat$NsampF2[yt]
+# hcr
+# tt
+# modEM
+# OMdir
+# i
+# seed=430
+# F1catch=ComCat$F1catch[yt]
+# F2catch=ComCat$F2catch[yt]
+# NsampF1=ComCat$NsampF1[yt]
+# NsampF2=ComCat$NsampF2[yt]
 
-UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, 
-                               F1catch=ComCat$F1catch[yt], F2catch=ComCat$F2catch[yt], 
-                               NsampF1=ComCat$NsampF1[yt], NsampF2=ComCat$NsampF2[yt],  ...){
-  set.seed(seed*tt)
+UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=ComCat,  ...){
+  
+  #set seed and get OM output. 
+  set.seed(seed*(tt+yt))
   modOM = SS_output(OMdir)
   
+  # Get commercial catches from ComCat. 
+  F1catch=ComCat$F1catch[yt]
+  F2catch=ComCat$F2catch[yt] 
+  NsampF1=ComCat$NsampF1[yt]
+  NsampF2=ComCat$NsampF2[yt]
   
   # RECREATIONAL AND DISCARDS #
   # F3 #
   #     estimate next year's EM forecasted population size
   #     parameters are based on a linear regression between EM observed biomass and F3 catch
   lr3 = lm(modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$`dead(B):_3` ~
-             modEM$timeseries[modEM$timeseries$Yr>1994 & modEM$timeseries$Yr<2016,]$Bio_all)
-  F3exp = (lr3$coefficients[1]) + ( (lr3$coefficients[2] )*modEM$timeseries[modEM$timeseries$Yr==tt-1,]$Bio_all )
+             modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$Bio_all)
+  F3exp = (lr3$coefficients[1]) + ( (lr3$coefficients[2] )*modOM$timeseries[modOM$timeseries$Yr==tt-1+(yt-1),]$Bio_all )
   # F3catch = rep(as.numeric(F3exp), FRQ)
   # # F3exp = (-146.0739) + ((0.01690873)*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all)      # expected F3 catch
   # F3exp = (-1670.934) + ( (0.07053087 )*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all )      # expected F3 catch
@@ -42,11 +48,11 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430,
   #     parameters are based on a linear regression between EM observed biomass and F4 catch
   # F4exp = (0.2286625) + ((5.37979e-06)*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all)     # expected F4 catch
   lr4 = lm(modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$`dead(N):_4` ~
-             modEM$timeseries[modEM$timeseries$Yr>1994 & modEM$timeseries$Yr<2016,]$Bio_all)
-  F4exp = (  lr4$coefficients[1] ) + ( ( lr4$coefficients[2] )*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all )     # expected F4 catch
+             modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$Bio_all)
+  F4exp = (  lr4$coefficients[1] ) + ( ( lr4$coefficients[2] )*modOM$timeseries[modOM$timeseries$Yr==tt-1+(yt-1),]$Bio_all )     # expected F4 catch
   # F4catch = rep(as.numeric(F4exp), FRQ)
   # F4exp = (  0.1964266 ) + ((6.277744e-06)*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all)     # expected F4 catch
-  F4catch = F4exp + rnorm(1,0,0.04200714/2 )                         # actual F3 catch w implementation uncertainty; true sd too high
+  F4catch = F4exp + rnorm(1,0,0.04200714/2 )                         # actual F4 catch w implementation uncertainty; true sd too high
   # # note: considered chosing to not include uncertainty at this stage, because the data generating process will add appropriate uncertainty; 
   #       included b/c more consistent with historical data
   

@@ -11,19 +11,19 @@
 
 # !!!!! think about parallelization? #
 
-
-
-#-------------------------------------------------------------------------------------------------------------
-# Define relevant parameters and directories
-#-------------------------------------------------------------------------------------------------------------
 # 
-# MCMCdir = "R:\\Management Strategy Evaluation\\SB\\MSE_RUN\\RUN_MCMC\\sandbar_330_OM_Base_MCMC" # OM version that undergoes MCMC directory
-# OMdir = "R:\\Management Strategy Evaluation\\SB\\MSE_RUN\\OM_Base\\HCR1\\OM" # OM directory
-# EMdir = "R:\\Management Strategy Evaluation\\SB\\MSE_RUN\\OM_Base\\HCR1\\EM" # EM directory
-# StoreResults = "R:\\Management Strategy Evaluation\\SB\\MSE_RUN\\OM_Base\\HCR1\\StoreResults" # Directory to store results
-# sourcedir = "R:\\Management Strategy Evaluation\\SB\\MSE_RUN\\"
 # 
-# FRQ=5   # frequency of assessments 
+# #-------------------------------------------------------------------------------------------------------------
+# # Define relevant parameters and directories
+# #-------------------------------------------------------------------------------------------------------------
+# # 
+# MCMCdir = "D:\\MSE_COVID19_FILES_BACKUP\\TEST_PLAY_EXAMPLE\\MCMC" # OM version that undergoes MCMC directory
+# OMdir = "D:\\MSE_COVID19_FILES_BACKUP\\TEST_PLAY_EXAMPLE\\HCR1\\OM" # OM directory
+# EMdir = "D:\\MSE_COVID19_FILES_BACKUP\\TEST_PLAY_EXAMPLE\\HCR1\\EM" # EM directory
+# StoreResults = "D:\\MSE_COVID19_FILES_BACKUP\\TEST_PLAY_EXAMPLE\\HCR1\\StoreResults" # Directory to store results
+# sourcedir = "D:\\MSE_COVID19_FILES_BACKUP\\MSE_Proj\\SS_MSE_AssessmentFrequency\\"
+# 
+# FRQ=5   # frequency of assessments
 #         # (constant ACL -- less of a big deal for longer-lived species cite: Quang et al. 2020 F&F)
 # 
 # # HCR parameters -- for threshold control rule
@@ -37,10 +37,12 @@
 # 
 # BuildPar=T
 # OMdirs=list(OMdir)
-# simYrs=100
+# simYrs=10
 # niters=1
 # seed=430
-# Fprop averaged for years 1995-2015
+# SR="LFSR"
+# implement="default"
+# # Fprop averaged for years 1995-2015
 
 #-------------------------------------------------------------------------------------------------------------
 # MSE FUNCTION:
@@ -76,6 +78,7 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
   source(file.path(sourcedir,"RunOM_NoHess.R")) # RunOM_NoHess
   source(file.path(sourcedir,"BuildEMDatFile.R")) # BuildEMDatFile
   source(file.path(sourcedir,"UpdateEMDatFile.R")) # UpdateEMDatFile
+  source(file.path(sourcedir,"UpdateOMDatFile.R")) # UpdateOMDatFile
   source(file.path(sourcedir,"RunEM.R")) # RunEM
   source(file.path(sourcedir,"HCR.R")) # HCR
   if(implement=="default"){
@@ -84,6 +87,7 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
   if(implement=="MexRec"){
     source(file.path(sourcedir,"ImplementHCR_MexRec.R")) # ImplementHCR
   }
+  source(file.path(sourcedir,"UpdateCatchesAnnual.R")) # ImplementHCR
   source(file.path(sourcedir,"EditStarterFile.R")) # ImplementHCR
   # copy files to *save results* folder; maybe save relevant results in .Rdata form
   
@@ -99,7 +103,8 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
   
   set.seed(seed)
   
-  MSEResults <<- list()     # empty list to store MSE results
+  #### NOTE: Not saving MSEResults in this code variant.  
+  # MSEResults <<- list()     # empty list to store MSE results
   # SSgetMCMC(dir="D:\\MSE_Run\\RUN_MCMC\\sandbar_330_OM_BH_MCMC", writecsv=F)
   mcmc = SSgetMCMC(dir=MCMCdir, writecsv=FALSE) # get mcmc file
   OMdat = SS_readdat(file=paste0(OMdir,"\\SB.dat"), version="3.30")
@@ -126,6 +131,7 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
     } # End if BuildPar==T
 
     
+    # for(tt in seq(StartSimYear,(EndYear+1),by=FRQ) ){ # maybe by FRQ!
     for(tt in seq(StartSimYear,(EndYear+1),by=FRQ) ){ # maybe by FRQ!
     # for(tt in seq(StartSimYear,2041,by=FRQ)){ # maybe by FRQ!
       # timet <<- tt
@@ -146,11 +152,11 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
       } #end if tt==1
       
       if(tt>StartSimYear){              # this is to include future observation error
-        UpdateOM(OMdir, tt, FRQ)
+        UpdateOM(OMdir, tt)             # NOTE: This is only to update annually. 
         UpdateEM(EMdir, OMdir, FRQ, tt)
       } #end if tt>1
       
-      
+      # if(tt %in% seq(StartSimYear,(EndYear+1),by=FRQ) ) {} # End Assessment Years
       #-------------------------------------------------------------------------------------------------------------
       # RUN EM
       #-------------------------------------------------------------------------------------------------------------
@@ -163,31 +169,44 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
       modEM <<- SS_output(dir=EMdir)
       
       if(tt < EndYear){                                                     # Only do HCR if tt < EndYear.
+        # Apply HCR to EM Assessment Results
         hcr = HCR(Btarg, Bconst=1, Ftarg, Fconst, a, b, modEM, tt, Fprop)
         
         #-------------------------------------------------------------------------------------------------------------
-        # UPDATE OM TO APPLY HCR
+        # Get Commercial catch & Nsamp for next FRQ yrs
         #-------------------------------------------------------------------------------------------------------------
-        implementHCR(hcr, tt, FRQ, modEM, OMdir, i)
-        # MSEResults <<- imphcr$MSEResults
+        ComCat = implementHCR(hcr, tt, FRQ, modEM, OMdir, i)
+        
+        # ---------------------------------------------------------------------------------------------------------------
+        # UPDATE OM ANNUALLY between Assessment years
+        #----------------------------------------------------------------------------------------------------------------
+        for(yt in 1:FRQ){
+          UpdateCatchesAnnual(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=ComCat)
+          if(yt<FRQ){
+            EditStarterFile(OMdir, seed+yt, tt)
+            RunOM_NoHess(OMdir)
+          } # end yt<FRQ
+        } # END ANNUAL yt OM UPDATE   
         
       } # End HCR and implementHCR
-         
-        
-    } # end tt loop ; time loop
+      
+      
+      
+    } # end tt by FRQ loop ; time loop
     
     # save files to StoreResults
-    file.copy(from=paste0(OMdir,"\\data.ss_new"),to=paste0(StoreResults,"\\OMdata_",i,".ss_new"))
+    #    In this version, only saving OM & EM Report.sso Files.-- All I really need. 
+    # file.copy(from=paste0(OMdir,"\\data.ss_new"),to=paste0(StoreResults,"\\OMdata_",i,".ss_new"))
     file.copy(from=paste0(OMdir,"\\Report.sso"),to=paste0(StoreResults,"\\OMReport_",i,".sso"))
-    file.copy(from=paste0(EMdir,"\\data.ss_new"),to=paste0(StoreResults,"\\EMdata_",i,".ss_new"))
+    # file.copy(from=paste0(EMdir,"\\data.ss_new"),to=paste0(StoreResults,"\\EMdata_",i,".ss_new"))
     file.copy(from=paste0(EMdir,"\\Report.sso"),to=paste0(StoreResults,"\\EMReport_",i,".sso"))
-    OM = SS_output(OMdir)
-    EM = SS_output(EMdir)
-    MSEResults[[paste0("OM_",i)]] <- OM
-    MSEResults[[paste0("EM_",i)]] <- EM
-    assign("MSEResults",MSEResults, envir=globalenv())
-    # Save MSEResults data in store results
-    save(MSEResults, file=paste0(StoreResults,"\\MSEResults.RData"))
+    # OM = SS_output(OMdir)
+    # EM = SS_output(EMdir)
+    # MSEResults[[paste0("OM_",i)]] <- OM
+    # MSEResults[[paste0("EM_",i)]] <- EM
+    # assign("MSEResults",MSEResults, envir=globalenv())
+    # # Save MSEResults data in store results
+    # save(MSEResults, file=paste0(StoreResults,"\\MSEResults.RData"))
     
     #convert data files to starter version. 
     file.copy(from=file.path(OMdir,"SB - START.dat"),to=file.path(OMdir,"SB.dat"), overwrite=T)
@@ -207,7 +226,10 @@ MSE_func = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
 #          simYrs=100, niters=1, Fprop)
 
 # MSE_func(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5, niters=1, sourcedir=sourcedir, SR="BH")
-
+# MSE_func(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5, 
+#          Btarg="BMSY", Bconst=1, Ftarg="FMSY", Fconst=1, a=0.1, b=1, 
+#          BuildPar=T, OMdirs=list(OMdir), 
+#          simYrs=10, niters=1, seed=430, sourcedir, SR="LFSR", implement="default")
 
 
 ## only run implementHCR if tt<EndYear{}
