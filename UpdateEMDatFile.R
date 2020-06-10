@@ -124,15 +124,15 @@ UpdateEM = function(EMdir, OMdir, FRQ=5, tt, ...) {
   
 } # end UpdateEM function
 
-
-
-UpdateOM <- function(OMdir, tt, FRQ, ...){
-  # re-write new OM data file with historical expected values
-  OMexpect_dat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=2, version="3.30") 
-  OMdat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=1, version="3.30") 
-  
-  OMdat$CPUE[OMdat$CPUE$year>=tt-FRQ & OMdat$CPUE$year<tt,] <- OMexpect_dat$CPUE[OMexpect_dat$CPUE$year>=tt-FRQ & OMexpect_dat$CPUE$year<tt,]
-  
-  SS_writedat(OMdat, outfile=paste(OMdir,"\\SB.dat", sep=""), version="3.30", overwrite=T)
-} # end UpdateOM function
+# 
+# 
+# UpdateOM <- function(OMdir, tt, FRQ, ...){
+#   # re-write new OM data file with historical expected values
+#   OMexpect_dat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=2, version="3.30") 
+#   OMdat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=1, version="3.30") 
+#   
+#   OMdat$CPUE[OMdat$CPUE$year>=tt-FRQ & OMdat$CPUE$year<tt,] <- OMexpect_dat$CPUE[OMexpect_dat$CPUE$year>=tt-FRQ & OMexpect_dat$CPUE$year<tt,]
+#   
+#   SS_writedat(OMdat, outfile=paste(OMdir,"\\SB.dat", sep=""), version="3.30", overwrite=T)
+# } # end UpdateOM function
 
