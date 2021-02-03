@@ -34,16 +34,18 @@ implementHCR = function(hcr, tt, FRQ, modEM, OMdir, i, seed=430, MaxCatch=NA, ..
     } # end f loop
     
     hcr$ACL <- c1
-      
+    
   } # end if ACL > 50% total biomass
- 
+  
   
   # COMMERCIAL CATCH #
   ### calculate expected commercial ACL ###
   # 41.7 mt DW => 58 mt round weight
-  comACL = hcr$ACL / 2
+  comACL = hcr$ACL - 58
+  comACL <- ifelse(comACL<0, 0, comACL)
   
   ### commercial catch w implementation uncertainty!   ###
+  # actualCatch = rlnorm(FRQ, -0.2722412, 0.3306523) * comACL
   actualCatch = rlnorm(FRQ, -0.6015450, 0.3306523) * comACL
   # actualCatch = ifelse(actualCatch > MaxCatch, 0, actualCatch)
   
@@ -60,17 +62,6 @@ implementHCR = function(hcr, tt, FRQ, modEM, OMdir, i, seed=430, MaxCatch=NA, ..
   F2catch = ifelse(F2catch<0, 0, F2catch)
   
   
-  # RECREATIONAL AND DISCARDS #
-  # F3 #
-  # NEW WAY / NEW IMPLEMENT HCR CODE # 
-  F3exp <- hcr$ACL / 2
-  F3catch = F3exp + rnorm(FRQ,0,102.0899 / 5 )                     # actual F3 catch w implementation uncertainty; true sd too hgih
-  # # note: chosing to not include uncertainty at this stage, because the data generating process will add appropriate uncertainty;
-  #       included b/c more consistent with historical data
-  
-  F3catch = ifelse(F3catch<0, 0, F3catch)
-  ###     NOTE: I am cheating and reducing SD by an order of magnitude; otherwise very crazy results
-    
   
   #-------------------------------------------------------------------------------------------------------------
   # Calculate Nsamp for LFreqs
@@ -88,14 +79,12 @@ implementHCR = function(hcr, tt, FRQ, modEM, OMdir, i, seed=430, MaxCatch=NA, ..
   F2c = ifelse(F2catch==0, 1e-5, F2catch)
   NsampF2 = round( ( 2.196819 * log(F2c) ) + -7.636586 + rnorm(FRQ, 0, 2.99855) )
   NsampF2 = ifelse(NsampF2<0, 0, NsampF2)
-  F3c = ifelse(F3catch==0, 1e-5, F3catch)
-  NsampF3 = round( (  1.221945 * log(F3c)  ) + -3.150376 + rnorm(FRQ, 0, 1.907433) )
-  NsampF3 = ifelse(NsampF3<0, 0, NsampF3)
   
- 
+  
   # Return 
-  return(list(F1catch = F1catch, F2catch = F2catch, F3catch = F3catch, NsampF1 = NsampF1, NsampF2 = NsampF2, NsampF3 = NsampF3))
+  return(list(F1catch = F1catch, F2catch = F2catch, NsampF1 = NsampF1, NsampF2 = NsampF2))
   
+  # return(MSEResults = MSEResults)
 } # End implementHCR function
 
 
