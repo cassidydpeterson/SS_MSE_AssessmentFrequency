@@ -1,3 +1,4 @@
+### Update Catches Annual LoMexRec
 ###############################################
 # UPDATE CATCHES ANNUALLY BETWEEN ASSESSMENTS
 # Feb 2021
@@ -25,27 +26,14 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   NsampF1=ComCat$NsampF1[yt]
   NsampF2=ComCat$NsampF2[yt]
   
+  
   # RECREATIONAL AND DISCARDS #
   # F3 #
   #     estimate next year's EM forecasted population size
   #     parameters are based on a linear regression between EM observed biomass and F3 catch
-  lr3 = lm(modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$`dead(B):_3` ~
-             modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$Bio_all)
-  F3exp = (lr3$coefficients[1]) + ( (lr3$coefficients[2] )*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all )
-  
-  # If expected F3 catch is less than average over past few years (), then linear ramp to zero. This is to account for the negative intercept
-  if(F3exp < 109 ){
-    temp_a <- (109 - lr3$coefficients[1])/(lr3$coefficients[2]) 
-    F3exp <- (109/temp_a) * modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all
-  }
-  
-  F3catch = F3exp + rnorm(1, 0, 102.0899/5 )                     # actual F3 catch w implementation uncertainty; true sd too hgih
-  # # note: chosing to not include uncertainty at this stage, because the data generating process will add appropriate uncertainty;
-  #       included b/c more consistent with historical data
-  
+  F3catch = rnorm(1, 109, 17.7)
   F3catch = ifelse(F3catch<0, 0, F3catch)
   ###     NOTE: I am cheating and reducing SD by an order of magnitude; otherwise very crazy results
-  
   
   
   # F4 #
@@ -54,10 +42,11 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   lr4 = lm(modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$`dead(N):_4` ~
              modOM$timeseries[modOM$timeseries$Yr>1994 & modOM$timeseries$Yr<2016,]$Bio_all)
   F4exp = (  lr4$coefficients[1] ) + ( ( lr4$coefficients[2] )*modOM$timeseries[modOM$timeseries$Yr==tt-1,]$Bio_all )     # expected F4 catch
-  F4catch = F4exp + rnorm(1, 0, 0.04200714/2 )                         # actual F4 catch w implementation uncertainty; true sd too high
-  F4catch = ifelse(F4catch<0, 0, F4catch)                              # catch can't be negative
+  F4catch = F4exp + rnorm(1,0,0.04200714/2 )                         # actual F3 catch w implementation uncertainty; true sd too high
+  # # note: considered chosing to not include uncertainty at this stage, because the data generating process will add appropriate uncertainty; 
+  #       included b/c more consistent with historical data
   
-  
+  F4catch = ifelse(F4catch<0, 0, F4catch)
   
   
   
@@ -78,9 +67,6 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   
   
   
-  
-  
-  
   #-------------------------------------------------------------------------------------------------------------
   # Add new data to OM
   #-------------------------------------------------------------------------------------------------------------
@@ -88,8 +74,7 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   
   OMdat = SS_readdat(file=paste0(OMdir,"\\SB.dat"), version="3.30") 
   newOMdat = OMdat
-  endyr = tt+(yt-1)
-  
+  endyr = tt-1
   
   # Update catches for each fleet
   for( f in levels(as.factor(newOMdat$catch$fleet)) ){
@@ -116,18 +101,18 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   } # end Lfreq fs loop
   
   
-  
   # limit number of digits
   newOMdat$catch<-round(newOMdat$catch, digits=5)
   newOMdat$lencomp<-round(newOMdat$lencomp, digits=4)
   
-  # Re-write OM data file with additional year of data. 
+  
+  # Re-write OM data file with additional FRQ years of data. 
   SS_writedat(newOMdat, outfile=paste0(OMdir,"\\SB.dat"), version="3.30", overwrite=T)
+
   
-  
-  # #-------------------------------------------------------------------------------------------------------------
-  # # Save Results
-  # #-------------------------------------------------------------------------------------------------------------
+  #-------------------------------------------------------------------------------------------------------------
+  # Save Results
+  #-------------------------------------------------------------------------------------------------------------
   # ### SAVE RESULTS ###
   # 
   # # Create MSEResults$ACL_i (if it doesn't already exist)
@@ -154,7 +139,6 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   #                                               Estimated_FMSY = rep(modEM$derived_quants["Fstd_MSY","Value"], FRQ) ) )
   # 
   # assign("MSEResults", MSEResults, envir=globalenv())       # save MSEResults in global environment
-  
   
   
 }
