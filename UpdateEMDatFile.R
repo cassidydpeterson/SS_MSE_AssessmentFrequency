@@ -1,6 +1,6 @@
 ######################################
 # UPDATE EM DATA FILE FROM OM (MSE2)
-# Oct. 2018
+# Feb 2021
 # CPeterson
 ######################################
 
@@ -15,9 +15,9 @@ UpdateEM = function(EMdir, OMdir, FRQ=5, tt, ...) {
   ### Make data Corrections for variance adjustment!
   
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # get data files
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   
   EMdat = SS_readdat(file=paste(EMdir,"\\SB.dat", sep=""), version="3.30")
   
@@ -29,18 +29,18 @@ UpdateEM = function(EMdir, OMdir, FRQ=5, tt, ...) {
   
   
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # calculate years
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   StartYr = tt-FRQ
   EndYr = tt-1
   
   
   
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # Add new catch years
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   #     get old and new catch; subset by fleet and reconstruct.
   oldcatch = EMdat$catch
   newcatch = subset(OMboot_dat$catch, OMboot_dat$catch$year>=StartYr & OMboot_dat$catch$year<=EndYr)  # get new catch data
@@ -50,13 +50,13 @@ UpdateEM = function(EMdir, OMdir, FRQ=5, tt, ...) {
     assign(paste0("newcatchF",l), subset(newcatch, newcatch$fleet==l))
     catch = rbind(catch, get(paste0("oldcatchF",l)), get(paste0("newcatchF",l)) )
   }
-  NewEMdat$catch = catch
+  NewEMdat$catch = round(catch, digits=5)
   
   
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # Add new CPUE years
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   oldCPUE = EMdat$CPUE
   newCPUE = subset(OMboot_dat$CPUE, OMboot_dat$CPUE$year>=StartYr & OMboot_dat$CPUE$year<=EndYr)  # get new CPUE data
   CPUE = c()
@@ -65,13 +65,13 @@ UpdateEM = function(EMdir, OMdir, FRQ=5, tt, ...) {
     assign(paste0("newCPUE",m), subset(newCPUE, newCPUE$index==m))
     CPUE = rbind(CPUE, get(paste0("oldCPUE",m)), get(paste0("newCPUE",m)) )
   }
-  NewEMdat$CPUE = CPUE
+  NewEMdat$CPUE = round(CPUE, digits=5)
   
   
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # Add new lencomps
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   
   origlen = EMdat$lencomp
   newlen = subset(OMdat$lencomp, abs(OMdat$lencomp$Yr)>=StartYr & abs(OMdat$lencomp$Yr)<=EndYr)              
@@ -110,29 +110,32 @@ UpdateEM = function(EMdir, OMdir, FRQ=5, tt, ...) {
     
   } # end n loop for lencomps
   lencomps$Yr <- ifelse(lencomps$Nsamp<1, -1*abs(lencomps$Yr), lencomps$Yr)
-  NewEMdat$lencomp = lencomps
+  NewEMdat$lencomp = round(lencomps, digits=5)
+  NewEMdat$CPUE$obs <- ifelse(NewEMdat$CPUE$obs==0, 0.00001, NewEMdat$CPUE$obs)
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # update endyear
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   NewEMdat$endyr=EndYr
   
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   # re-write new EM data file
-  ####------------------------------------------------------------------------------------------------------------
+  ####----------------------------------------------------------------------------------------------------------
   SS_writedat(NewEMdat, outfile=paste(EMdir,"\\SB.dat", sep=""), version="3.30", overwrite=T)
   
 } # end UpdateEM function
 
-# 
-# 
-# UpdateOM <- function(OMdir, tt, FRQ, ...){
-#   # re-write new OM data file with historical expected values
-#   OMexpect_dat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=2, version="3.30") 
-#   OMdat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=1, version="3.30") 
-#   
-#   OMdat$CPUE[OMdat$CPUE$year>=tt-FRQ & OMdat$CPUE$year<tt,] <- OMexpect_dat$CPUE[OMexpect_dat$CPUE$year>=tt-FRQ & OMexpect_dat$CPUE$year<tt,]
-#   
-#   SS_writedat(OMdat, outfile=paste(OMdir,"\\SB.dat", sep=""), version="3.30", overwrite=T)
-# } # end UpdateOM function
+
+
+UpdateOM_annual <- function(OMdir, t, fq=1, ...){
+  # re-write new OM data file with historical expected values
+  OMexpect_dat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=2, version="3.30") 
+  OMdat = SS_readdat(file=paste(OMdir,"\\data.ss_new", sep=""), section=1, version="3.30") 
+  
+  OMdat$CPUE[OMdat$CPUE$year>=t-fq & OMdat$CPUE$year<t,] <- OMexpect_dat$CPUE[OMexpect_dat$CPUE$year>=t-fq & OMexpect_dat$CPUE$year<t,]
+  OMdat$CPUE<-round(OMdat$CPUE, digits=5)
+  OMdat$CPUE$obs <- ifelse(OMdat$CPUE$obs==0, 0.00001, OMdat$CPUE$obs)
+  
+  SS_writedat(OMdat, outfile=paste(OMdir,"\\SB.dat", sep=""), version="3.30", overwrite=T)
+} # end UpdateOM function
 

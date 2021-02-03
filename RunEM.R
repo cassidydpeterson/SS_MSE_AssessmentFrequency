@@ -15,7 +15,7 @@ RunEM = function( EMdir , extras="" , intern=FALSE) {
   on.exit(setwd(oldwd))
   setwd(newdir)
   
-  system(paste0("ss ",extras), intern=intern)
+  system(paste0("ss -nohess ",extras), intern=intern)
   
 }
 
