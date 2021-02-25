@@ -22,8 +22,8 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   # Get commercial catches from ComCat. 
   F1catch=ComCat$F1catch[yt]
   F2catch=ComCat$F2catch[yt] 
-  F2catch=ComCat$F3catch[yt] 
-  NsampF3=ComCat$NsampF1[yt]
+  F3catch=ComCat$F3catch[yt] 
+  NsampF1=ComCat$NsampF1[yt]
   NsampF2=ComCat$NsampF2[yt]
   NsampF3=ComCat$NsampF3[yt]
   
