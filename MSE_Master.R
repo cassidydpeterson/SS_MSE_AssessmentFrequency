@@ -37,7 +37,7 @@
 # 
 # BuildPar=T
 # OMdirs=list(OMdir)
-# simYrs=10
+# simYrs=100
 # niters=1
 # seed=430
 # SR="LFSR"
