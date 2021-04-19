@@ -74,7 +74,7 @@ UpdateCatchesAnnual = function(hcr, tt, yt, modEM, OMdir, i, seed=430, ComCat=Co
   
   OMdat = SS_readdat(file=paste0(OMdir,"\\SB.dat"), version="3.30") 
   newOMdat = OMdat
-  endyr = tt-1
+  endyr = tt+(yt-1)
   
   # Update catches for each fleet
   for( f in levels(as.factor(newOMdat$catch$fleet)) ){

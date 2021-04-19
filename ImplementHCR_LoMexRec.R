@@ -42,7 +42,6 @@ implementHCR = function(hcr, tt, FRQ, modEM, OMdir, i, seed=430, MaxCatch=NA, ..
   ### calculate expected commercial ACL ###
   # 41.7 mt DW => 58 mt round weight
   comACL = hcr$ACL - 58
-  comACL <- ifelse(comACL<0, 0, comACL)
   
   ### commercial catch w implementation uncertainty!   ###
   # actualCatch = rlnorm(FRQ, -0.2722412, 0.3306523) * comACL
