@@ -186,7 +186,7 @@ MSE_func_FRQ = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
       #-------------------------------------------------------------------------------------------------------------
       modEM <<- SS_output(dir=EMdir)
       
-      if(tt < EndYear){                                                     # Only do HCR if tt < EndYear.
+      if(tt <= EndYear){                                                     # Only do HCR if tt < EndYear.
         # Apply HCR to EM Assessment Results
         hcr = HCR(Btarg, Bconst=1, Ftarg, Fconst, a, b, modEM, tt, Fprop)
         
@@ -217,9 +217,9 @@ MSE_func_FRQ = function(MCMCdir, OMdir, EMdir, StoreResults, FRQ=5,
     # save files to StoreResults
     #    In this version, only saving OM & EM Report.sso Files.-- All I really need. 
     # file.copy(from=paste0(OMdir,"\\data.ss_new"),to=paste0(StoreResults,"\\OMdata_",i,".ss_new"))
-    file.copy(from=paste0(OMdir,"\\Report.sso"),to=paste0(StoreResults,"\\OMReport_",i,".sso"))
+    file.copy(from=paste0(OMdir,"\\Report.sso"),to=paste0(StoreResults,"\\OMReport_",i,".sso"), overwrite=T)
     # file.copy(from=paste0(EMdir,"\\data.ss_new"),to=paste0(StoreResults,"\\EMdata_",i,".ss_new"))
-    file.copy(from=paste0(EMdir,"\\Report.sso"),to=paste0(StoreResults,"\\EMReport_",i,".sso"))
+    file.copy(from=paste0(EMdir,"\\Report.sso"),to=paste0(StoreResults,"\\EMReport_",i,".sso"), overwrite=T)
     # OM = SS_output(OMdir)
     # EM = SS_output(EMdir)
     # MSEResults[[paste0("OM_",i)]] <- OM
