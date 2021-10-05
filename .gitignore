@@ -2,8 +2,14 @@
 .Rhistory
 .RData
 .Ruserdata
-Run_MSE_inParallel.R
 UpdateCatchesAnnual_OLD.R
 Plotting_Helper.R
 GLM.R
 GLM_Plotting_Helper.R
+BuildDecisionTable_Original.R
+HCR_Original.R
+MSE_Master_ORIGINAL.R
+Run_MSE_inParallel_Original.R
+SS_ReadReportResults_Original.R
+UpdateCatchesAnnual_Original.R
+UpdateCatchesAnnual_OLD.R
