@@ -4,17 +4,26 @@
 
 ### function requirements ####
 # library(r4ss)
-# OMdir = "R:\\Management Strategy Evaluation\\SB\\TEST_Base\\HCR1\\OM"
 
 
-RunOM_NoHess = function( OMdir , extras="", intern=FALSE) {
-  
+RunOM_NoHess <- function(OMdir, extras = "", intern = FALSE) {
   newdir <- file.path(OMdir)
-  oldwd <- getwd()              # save working directory
+  oldwd <- getwd() # save working directory
   on.exit(setwd(oldwd))
   setwd(newdir)
-  
-  system(paste0("ss -nohess"," ",extras), intern=intern)
-  
-  # setwd(oldwd)
+
+  system(paste0("ss -nohess", " ", extras), intern = intern)
 }
+
+
+
+# ## Example Linux code
+# RunOM_NoHess <- function(OMdir, extras = "", intern = FALSE) {
+#   newdir <- file.path(OMdir)
+#   oldwd <- getwd() # save working directory
+#   on.exit(setwd(oldwd))
+#   setwd(newdir)
+# 
+#   system(paste0("./ss -nohess", " ", extras), intern = intern)
+# 
+# }

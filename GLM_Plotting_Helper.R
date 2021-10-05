@@ -8,7 +8,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(3,2), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1,1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Base")){
     coll='black'
@@ -25,7 +25,7 @@ for(i in levels(as.factor(p.data.TC$name))){
 }
 mtext("Base",line=-1.2, side=3)
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"BH")){
     if(stringr::str_detect(i,"M_BH")){
@@ -48,7 +48,7 @@ for(i in levels(as.factor(p.data.TC$name))){
 }
 mtext("BH",line=-1.2, side=3)
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Hih")){
     coll='olivedrab3'
@@ -67,7 +67,7 @@ for(i in levels(as.factor(p.data.TC$name))){
 mtext("Hih",line=-1.2, side=3)
 
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"lnR0")){
     coll='darkorchid'
@@ -85,7 +85,7 @@ for(i in levels(as.factor(p.data.TC$name))){
 }
 mtext("lnR0",line=-1.2, side=3)
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Loh")){
     coll='orange'
@@ -104,7 +104,7 @@ for(i in levels(as.factor(p.data.TC$name))){
 mtext("Loh",line=-1.2, side=3)
 
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"M_BH")){
     coll='salmon'
@@ -139,7 +139,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(3,2), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.2,1.2,0.1,0.1))
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Base")){
     coll='black'
@@ -151,7 +151,7 @@ for(i in levels(as.factor(p.data.PR$name))){
 }
 mtext("Base",line=-1.2, side=3)
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"BH")){
     if(stringr::str_detect(i,"M_BH")){
@@ -167,7 +167,7 @@ for(i in levels(as.factor(p.data.PR$name))){
 }
 mtext("BH",line=-1.2, side=3)
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Hih")){
     coll='olivedrab3'
@@ -180,7 +180,7 @@ for(i in levels(as.factor(p.data.PR$name))){
 mtext("Hih",line=-1.2, side=3)
 
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"lnR0")){
     coll='darkorchid'
@@ -192,7 +192,7 @@ for(i in levels(as.factor(p.data.PR$name))){
 }
 mtext("lnR0",line=-1.2, side=3)
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Loh")){
     coll='orange'
@@ -205,7 +205,7 @@ for(i in levels(as.factor(p.data.PR$name))){
 mtext("Loh",line=-1.2, side=3)
 
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"M_BH")){
     coll='salmon'
@@ -234,7 +234,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(3,2), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.2,1.2,0.1,0.1))
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Base")){
@@ -247,7 +247,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 }
 mtext("Base",line=-1.2, side=3)
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"BH")){
@@ -264,7 +264,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 }
 mtext("BH",line=-1.2, side=3)
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Hih")){
@@ -278,7 +278,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 mtext("Hih",line=-1.2, side=3)
 
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"lnR0")){
@@ -291,7 +291,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 }
 mtext("lnR0",line=-1.2, side=3)
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Loh")){
@@ -305,7 +305,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 mtext("Loh",line=-1.2, side=3)
 
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"M_BH")){
@@ -358,7 +358,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Base")){
     coll='black'
@@ -375,7 +375,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Base")){
     coll='black'
@@ -386,7 +386,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Base")){
@@ -400,7 +400,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="black", lwd=2, cex=1.5, lty=1, pch=16)
@@ -422,7 +422,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"BH")){
     if(stringr::str_detect(i,"M_BH")){
@@ -444,7 +444,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"BH")){
     if(stringr::str_detect(i,"M_BH")){
@@ -459,7 +459,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"BH")){
@@ -477,7 +477,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="deepskyblue", lwd=2, cex=1.5, lty=1, pch=16)
@@ -499,7 +499,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Hih")){
     coll='olivedrab3'
@@ -516,7 +516,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Hih")){
     coll='olivedrab3'
@@ -527,7 +527,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Hih")){
@@ -541,7 +541,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="olivedrab3", lwd=2, cex=1.5, lty=1, pch=16)
@@ -564,7 +564,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"lnR0")){
     coll='darkorchid'
@@ -581,7 +581,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"lnR0")){
     coll='darkorchid'
@@ -592,7 +592,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"lnR0")){
@@ -606,7 +606,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="darkorchid", lwd=2, cex=1.5, lty=1, pch=16)
@@ -633,7 +633,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Loh")){
     coll='orange'
@@ -650,7 +650,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Loh")){
     coll='orange'
@@ -661,7 +661,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Loh")){
@@ -675,7 +675,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="orange", lwd=2, cex=1.5, lty=1, pch=16)
@@ -700,7 +700,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"M_BH")){
     coll='salmon'
@@ -717,7 +717,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"M_BH")){
     coll='salmon'
@@ -728,7 +728,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"M_BH")){
@@ -742,7 +742,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="salmon", lwd=2, cex=1.5, lty=1, pch=16)
@@ -767,12 +767,12 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_
     width=300,
     height=400,
     pointsize=18,
-    res=300)
+    res=600)
 ######
 par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
 
 ## Probability of Recovery 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.2))
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.2))
 mtext("Probability of Recovery by 2115", side=2, line=1)
 for(i in rev(levels(as.factor(p.data.PR$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
@@ -784,14 +784,14 @@ for(i in rev(levels(as.factor(p.data.PR$name)))){
   if(stringr::str_detect(i,"Concept")){
     ltyy = 1; pchh=16
     lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
   # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
   
 }
 mtext("Concept", side=3, line=0.2)
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
 for(i in rev(levels(as.factor(p.data.PR$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -803,13 +803,13 @@ for(i in rev(levels(as.factor(p.data.PR$name)))){
   if(stringr::str_detect(i,"LoMexRec")){
     ltyy = 2; pchh=17
     lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
-
+  
 }
 mtext("LoMexRec", side=3, line=0.2)
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
 for(i in rev(levels(as.factor(p.data.PR$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -822,7 +822,7 @@ for(i in rev(levels(as.factor(p.data.PR$name)))){
   if(stringr::str_detect(i,"HiMexRec")){
     ltyy = 3; pchh=15
     lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   
 }
 mtext("HiMexRec", side=3, line=0.2)
@@ -830,7 +830,7 @@ mtext("HiMexRec", side=3, line=0.2)
 
 
 ### SSB
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
 abline(h=1)
 for(i in rev(levels(as.factor(p.data.SSB$name)))){
@@ -843,7 +843,7 @@ for(i in rev(levels(as.factor(p.data.SSB$name)))){
   if(stringr::str_detect(i,"Concept")){
     ltyy = 1; pchh=16
     lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
   # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
   
@@ -851,7 +851,7 @@ for(i in rev(levels(as.factor(p.data.SSB$name)))){
 
 
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in rev(levels(as.factor(p.data.SSB$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
@@ -864,14 +864,14 @@ for(i in rev(levels(as.factor(p.data.SSB$name)))){
   if(stringr::str_detect(i,"LoMexRec")){
     ltyy = 2; pchh=17
     lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
   
 }
 
 
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in rev(levels(as.factor(p.data.SSB$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
@@ -885,7 +885,7 @@ for(i in rev(levels(as.factor(p.data.SSB$name)))){
   if(stringr::str_detect(i,"HiMexRec")){
     ltyy = 3; pchh=15
     lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   
 }
 
@@ -893,8 +893,8 @@ for(i in rev(levels(as.factor(p.data.SSB$name)))){
 
 
 ### Total commercial catch 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
-mtext("Total US Commercial Catch", side=2, line=1)
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
 for(i in rev(levels(as.factor(p.data.TC$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -905,13 +905,13 @@ for(i in rev(levels(as.factor(p.data.TC$name)))){
   if(stringr::str_detect(i,"Concept")){
     ltyy = 1; pchh=16
     lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
   # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
   
 }
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in rev(levels(as.factor(p.data.TC$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -923,13 +923,13 @@ for(i in rev(levels(as.factor(p.data.TC$name)))){
   if(stringr::str_detect(i,"LoMexRec")){
     ltyy = 2; pchh=17
     lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
- 
+  
 }
 
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
 for(i in rev(levels(as.factor(p.data.TC$name)))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -942,38 +942,38 @@ for(i in rev(levels(as.factor(p.data.TC$name)))){
   if(stringr::str_detect(i,"HiMexRec")){
     ltyy = 3; pchh=15
     lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
-    }
+  }
   
 }
 
 
 ### POF
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 mtext("Probability of Overfishing", side=2, line=1)
-mtext("Assessment Frequency", side=1, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
 # lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
 # lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
 # legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
 legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
-mtext("Assessment Frequency", side=1, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
 # lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
 lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
 # lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
 legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
-mtext("Assessment Frequency", side=1, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
 # lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
 # lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
 lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
@@ -984,6 +984,2520 @@ legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', 
 
 #####
 dev.off()
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp2.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=400,
+    pointsize=18,
+    res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+# p.data.PR[p.data.PR$Imp=="Concept",]
+boxplot(p.data.PR[p.data.PR$Imp=="Concept",]$pred~p.data.PR[p.data.PR$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PR[p.data.PR$Imp=="LoMexRec",]$pred~p.data.PR[p.data.PR$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PR[p.data.PR$Imp=="HiMexRec",]$pred~p.data.PR[p.data.PR$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+# p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ
+boxplot(p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC[p.data.TC$Imp=="Concept",]$pred_BT~p.data.TC[p.data.TC$Imp=="Concept",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC[p.data.TC$Imp=="LoMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="LoMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC[p.data.TC$Imp=="HiMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="HiMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~p.data.POF[p.data.POF$Imp=="Concept",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~p.data.POF[p.data.POF$Imp=="LoMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~p.data.POF[p.data.POF$Imp=="HiMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=400,
+     pointsize=18,
+     res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.2))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp2.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=400,
+     pointsize=18,
+     res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+# p.data.PR[p.data.PR$Imp=="Concept",]
+boxplot(p.data.PR[p.data.PR$Imp=="Concept",]$pred~p.data.PR[p.data.PR$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PR[p.data.PR$Imp=="LoMexRec",]$pred~p.data.PR[p.data.PR$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PR[p.data.PR$Imp=="HiMexRec",]$pred~p.data.PR[p.data.PR$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+# p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ
+boxplot(p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC[p.data.TC$Imp=="Concept",]$pred_BT~p.data.TC[p.data.TC$Imp=="Concept",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC[p.data.TC$Imp=="LoMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="LoMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC[p.data.TC$Imp=="HiMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="HiMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~p.data.POF[p.data.POF$Imp=="Concept",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~p.data.POF[p.data.POF$Imp=="LoMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~p.data.POF[p.data.POF$Imp=="HiMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+
+
+
+##### ----------- w PRMSST ---------------------------------------------
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp_MSST.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=400,
+    pointsize=18,
+    res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Prob Recovery to MSST by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+
+MyOrder=matrix(1:8, nrow=4, ncol=2, byrow=T)
+legend("top", c("Base","BH","Hih","lnR0","Loh","M_BH","All OMs")[MyOrder], col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","grey45")[MyOrder], lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+
+
+
+
+#####
+dev.off()
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp2_MSST.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=400,
+    pointsize=18,
+    res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+# p.data.PR[p.data.PR$Imp=="Concept",]
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Prob Recover to MSST by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+# p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ
+boxplot(p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC[p.data.TC$Imp=="Concept",]$pred_BT~p.data.TC[p.data.TC$Imp=="Concept",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC[p.data.TC$Imp=="LoMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="LoMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC[p.data.TC$Imp=="HiMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="HiMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~p.data.POF[p.data.POF$Imp=="Concept",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+MyOrder=matrix(1:8, nrow=4, ncol=2, byrow=T)
+legend("top", c("Base","BH","Hih","lnR0","Loh","M_BH","All OMs")[MyOrder], col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","grey45")[MyOrder], lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~p.data.POF[p.data.POF$Imp=="LoMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+
+
+boxplot(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~p.data.POF[p.data.POF$Imp=="HiMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+
+
+
+
+
+#####
+dev.off()
+
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp_MSST.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=400,
+     pointsize=18,
+     res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Prob Recovery to MSST by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+
+MyOrder=matrix(1:8, nrow=4, ncol=2, byrow=T)
+legend("top", c("Base","BH","Hih","lnR0","Loh","M_BH","All OMs")[MyOrder], col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","grey45")[MyOrder], lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+
+
+
+
+#####
+dev.off()
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp2_MSST.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=400,
+     pointsize=18,
+     res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+# p.data.PR[p.data.PR$Imp=="Concept",]
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Prob Recover to MSST by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PR$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+# p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ
+boxplot(p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC[p.data.TC$Imp=="Concept",]$pred_BT~p.data.TC[p.data.TC$Imp=="Concept",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC[p.data.TC$Imp=="LoMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="LoMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC[p.data.TC$Imp=="HiMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="HiMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~p.data.POF[p.data.POF$Imp=="Concept",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+MyOrder=matrix(1:8, nrow=4, ncol=2, byrow=T)
+legend("top", c("Base","BH","Hih","lnR0","Loh","M_BH","All OMs")[MyOrder], col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","grey45")[MyOrder], lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~p.data.POF[p.data.POF$Imp=="LoMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+
+
+boxplot(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~p.data.POF[p.data.POF$Imp=="HiMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+
+
+
+
+
+#####
+dev.off()
+
+
+
+
+
+
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp_MSST.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=400,
+    pointsize=18,
+    res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.2))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp2_MSST.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=400,
+    pointsize=18,
+    res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+# p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+# p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ
+boxplot(p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC[p.data.TC$Imp=="Concept",]$pred_BT~p.data.TC[p.data.TC$Imp=="Concept",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC[p.data.TC$Imp=="LoMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="LoMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC[p.data.TC$Imp=="HiMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="HiMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~p.data.POF[p.data.POF$Imp=="Concept",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~p.data.POF[p.data.POF$Imp=="LoMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~p.data.POF[p.data.POF$Imp=="HiMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp_MSST.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=400,
+     pointsize=18,
+     res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.2))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="", lwd=2, border="grey75" )
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQ_Results_ByImp2_MSST.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=400,
+     pointsize=18,
+     res=600)
+######
+par(mfrow=c(4,3), mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1.1,1.1,1.1,0.1))
+
+## Probability of Recovery 
+# p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" ,ylim=c(0, 1.1))
+mtext("Probability of Recovery by 2115", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("Concept", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,1.1) )
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+mtext("LoMexRec", side=3, line=0.2)
+
+boxplot(p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$pred~p.data.PRMSST[p.data.PRMSST$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0,1.1))
+for(i in rev(levels(as.factor(p.data.PRMSST$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.PRMSST[p.data.PRMSST$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+mtext("HiMexRec", side=3, line=0.2)
+
+
+
+### SSB
+# p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ
+boxplot(p.data.SSB[p.data.SSB$Imp=="Concept",]$pred~p.data.SSB[p.data.SSB$Imp=="Concept",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+mtext(expression("SSB"["2115"]*" / SSB"["MSY"]), side=2, line=1)
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="LoMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+
+boxplot(p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$pred~p.data.SSB[p.data.SSB$Imp=="HiMexRec",]$FRQ , ylab="",xlab="", lwd=2, border="grey75" , ylim=c(0, 1.75))
+abline(h=1)
+for(i in rev(levels(as.factor(p.data.SSB$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred~c(1,2,3,4), data=p.data.SSB[p.data.SSB$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+
+
+### Total commercial catch 
+boxplot(p.data.TC[p.data.TC$Imp=="Concept",]$pred_BT~p.data.TC[p.data.TC$Imp=="Concept",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+mtext("Total US Commercial Catch (mt)", side=2, line=1)
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  if(stringr::str_detect(i,"Concept")){
+    ltyy = 1; pchh=16
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+boxplot(p.data.TC[p.data.TC$Imp=="LoMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="LoMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  if(stringr::str_detect(i,"LoMexRec")){
+    ltyy = 2; pchh=17
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  # if(stringr::str_detect(i,"HiMexRec")){ltyy = 3; pchh=15}
+  
+}
+
+
+boxplot(p.data.TC[p.data.TC$Imp=="HiMexRec",]$pred_BT~p.data.TC[p.data.TC$Imp=="HiMexRec",]$FRQ, ylab="",xlab="", lwd=2, border="grey75" , ylim=c(1000, 20000))
+for(i in rev(levels(as.factor(p.data.TC$name)))){
+  if(stringr::str_detect(i,"Base")){coll='black'}
+  if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
+  if(stringr::str_detect(i,"Hih")){coll='olivedrab3'}
+  if(stringr::str_detect(i,"lnR0")){coll='darkorchid'}
+  if(stringr::str_detect(i,"Loh")){coll='orange'}
+  if(stringr::str_detect(i,"M_BH")){coll='salmon'}
+  # if(stringr::str_detect(i,"Concept")){ltyy = 1; pchh=16}
+  # if(stringr::str_detect(i,"LoMexRec")){ltyy = 2; pchh=17}
+  if(stringr::str_detect(i,"HiMexRec")){
+    ltyy = 3; pchh=15
+    lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=1.25)
+  }
+  
+}
+
+
+### POF
+
+boxplot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~p.data.POF[p.data.POF$Imp=="Concept",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Probability of Overfishing", side=2, line=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, cex=1.25, lty=1, pch=16)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+# legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
+legend("top", c("Base","All OMs","BH"), col=c("black","grey45","deepskyblue"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+boxplot(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~p.data.POF[p.data.POF$Imp=="LoMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=2, pch=17)
+# lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
+legend("top", c("Hih","lnR0"), col=c("olivedrab3","darkorchid"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+boxplot(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~p.data.POF[p.data.POF$Imp=="HiMexRec",]$FRQ, 
+        ylab="",xlab="", lwd=2, border="grey75", ylim=c(0,0.6))
+abline(h=1)
+mtext("Assessment Frequency (years)", side=1, line=1)
+# lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
+# lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='o', col='grey45', lwd=2, cex=1.25, lty=3, pch=15)
+legend("top", c("Loh","M_BH"), col=c("orange","salmon"), lwd=2, lty=1, bty='n', ncol=2, cex=0.75)
+
+
+
+
+#####
+dev.off()
+
+#####---------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1006,7 +3520,7 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -1020,13 +3534,13 @@ for(i in levels(as.factor(p.data.TC$name))){
   lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=2)
 }
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.TC$pred_BT~p.data.TC$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.TC$pred_BT~p.data.TC$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.TC$pred_BT~p.data.TC$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
-mtext("Total US Commercial Catch", side=2, outer=T, line=-0.7)
+mtext("Total US Commercial Catch (mt)", side=2, outer=T, line=-0.7)
 #####
 dev.off()
 
@@ -1046,7 +3560,7 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -1060,9 +3574,9 @@ for(i in levels(as.factor(p.data.PR$name))){
   lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=2)
 }
 
-boxplot(predict(PRp, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(PRp, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(PRp, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.PR$pred~p.data.PR$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.PR$pred~p.data.PR$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.PR$pred~p.data.PR$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1087,7 +3601,7 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 2))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 2))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Base")){coll='black'}
@@ -1103,9 +3617,9 @@ for(i in levels(as.factor(p.data.SSB$name))){
 }
 legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
-boxplot(predict(SSBp, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(SSBp, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(SSBp, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.SSB$pred~p.data.SSB$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.SSB$pred~p.data.SSB$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.SSB$pred~p.data.SSB$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1120,18 +3634,19 @@ dev.off()
 png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\POF_FRQ_Results.png",
     type="cairo",
     units="mm",
-    width=300,
+    width=150,
     height=300,
     pointsize=18,
     res=300)
 #####
 par(mar=c(2.1, 2.1, 1.1, 1.1),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1,1,1,1))
-layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #, 
-         # widths=c(3,1), 
-         # heights=c(2,2)
-)
+# layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #, 
+#          # widths=c(3,1), 
+#          # heights=c(2,2)
+# )
+par(mfrow=c(1,2))
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
@@ -1139,12 +3654,12 @@ lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='bl
 lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
 legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
 
-boxplot(predict(POF_p, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(POF_p, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(POF_p, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
-        names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
-                "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
-                "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
+boxplot(p.data.POF$pred~p.data.POF$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2, ylim=c(0,0.6)) 
+# boxplot(p.data.POF$pred~p.data.POF$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+# boxplot(p.data.POF$pred~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+#         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
+#                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
+#                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
 mtext("Prob overfishing", side=2, outer=T, line=-0.7)
 #####
 dev.off()

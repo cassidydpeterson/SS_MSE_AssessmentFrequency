@@ -9,7 +9,7 @@ Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec', 'Results_Hih_HiMexRe
 
 BuildTable <- function(Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec', 'Results_Hih_HiMexRec', 'Results_Loh_HiMexRec', 'Results_lnR0_HiMexRec', 'Results_M_BH_HiMexRec'), stat = "median"){
   ### AAV ###
-  # AAV = rbind(Results_BASE$AAV_HCR, Results_BH$AAV_HCR, Results_Hih$AAV_HCR, Results_Loh$AAV_HCR, Results_lnR0$AAV_HCR, Results_M_BH$AAV_HCR) 
+
   # AAV
   AAV = get(Results[1])$AAV_FRQ
   for(r in 2:length(Results)){
@@ -20,7 +20,6 @@ BuildTable <- function(Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec
   
   
   ### Tot commercial catch ###
-  # TotComCatch = rbind(Results_BASE$Com_Catch_cumulative, Results_BH$Com_Catch_cumulative, Results_Hih$Com_Catch_cumulative, Results_Loh$Com_Catch_cumulative, Results_lnR0$Com_Catch_cumulative, Results_M_BH$Com_Catch_cumulative) 
   # TotComCatch
   TotComCatch = get(Results[1])$Com_Catch_cumulative
   for(r in 2:length(Results)){
@@ -31,15 +30,11 @@ BuildTable <- function(Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec
   
   
   ### SSB/SSBMSY ###
-  # SSB_SSBMSY_2115 = rbind(Results_BASE$SSB_SSBMSY_2115, Results_BH$SSB_SSBMSY_2115, Results_Hih$SSB_SSBMSY_2115, Results_Loh$SSB_SSBMSY_2115, Results_lnR0$SSB_SSBMSY_2115, Results_M_BH$SSB_SSBMSY_2115) 
-  # dim(SSB_SSBMSY_2115)
   SSB_SSBMSY_2115 = get(Results[1])$SSB_SSBMSY_2115
   for(r in 2:length(Results)){
     SSB_SSBMSY_2115 <- rbind(SSB_SSBMSY_2115, get(Results[r])$SSB_SSBMSY_2115)
   }
-  
-  # SSB_SSBMSY_2065 = rbind(Results_BASE$SSB_SSBMSY_2065, Results_BH$SSB_SSBMSY_2065, Results_Hih$SSB_SSBMSY_2065, Results_Loh$SSB_SSBMSY_2065, Results_lnR0$SSB_SSBMSY_2065, Results_M_BH$SSB_SSBMSY_2065) 
-  # dim(SSB_SSBMSY_2065)
+   
   SSB_SSBMSY_2065 = get(Results[1])$SSB_SSBMSY_2065
   for(r in 2:length(Results)){
     SSB_SSBMSY_2065 <- rbind(SSB_SSBMSY_2065, get(Results[r])$SSB_SSBMSY_2065)
@@ -49,17 +44,12 @@ BuildTable <- function(Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec
   
   
   ### F/FMSY ##
-  # F_FMSY_2115 = rbind(Results_BASE$FM_FMMSY_2115, Results_BH$FM_FMMSY_2115, Results_Hih$FM_FMMSY_2115, Results_Loh$FM_FMMSY_2115, Results_lnR0$FM_FMMSY_2115, Results_M_BH$FM_FMMSY_2115) 
-  # dim(F_FMSY_2115)
   F_FMSY_2115 = get(Results[1])$FM_FMMSY_2115
   for(r in 2:length(Results)){
     F_FMSY_2115 <- rbind(F_FMSY_2115, get(Results[r])$FM_FMMSY_2115)
   }
   
   
-  # F_FMSY_2065 = rbind(Results_BASE$FM_FMMSY_2065, Results_BH$FM_FMMSY_2065, Results_Hih$FM_FMMSY_2065, Results_Loh$FM_FMMSY_2065, Results_lnR0$FM_FMMSY_2065, Results_M_BH$FM_FMMSY_2065) 
-  # dim(F_FMSY_2065)
-  # View(F_FMSY_2065)
   F_FMSY_2065 = get(Results[1])$FM_FMMSY_2065
   for(r in 2:length(Results)){
     F_FMSY_2065 <- rbind(F_FMSY_2065, get(Results[r])$FM_FMMSY_2065)
@@ -70,17 +60,12 @@ BuildTable <- function(Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec
   
   
   ### Avg len F ###
-  # AvgLen_F_2065 = rbind(Results_BASE$AvgLen_F_2065, Results_BH$AvgLen_F_2065, Results_Hih$AvgLen_F_2065, Results_Loh$AvgLen_F_2065, Results_lnR0$AvgLen_F_2065, Results_M_BH$AvgLen_F_2065) 
-  # dim(AvgLen_F_2065)
   AvgLen_F_2065 = get(Results[1])$AvgLen_F_2065
   for(r in 2:length(Results)){
     AvgLen_F_2065 <- rbind(AvgLen_F_2065, get(Results[r])$AvgLen_F_2065)
   }
   
   
-  # AvgLen_F_2115 = rbind(Results_BASE$AvgLen_F_2115, Results_BH$AvgLen_F_2115, Results_Hih$AvgLen_F_2115, Results_Loh$AvgLen_F_2115, Results_lnR0$AvgLen_F_2115, Results_M_BH$AvgLen_F_2115) 
-  # dim(AvgLen_F_2115)
-  # View(AvgLen_F_2115)
   AvgLen_F_2115 = get(Results[1])$AvgLen_F_2115
   for(r in 2:length(Results)){
     AvgLen_F_2115 <- rbind(AvgLen_F_2115, get(Results[r])$AvgLen_F_2115)
@@ -89,7 +74,6 @@ BuildTable <- function(Results = c('Results_Base_HiMexRec', 'Results_BH_HiMexRec
   
   
   ### prob Recov 2115 ###
-  # SSB_SSBMSY_2115
   Recov <- ifelse(SSB_SSBMSY_2115>1, 1, 0) 
   
   
@@ -223,19 +207,16 @@ for(Imp in c('C','H','L')){
   ### prob Recov 2115 ###
   SSB_SSBMSY_2115
   Recov <- as.data.frame(ifelse(SSB_SSBMSY_2115>0.9, 1, 0) )
-  ######################################## CONSIDER DEFINITION OF RECOVERED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
-  
-  # ### Prob overfishing ###
-  # POF_a = OM_Base_Concept$FRQ_1$FM_FMMSY[as.character(2016:2115),]
-  # POF_b = ifelse(POF_a>1, 1, 0)
-  # POFapply(POF_b, 2, sum) / nrow(POF_b)
+  RecovMSST <- as.data.frame(ifelse(SSB_SSBMSY_2115>0.87, 1, 0) )
+  ########## CONSIDER DEFINITION OF RECOVERED 
   
   
   
   
   assign(paste0("Recov_",Imp), Recov)
   assign(paste0("PRecov_",Imp), apply(Recov, 2, sum, na.rm=T) / nrow(Recov))
+  assign(paste0("RecovMSST_",Imp), RecovMSST)
+  assign(paste0("PRecovMSST_",Imp), apply(RecovMSST, 2, sum, na.rm=T) / nrow(RecovMSST))
   assign(paste0("POF_",Imp), get(Results[1])$ProbOF )
   assign(paste0("TotComCatch_",Imp), TotComCatch)
   assign(paste0("Med_TotComCatch_",Imp), apply(TotComCatch, 2, median, na.rm=T) )
@@ -272,35 +253,35 @@ Lab_vecH = c(rep(ResultsH[1], 100), rep(ResultsH[2], 100) , rep(ResultsH[3], 100
 
 
 # FOR LoMexRec
-FRQ1L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(1, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_1, ProbRec=Recov_L$FRQ_1, SSB2115=SSB_SSBMSY_2115_L$FRQ_1, F2115=F_FMSY_2115_L$FRQ_1, AAV=as.data.frame(AAV_ALL_L)$FRQ_1, POF=POF_L$FRQ_1 ))
-FRQ5L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(5, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_5, ProbRec=Recov_L$FRQ_5, SSB2115=SSB_SSBMSY_2115_L$FRQ_5, F2115=F_FMSY_2115_L$FRQ_5, AAV=as.data.frame(AAV_ALL_L)$FRQ_5, POF=POF_L$FRQ_5 ))
-FRQ10L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(10, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_10, ProbRec=Recov_L$FRQ_10, SSB2115=SSB_SSBMSY_2115_L$FRQ_10, F2115=F_FMSY_2115_L$FRQ_10, AAV=as.data.frame(AAV_ALL_L)$FRQ_10,  POF=POF_L$FRQ_15 ))
-FRQ15L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(15, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_15, ProbRec=Recov_L$FRQ_15, SSB2115=SSB_SSBMSY_2115_L$FRQ_15, F2115=F_FMSY_2115_L$FRQ_15, AAV=as.data.frame(AAV_ALL_L)$FRQ_15,  POF=POF_L$FRQ_15 ))
+FRQ1L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(1, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_1, ProbRec=Recov_L$FRQ_1, SSB2115=SSB_SSBMSY_2115_L$FRQ_1, F2115=F_FMSY_2115_L$FRQ_1, AAV=as.data.frame(AAV_ALL_L)$FRQ_1, POF=POF_L$FRQ_1, ProbRecMSST=RecovMSST_L$FRQ_1 ))
+FRQ5L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(5, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_5, ProbRec=Recov_L$FRQ_5, SSB2115=SSB_SSBMSY_2115_L$FRQ_5, F2115=F_FMSY_2115_L$FRQ_5, AAV=as.data.frame(AAV_ALL_L)$FRQ_5, POF=POF_L$FRQ_5, ProbRecMSST=RecovMSST_L$FRQ_5 ))
+FRQ10L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(10, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_10, ProbRec=Recov_L$FRQ_10, SSB2115=SSB_SSBMSY_2115_L$FRQ_10, F2115=F_FMSY_2115_L$FRQ_10, AAV=as.data.frame(AAV_ALL_L)$FRQ_10,  POF=POF_L$FRQ_15, ProbRecMSST=RecovMSST_L$FRQ_10 ))
+FRQ15L = as.data.frame(cbind(name=Lab_vecL, Imp=rep("LoMexRec", length(Lab_vecL)), OM=OM_vec, FRQ=rep(15, length(Lab_vecL)), TotComCatch = TotComCatch_L$FRQ_15, ProbRec=Recov_L$FRQ_15, SSB2115=SSB_SSBMSY_2115_L$FRQ_15, F2115=F_FMSY_2115_L$FRQ_15, AAV=as.data.frame(AAV_ALL_L)$FRQ_15,  POF=POF_L$FRQ_15, ProbRecMSST=RecovMSST_L$FRQ_15 ))
 
 # FOR HiMexRec
-FRQ1H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(1, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_1, ProbRec=Recov_H$FRQ_1, SSB2115=SSB_SSBMSY_2115_H$FRQ_1, F2115=F_FMSY_2115_H$FRQ_1, AAV=as.data.frame(AAV_ALL_H)$FRQ_1,  POF=POF_H$FRQ_1 ))
-FRQ5H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(5, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_5, ProbRec=Recov_H$FRQ_5, SSB2115=SSB_SSBMSY_2115_H$FRQ_5, F2115=F_FMSY_2115_H$FRQ_5, AAV=as.data.frame(AAV_ALL_H)$FRQ_5,  POF=POF_H$FRQ_5 ))
-FRQ10H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(10, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_10, ProbRec=Recov_H$FRQ_10, SSB2115=SSB_SSBMSY_2115_H$FRQ_10, F2115=F_FMSY_2115_H$FRQ_10, AAV=as.data.frame(AAV_ALL_H)$FRQ_10,  POF=POF_H$FRQ_10 ))
-FRQ15H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(15, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_15, ProbRec=Recov_H$FRQ_15, SSB2115=SSB_SSBMSY_2115_H$FRQ_15, F2115=F_FMSY_2115_H$FRQ_15, AAV=as.data.frame(AAV_ALL_H)$FRQ_15,  POF=POF_H$FRQ_15 ))
+FRQ1H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(1, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_1, ProbRec=Recov_H$FRQ_1, SSB2115=SSB_SSBMSY_2115_H$FRQ_1, F2115=F_FMSY_2115_H$FRQ_1, AAV=as.data.frame(AAV_ALL_H)$FRQ_1,  POF=POF_H$FRQ_1, ProbRecMSST=RecovMSST_H$FRQ_1 ))
+FRQ5H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(5, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_5, ProbRec=Recov_H$FRQ_5, SSB2115=SSB_SSBMSY_2115_H$FRQ_5, F2115=F_FMSY_2115_H$FRQ_5, AAV=as.data.frame(AAV_ALL_H)$FRQ_5,  POF=POF_H$FRQ_5, ProbRecMSST=RecovMSST_H$FRQ_5 ))
+FRQ10H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(10, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_10, ProbRec=Recov_H$FRQ_10, SSB2115=SSB_SSBMSY_2115_H$FRQ_10, F2115=F_FMSY_2115_H$FRQ_10, AAV=as.data.frame(AAV_ALL_H)$FRQ_10,  POF=POF_H$FRQ_10, ProbRecMSST=RecovMSST_H$FRQ_10 ))
+FRQ15H = as.data.frame(cbind(name=Lab_vecH, Imp=rep("HiMexRec", length(Lab_vecH)), OM=OM_vec, FRQ=rep(15, length(Lab_vecH)), TotComCatch = TotComCatch_H$FRQ_15, ProbRec=Recov_H$FRQ_15, SSB2115=SSB_SSBMSY_2115_H$FRQ_15, F2115=F_FMSY_2115_H$FRQ_15, AAV=as.data.frame(AAV_ALL_H)$FRQ_15,  POF=POF_H$FRQ_15, ProbRecMSST=RecovMSST_H$FRQ_15 ))
 
 # FOR Concept
-FRQ1C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(1, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_1, ProbRec=Recov_C$FRQ_1, SSB2115=SSB_SSBMSY_2115_C$FRQ_1, F2115=F_FMSY_2115_C$FRQ_1, AAV=as.data.frame(AAV_ALL_C)$FRQ_1,  POF=POF_C$FRQ_1 ))
-FRQ5C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(5, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_5, ProbRec=Recov_C$FRQ_5, SSB2115=SSB_SSBMSY_2115_C$FRQ_5, F2115=F_FMSY_2115_C$FRQ_5, AAV=as.data.frame(AAV_ALL_C)$FRQ_5,  POF=POF_C$FRQ_5 ))
-FRQ10C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(10, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_10, ProbRec=Recov_C$FRQ_10, SSB2115=SSB_SSBMSY_2115_C$FRQ_10, F2115=F_FMSY_2115_C$FRQ_10, AAV=as.data.frame(AAV_ALL_C)$FRQ_10,  POF=POF_C$FRQ_10 ))
-FRQ15C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(15, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_15, ProbRec=Recov_C$FRQ_15, SSB2115=SSB_SSBMSY_2115_C$FRQ_15, F2115=F_FMSY_2115_C$FRQ_15, AAV=as.data.frame(AAV_ALL_C)$FRQ_15,  POF=POF_C$FRQ_15 ))
+FRQ1C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(1, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_1, ProbRec=Recov_C$FRQ_1, SSB2115=SSB_SSBMSY_2115_C$FRQ_1, F2115=F_FMSY_2115_C$FRQ_1, AAV=as.data.frame(AAV_ALL_C)$FRQ_1,  POF=POF_C$FRQ_1, ProbRecMSST=RecovMSST_C$FRQ_1 ))
+FRQ5C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(5, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_5, ProbRec=Recov_C$FRQ_5, SSB2115=SSB_SSBMSY_2115_C$FRQ_5, F2115=F_FMSY_2115_C$FRQ_5, AAV=as.data.frame(AAV_ALL_C)$FRQ_5,  POF=POF_C$FRQ_5, ProbRecMSST=RecovMSST_C$FRQ_5 ))
+FRQ10C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(10, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_10, ProbRec=Recov_C$FRQ_10, SSB2115=SSB_SSBMSY_2115_C$FRQ_10, F2115=F_FMSY_2115_C$FRQ_10, AAV=as.data.frame(AAV_ALL_C)$FRQ_10,  POF=POF_C$FRQ_10, ProbRecMSST=RecovMSST_C$FRQ_10 ))
+FRQ15C = as.data.frame(cbind(name=Lab_vecC, Imp=rep("Concept", length(Lab_vecC)), OM=OM_vec, FRQ=rep(15, length(Lab_vecC)), TotComCatch = TotComCatch_C$FRQ_15, ProbRec=Recov_C$FRQ_15, SSB2115=SSB_SSBMSY_2115_C$FRQ_15, F2115=F_FMSY_2115_C$FRQ_15, AAV=as.data.frame(AAV_ALL_C)$FRQ_15,  POF=POF_C$FRQ_15, ProbRecMSST=RecovMSST_C$FRQ_15 ))
 
 FRQ_DATA = rbind(FRQ1C, FRQ5C, FRQ10C, FRQ15C,
                  FRQ1L, FRQ5L, FRQ10L, FRQ15L,
                  FRQ1H, FRQ5H, FRQ10H, FRQ15H)
 
-save(FRQ_DATA, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\FRQ_DATA.RData")
+save(FRQ_DATA, file="FRQ_DATA.RData")
 
 
 
 
 # PLOT
 
-png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\Barplot_Decision_Table.png",
+png(filename="Barplot_Decision_Table.png",
     type="cairo",
     units="mm",
     width=100,

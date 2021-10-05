@@ -4,7 +4,7 @@
 # May 2021
 ###################
 
-library(betareg)
+# library(betareg)
 library(doBy)
 
 
@@ -22,6 +22,7 @@ FD$OM = as.factor(FD$OM)
 FD$FRQ = as.numeric(as.character(FD$FRQ))
 FD$TotComCatch = as.numeric(as.character(FD$TotComCatch))
 FD$ProbRec = as.numeric(as.character(FD$ProbRec))
+FD$ProbRecMSST = as.numeric(as.character(FD$ProbRecMSST))
 FD$SSB2115 = as.numeric(as.character(FD$SSB2115))
 FD$F2115 = as.numeric(as.character(FD$F2115))
 FD$POF = as.numeric(as.character(FD$POF))
@@ -29,6 +30,90 @@ FD$AAV = as.numeric(as.character(FD$AAV))
 str(FD)
 
 
+#### FINAL MODELS ####
+FD_C = FD[complete.cases(FD),]
+# FD_C = FD
+
+# Total Catch 
+TC4=glm(log(TotComCatch)~as.factor(FRQ)*Imp*OM, data=FD, family=gaussian(link="identity")) ### THIS ONE
+
+TCp = TC4
+p.data=expand.grid(FRQ=c(1, 5, 10, 15),Imp=levels(FD$Imp),OM=levels(FD$OM))
+p.data=cbind(p.data,pred=predict(TCp,newdata=p.data,type='response'))
+p.data$pred_BT = exp(p.data$pred + (0.5*summary(TCp)$dispersion) )
+p.data$name = paste0(p.data$Imp,"_",p.data$OM)
+p.data.TC = p.data
+
+
+## Prob Recov
+PR3=glm(ProbRec ~ as.factor(FRQ)+Imp*OM, data=FD,family=binomial(link="logit")) ##
+PR4=glm(ProbRec ~ FRQ+Imp*OM, data=FD,family=binomial(link="logit"))
+PR5=glm(ProbRec ~ as.factor(FRQ)*Imp*OM, data=FD,family=binomial(link="logit")) ##
+
+PRp = PR3
+p.data=expand.grid(FRQ=c(1,5,10,15),Imp=levels(FD$Imp),OM=levels(FD$OM))
+p.data=cbind(p.data,pred=predict(PRp,newdata=p.data,type='response'))
+p.data$name= paste0(p.data$Imp,"_",p.data$OM)
+p.data.PR = p.data
+
+summary(PR3)
+
+
+PR3MSST=glm(ProbRecMSST ~ as.factor(FRQ)+Imp*OM, data=FD,family=binomial(link="logit")) ##
+PRpMSST = PR3MSST
+p.data=expand.grid(FRQ=c(1,5,10,15),Imp=levels(FD$Imp),OM=levels(FD$OM))
+p.data=cbind(p.data,pred=predict(PRpMSST,newdata=p.data,type='response'))
+p.data$name= paste0(p.data$Imp,"_",p.data$OM)
+p.data.PRMSST = p.data
+
+# PR3b=glm(ProbRec ~ as.factor(FRQ)+Imp, data=FD[FD$OM=="Base",],family=binomial(link="logit")); summary(PR3b) ##
+# PR3b=glm(ProbRec ~ as.factor(FRQ)+Imp, data=FD[FD$OM=="BH",],family=binomial(link="logit")); summary(PR3b) ##
+# PR3b=glm(ProbRec ~ as.factor(FRQ)+Imp, data=FD[FD$OM=="Hih",],family=binomial(link="logit")); summary(PR3b) ##
+# PR3b=glm(ProbRec ~ as.factor(FRQ)+Imp, data=FD[FD$OM=="lnR0",],family=binomial(link="logit")); summary(PR3b) ##
+# PR3b=glm(ProbRec ~ as.factor(FRQ)+Imp, data=FD[FD$OM=="Loh",],family=binomial(link="logit")); summary(PR3b) ##
+# PR3b=glm(ProbRec ~ as.factor(FRQ)+Imp, data=FD[FD$OM=="M_BH",],family=binomial(link="logit")); summary(PR3b) ##
+# p.data=expand.grid(FRQ=c(1,5,10,15),Imp=levels(FD$Imp))
+# p.data=cbind(p.data,pred=predict(PR3b,newdata=p.data,type='response'))
+# # plot(summaryBy(pred~FRQ, data=p.data, FUN=mean), type='b', ylim=c(0,1))
+# lines(summaryBy(pred~FRQ, data=p.data, FUN=mean), type='b', ylim=c(0,1), col="salmon")
+
+
+
+## POF
+
+POFa = (FD$POF*(length(FD$POF)-1) + 0.5) / (length(FD$POF))
+POF_8 = glm(POFa~as.factor(FRQ)*Imp, data=FD, family=gaussian(link="logit"))
+
+POF_p = POF_8
+p.data=expand.grid(FRQ=c(1, 5, 10, 15),Imp=levels(FD$Imp))
+p.data=cbind(p.data,pred=predict(POF_p,newdata=p.data,type='response'))
+p.data.POF = p.data
+
+
+
+# anova(TC4, test="F")
+# car::Anova(TC)
+# TukeyHSD(aov(TC4))
+# plot(aov(TC4))
+
+## SSB
+SSB1=glm(SSB2115~as.factor(FRQ)+Imp*OM, data=FD, family=gaussian(link="identity"))
+
+SSBp = SSB1
+p.data=expand.grid(FRQ=c(1, 5, 10, 15),Imp=levels(FD_C$Imp),OM=levels(FD_C$OM))
+p.data=cbind(p.data,pred=predict(SSBp,newdata=p.data,type='response'))
+p.data$name = paste0(p.data$Imp,"_",p.data$OM)
+p.data.SSB=p.data
+
+# SSB1a=glm(SSB2115~as.factor(FRQ)+Imp, data=FD[FD$OM=="M_BH",], family=gaussian(link="identity")); summary(SSB1a)
+
+
+
+
+# PR3c=glm(ProbRec ~ as.factor(FRQ)+OM, data=FD_C_C,family=binomial(link="logit")) ##
+# PR3l=glm(ProbRec ~ as.factor(FRQ)+OM, data=FD_C_L,family=binomial(link="logit")) ##
+# PR3h=glm(ProbRec ~ as.factor(FRQ)+OM, data=FD_C_H,family=binomial(link="logit")) ##
+# summary(PR3c); summary(PR3l); summary(PR3h)
 
 
 
@@ -139,7 +224,8 @@ hist(FD$SSB2115)
 # GLM #
 #####################################################################
 
-FD_C = FD[complete.cases(FD),]
+# FD_C = FD[complete.cases(FD),]
+FD_C = FD
 
 ### TotCatch ####
 # TC1=glm(log(TotComCatch)~FRQ+Imp+OM, data=FD_C, family=gaussian(link="identity"))
@@ -323,7 +409,7 @@ PR=glm(ProbRec ~ as.factor(FRQ)+Imp+OM, data=FD_C,family=binomial(link="logit"))
 PRx=glm(ProbRec ~ FRQ+Imp+OM, data=FD_C,family=binomial(link="logit"))
 PR1=glm(ProbRec ~ as.factor(FRQ)+Imp*OM, data=FD_C,family=binomial(link="logit"))
 PR4=glm(ProbRec ~ as.factor(FRQ)*Imp*OM, data=FD_C,family=binomial(link="logit"))
-PR5=glm(ProbRec ~ FRQ*Imp*OM, data=FD_C,family=binomial(link="logit")) ## Best except all zeros
+PR5=glm(ProbRec ~ FRQ*Imp*OM, data=FD_C,family=binomial(link="logit")) 
 PR6=glm(ProbRec ~ FRQ+Imp*OM, data=FD_C,family=binomial(link="logit"))
 
 aics = AIC(PR, PRx, PR1, PR4, PR5, PR6)
@@ -333,12 +419,12 @@ summary(PR5)
 summary(PR4)
 
 
-PRp = PR5
+PRp = PR1
 p.data=expand.grid(FRQ=c(1,5,10,15),Imp=levels(FD_C$Imp),OM=levels(FD_C$OM))
 p.data=cbind(p.data,pred=predict(PRp,newdata=p.data,type='response'))
 p.data$name= paste0(p.data$Imp,"_",p.data$OM)
 predPR5=summaryBy(pred~FRQ,data=p.data,FUN=mean)
-plot(pred.mean~FRQ, data=predPR5, type='b', ylim=c(0,1))
+# plot(pred.mean~FRQ, data=predPR5, type='b', ylim=c(0,1))
 predPR5a=summaryBy(pred~FRQ*OM,data=p.data,FUN=mean)
 # plot(pred.mean~FRQ, data=predPR5a, type='b', ylim=c(0,1))
 p.data.PR = p.data
@@ -366,6 +452,7 @@ boxplot(predict(PRp, type='response')~FD_C$FRQ, ylab="",xlab="Assessment Frequen
 
 
 boxplot(p.data$pred ~ p.data$FRQ)
+boxplot(p.data$pred ~ p.data$FRQ*p.data$Imp)
 boxplot(predict(PR1, type="response")~FD_C$FRQ)
 
 
@@ -676,17 +763,252 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_
     res=300)
 #####
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TC1, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid") )
-boxplot(predict(PR1, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid") )
-boxplot(predict(SSB, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid") , ylim=c(0, 1.5))
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid") )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid") )
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid") , ylim=c(0, 2))
 abline(h=1)
 ## AAV BOXPLOT INSTEAD OF FMSY B/C OF THE COMPLICATING SCENARIOS OF STOCK COLLAPSE
-boxplot(predict(POF_8, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, col=c("grey45","deepskyblue","olivedrab3","darkorchid"), ylim=c(0,0.6))
 abline(h=1)
 #####
 dev.off()
 
+
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQxIMP_Results.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=600)
+#####
+par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0),  oma=c(2.1,0.1,0.1,0.1))
+
+
+boxplot(p.data.PR$pred~p.data.PR$FRQ*p.data.PR$Imp , ylab="Probability of Recovery by 2115",xlab="", lwd=2,ylim=c(0,1.05),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ*p.data.SSB$Imp , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="", lwd=2, ylim=c(0, 1.6),
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ*p.data.TC$Imp, ylab="Total US Commercial Catch (mt)",xlab="", lwd=2, 
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+plot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1, 2, 3, 4),  xlab="", ylim=c(0,0.5), xlim=c(0,13), ylab="Probability of Overfishing", axes=F, type='b', col='grey45', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(5, 6, 7, 8), type='b', col='olivedrab3', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(9, 10, 11, 12), type='b', col='orange', cex=1.5,pch=16, lwd=2)
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+mtext("Assessment Frequency (years)", 1, line=0.5, outer=T)
+
+#####
+dev.off()
+
+
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQxIMP_Results.tiff",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=600)
+#####
+par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0),  oma=c(2.1,0.1,0.1,0.1))
+
+
+boxplot(p.data.PR$pred~p.data.PR$FRQ*p.data.PR$Imp , ylab="Probability of Recovery by 2115",xlab="", lwd=2,ylim=c(0,1.05),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ*p.data.SSB$Imp , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="", lwd=2, ylim=c(0, 1.6),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ*p.data.TC$Imp, ylab="Total US Commercial Catch (mt)",xlab="", lwd=2, 
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+plot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1, 2, 3, 4),  xlab="", ylim=c(0,0.5), xlim=c(0,13), ylab="Probability of Overfishing", axes=F, type='b', col='grey45', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(5, 6, 7, 8), type='b', col='olivedrab3', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(9, 10, 11, 12), type='b', col='orange', cex=1.5,pch=16, lwd=2)
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+mtext("Assessment Frequency (years)", 1, line=0.5, outer=T)
+
+#####
+dev.off()
+
+
+
+
+
+
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQxIMP_Results_MSST.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=600)
+#####
+par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0),  oma=c(2.1,0.1,0.1,0.1))
+
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ*p.data.PRMSST$Imp , ylab="Prob of Recover to MSST by 2070",xlab="", lwd=2,ylim=c(0,1.05),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ*p.data.SSB$Imp , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="", lwd=2, ylim=c(0, 1.6),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ*p.data.TC$Imp, ylab="Total US Commercial Catch (mt)",xlab="", lwd=2, 
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+plot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1, 2, 3, 4),  xlab="", ylim=c(0,0.5), xlim=c(0,13), ylab="Probability of Overfishing", axes=F, type='b', col='grey45', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(5, 6, 7, 8), type='b', col='olivedrab3', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(9, 10, 11, 12), type='b', col='orange', cex=1.5,pch=16, lwd=2)
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+mtext("Assessment Frequency (years)", 1, line=0.5, outer=T)
+
+#####
+dev.off()
+
+
+
+
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_FRQxIMP_Results_MSST.tiff",
+     type="cairo",
+     units="mm",
+     width=300,
+     height=200,
+     pointsize=18,
+     res=600)
+#####
+par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0),  oma=c(2.1,0.1,0.1,0.1))
+
+
+boxplot(p.data.PRMSST$pred~p.data.PRMSST$FRQ*p.data.PRMSST$Imp , ylab="Prob of Recover to MSST by 2115",xlab="", lwd=2,ylim=c(0,1.05),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ*p.data.SSB$Imp , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="", lwd=2, ylim=c(0, 1.6),  
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ*p.data.TC$Imp, ylab="Total US Commercial Catch (mt)",xlab="", lwd=2, 
+        # col=c("grey45","deepskyblue","olivedrab3","darkorchid"),
+        col=c(rep("grey50",4),rep("olivedrab3",4),rep("orange",4)), 
+        axes=F )
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+
+plot(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1, 2, 3, 4),  xlab="", ylim=c(0,0.5), xlim=c(0,13), ylab="Probability of Overfishing", axes=F, type='b', col='grey45', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(5, 6, 7, 8), type='b', col='olivedrab3', cex=1.5,pch=16, lwd=2)
+lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(9, 10, 11, 12), type='b', col='orange', cex=1.5,pch=16, lwd=2)
+axis(2)
+axis(1, at=c(2.5, 6.5, 10.5), c("Concept","LoMexRec","HiMexRec"), col='white', line=1)
+axis(1, at=1:12, c(rep(c(1,5,10,15),3)), line=0, cex.axis=0.8)
+box()
+abline(h=1)
+
+mtext("Assessment Frequency (years)", 1, line=0.5, outer=T)
+
+#####
+dev.off()
 
 
 
@@ -699,7 +1021,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in rev(levels(as.factor(p.data.TC$name))) ){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -713,7 +1035,7 @@ for(i in rev(levels(as.factor(p.data.TC$name))) ){
   lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=2)
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in rev(levels(as.factor(p.data.PR$name))) ){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -727,7 +1049,7 @@ for(i in rev(levels(as.factor(p.data.PR$name))) ){
   lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=2)
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in rev(levels(as.factor(p.data.SSB$name))) ){
   if(stringr::str_detect(i,"Base")){coll='black'}
@@ -743,7 +1065,7 @@ for(i in rev(levels(as.factor(p.data.SSB$name))) ){
 }
 legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 # abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="grey45", lwd=2, lty=1, pch=16, cex=1.5)
@@ -766,7 +1088,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Base")){
     coll='black'
@@ -783,7 +1105,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Base")){
     coll='black'
@@ -794,7 +1116,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Base")){
@@ -808,7 +1130,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="black", lwd=2, cex=1.5, lty=1, pch=16)
@@ -830,7 +1152,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"BH")){
     if(stringr::str_detect(i,"M_BH")){
@@ -852,7 +1174,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"BH")){
     if(stringr::str_detect(i,"M_BH")){
@@ -867,7 +1189,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"BH")){
@@ -885,7 +1207,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="deepskyblue", lwd=2, cex=1.5, lty=1, pch=16)
@@ -907,7 +1229,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Hih")){
     coll='olivedrab3'
@@ -924,7 +1246,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Hih")){
     coll='olivedrab3'
@@ -935,7 +1257,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Hih")){
@@ -949,7 +1271,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="olivedrab3", lwd=2, cex=1.5, lty=1, pch=16)
@@ -972,7 +1294,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"lnR0")){
     coll='darkorchid'
@@ -989,7 +1311,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"lnR0")){
     coll='darkorchid'
@@ -1000,7 +1322,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"lnR0")){
@@ -1014,7 +1336,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="darkorchid", lwd=2, cex=1.5, lty=1, pch=16)
@@ -1041,7 +1363,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Loh")){
     coll='orange'
@@ -1058,7 +1380,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Loh")){
     coll='orange'
@@ -1069,7 +1391,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Loh")){
@@ -1083,7 +1405,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="orange", lwd=2, cex=1.5, lty=1, pch=16)
@@ -1108,7 +1430,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\FRQ_
     res=300)
 #######
 par(mfrow=c(2,2), mar=c(2.1, 2.1, 0.3, 0.3),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(0.1,0.1,0.1,0.1))
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="Total US Commercial Catch",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"M_BH")){
     coll='salmon'
@@ -1125,7 +1447,7 @@ for(i in levels(as.factor(p.data.TC$name))){
   
 }
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="Probability of Recovery by 2115",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"M_BH")){
     coll='salmon'
@@ -1136,7 +1458,7 @@ for(i in levels(as.factor(p.data.PR$name))){
   }
 }
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab=expression("SSB"["2115"]*" / SSB"["MSY"]),xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 1.75))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"M_BH")){
@@ -1150,7 +1472,7 @@ for(i in levels(as.factor(p.data.SSB$name))){
 # legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="Probability of Overfishing",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='o', col="salmon", lwd=2, cex=1.5, lty=1, pch=16)
@@ -1186,7 +1508,7 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.TC$name))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -1200,9 +1522,9 @@ for(i in levels(as.factor(p.data.TC$name))){
   lines(pred_BT~c(1,2,3,4), data=p.data.TC[p.data.TC$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=2)
 }
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.TC$pred_BT~p.data.TC$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.TC$pred_BT~p.data.TC$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.TC$pred_BT~p.data.TC$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1226,7 +1548,7 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
+boxplot(p.data.PR$pred~p.data.PR$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" )
 for(i in levels(as.factor(p.data.PR$name))){
   if(stringr::str_detect(i,"Base")){coll='black'}
   if(stringr::str_detect(i,"BH")){coll='deepskyblue'}
@@ -1240,9 +1562,9 @@ for(i in levels(as.factor(p.data.PR$name))){
   lines(pred~c(1,2,3,4), data=p.data.PR[p.data.PR$name==i,], type='o', lwd=2, col=coll, lty=ltyy, pch=pchh, cex=2)
 }
 
-boxplot(predict(PRp, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(PRp, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(PRp, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.PR$pred~p.data.PR$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.PR$pred~p.data.PR$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.PR$pred~p.data.PR$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1267,7 +1589,7 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 2))
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ , ylab="",xlab="Assessment Frequency", lwd=2, border="grey75" , ylim=c(0, 2))
 abline(h=1)
 for(i in levels(as.factor(p.data.SSB$name))){
   if(stringr::str_detect(i,"Base")){coll='black'}
@@ -1283,9 +1605,9 @@ for(i in levels(as.factor(p.data.SSB$name))){
 }
 legend("bottom", c("Base","BH","Hih","lnR0","Loh","M_BH","Concept","LoMexRec","HiMexRec"), col=c("black","deepskyblue","olivedrab3","darkorchid","orange","salmon","black",'black','black'), lwd=2, lty=c(rep(1, 6), 1, 2, 3), bty='n', ncol=3)
 
-boxplot(predict(SSBp, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(SSBp, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(SSBp, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.SSB$pred~p.data.SSB$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.SSB$pred~p.data.SSB$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.SSB$pred~p.data.SSB$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1301,17 +1623,18 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\POF_
     type="cairo",
     units="mm",
     width=300,
-    height=300,
+    height=150,
     pointsize=18,
     res=300)
 #####
 par(mar=c(2.1, 2.1, 1.1, 1.1),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1,1,1,1))
-layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #, 
-         # widths=c(3,1), 
-         # heights=c(2,2)
-)
+# layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #, 
+#          # widths=c(3,1), 
+#          # heights=c(2,2)
+# )
+par(mfrow=c(1,2))
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, 
+boxplot(p.data.POF$pred~p.data.POF$FRQ, 
         ylab="",xlab="Assessment Frequency", lwd=2, border="grey75", ylim=c(0,0.6))
 abline(h=1)
 lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
@@ -1319,12 +1642,12 @@ lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='bl
 lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
 legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('grey75','black','blue','red'), bty='n', ncol=2, lwd=2)
 
-boxplot(predict(POF_p, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(POF_p, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(POF_p, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
-        names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
-                "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
-                "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
+boxplot(p.data.POF$pred~p.data.POF$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+# boxplot(p.data.POF$pred~p.data.POF$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+# boxplot(p.data.POF$pred~p.data.POF$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+#         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
+#                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
+#                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
 mtext("Prob overfishing", side=2, outer=T, line=-0.7)
 #####
 dev.off()
@@ -1348,11 +1671,11 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)) )
+boxplot(p.data.TC$pred_BT~p.data.TC$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)) )
 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(exp(predict(TCp, type='response') + 0.5*summary(TCp)$dispersion)~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.TC$pred_BT~p.data.TC$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.TC$pred_BT~p.data.TC$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.TC$pred_BT~p.data.TC$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1376,11 +1699,11 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(predict(PRp, type='response')~FD_C$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)) )
+boxplot(p.data.PR$pred~p.data.PR$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)) )
 
-boxplot(predict(PRp, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(PRp, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(PRp, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.PR$pred~p.data.PR$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.PR$pred~p.data.PR$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.PR$pred~p.data.PR$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1405,11 +1728,11 @@ layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #,
          # heights=c(2,2)
 )
 
-boxplot(predict(SSBp, type='response')~FD_C$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)) )
+boxplot(p.data.SSB$pred~p.data.SSB$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)) )
 
-boxplot(predict(SSBp, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(SSBp, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(SSBp, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+boxplot(p.data.SSB$pred~p.data.SSB$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+boxplot(p.data.SSB$pred~p.data.SSB$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+boxplot(p.data.SSB$pred~p.data.SSB$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
@@ -1425,24 +1748,21 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\POF_
     type="cairo",
     units="mm",
     width=300,
-    height=300,
+    height=150,
     pointsize=18,
     res=300)
 #####
 par(mar=c(2.1, 2.1, 1.1, 1.1),tcl = -0.1, mgp = c(1, 0.1, 0), cex=1, oma=c(1,1,1,1))
-layout(  matrix(c(1,2,1,3,4,4), ncol=2, byrow=TRUE) #, 
-         # widths=c(3,1), 
-         # heights=c(2,2)
-)
+par(mfrow=c(1,2))
 
-boxplot(predict(POF_p, type='response')~FD_C$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)), ylim=c(0, 0.6) )
+boxplot(p.data.POF$pred~p.data.POF$FRQ, ylab="",xlab="Assessment Frequency", lwd=2,  col=c(rgb(0.75, 0.75, 0.75, 0.5),rgb(0.13, 0.55, 0.13, 0.5), rgb(0, 0, 1, 0.5), rgb(1, 0, 0, 0.5)), ylim=c(0, 0.6) )
 
-boxplot(predict(POF_p, type='response')~FD_C$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
-boxplot(predict(POF_p, type='response')~FD_C$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
-boxplot(predict(POF_p, type='response')~FD_C$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
-        names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
-                "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
-                "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
+boxplot(p.data.POF$pred~p.data.POF$Imp, border=c("black","blue",'red'),ylab="",xlab="Implementation Model", lwd=2) 
+# boxplot(p.data.POF$pred~p.data.POF$OM, border=c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), lwd=2,ylab="",xlab="OM") 
+# boxplot(p.data.POF$pred~p.data.POF$name, border=rep(c("grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"), 3), lwd=1, 
+#         names=c("Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
+#                 "Base_L","BH_L","Hih_L","lnR0_L","Loh_L","M_BH_L",
+#                 "Base_H","BH_H","Hih_H","lnR0_H","Loh_H","M_BH_H"), ylab="",xlab="OM * Imp Mod") 
 mtext("Prob Overfishing", side=2, outer=T, line=-0.7)
 #####
 dev.off()
@@ -1464,7 +1784,7 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\Trad
     pointsize=18,
     res=300)
 par(mfrow=c(1,1))
-plot(predict(SSBp, type='response') ~ exp(predict(TCp, type='response') + 0.5*summary(TC)$dispersion), col=as.numeric(as.factor(FD_C$FRQ)), pch=as.numeric(FD_C$name), xlab="Total US Commercial Catch",ylab=expression("SSB"["2015"]*" / SSB"["MSY"])) # COLOR CODE BY 
+plot(p.data.SSB$pred ~ p.data.TC$pred_BT, col=as.numeric(as.factor(p.data.TC$FRQ)), pch=as.numeric(as.factor(p.data.TC$name)), xlab="Total US Commercial Catch",ylab=expression("SSB"["2015"]*" / SSB"["MSY"])) # COLOR CODE BY 
 abline(h=1)
 legend("bottomright",c(
                        "Base_C","BH_C","Hih_C","lnR0_C","Loh_C","M_BH_C",
@@ -1481,49 +1801,52 @@ dev.off()
 
 
 
-## POF ### 
-predPOFa=summaryBy(pred~FRQ*Imp,data=p.data,FUN=mean)
-# "grey45","deepskyblue","olivedrab3","darkorchid","orange","salmon"
-# boxplot(p.data$pred~p.data$FRQ,  ylab="",xlab="Assessment Frequency", ylim=c(0,0.6))
-boxplot(predict(POF, type="response")~FD_C$FRQ,  ylab="",xlab="Assessment Frequency", ylim=c(0,0.6))
-# plot(pred.mean~FRQ, data=predPOF, type='b', lwd=2,  ylab="",xlab="Assessment Frequency", ylim=c(0,0.6))
-lines(p.data.POF[p.data.POF$Imp=="Concept",]$pred~c(1,2,3,4), type='b', col="grey45", lwd=2)
-lines(p.data.POF[p.data.POF$Imp=="LoMexRec",]$pred~c(1,2,3,4), type='b', col='blue', lwd=2)
-lines(p.data.POF[p.data.POF$Imp=="HiMexRec",]$pred~c(1,2,3,4), type='b', col='red', lwd=2)
-legend("top", c("Predicted","Concept","LoMexRec","HiMexRec"), col=c('black','grey45','blue','red'), bty='n', ncol=2, lwd=2)
 
 
 #### TRADEOFF PLOT W ERROR BARS ###
-SSB_pred = as.data.frame(cbind(FD_C, SSB = predict(SSB1, type='response')))
-TC_pred = as.data.frame(cbind(FD_C, TC = exp(predict(TC1, type='response') + 0.5*summary(TC)$dispersion) ))
+SSB_pred = p.data.SSB
+TC_pred = p.data.TC
 
 library(doBy)
-SSB_TO = as.data.frame(cbind(summaryBy(SSB~FRQ*Imp, data=SSB_pred, FUN=mean), SSB.sd=summaryBy(SSB~FRQ*Imp, data=SSB_pred, FUN=sd)[,3]))
+SSB_TO = as.data.frame(cbind(summaryBy(pred~FRQ*Imp, data=SSB_pred, FUN=mean), SSB.sd=summaryBy(pred~FRQ*Imp, data=SSB_pred, FUN=sd)[,3]))
 
-TC_TO = as.data.frame(cbind(summaryBy(TC~FRQ*Imp, data=TC_pred, FUN=mean), TC.sd = summaryBy(TC~FRQ*Imp, data=TC_pred, FUN=sd)[,3]))
+TC_TO = as.data.frame(cbind(summaryBy(pred_BT~FRQ*Imp, data=TC_pred, FUN=mean), TC.sd = summaryBy(pred_BT~FRQ*Imp, data=TC_pred, FUN=sd)[,3]))
 
 
 
 cols=c("black",'black','black','deepskyblue','deepskyblue','deepskyblue','darkolivegreen','darkolivegreen','darkolivegreen','purple','purple','purple')
 pchs=c(15, 16, 17,15, 16, 17,15, 16, 17,15, 16, 17)
 
-
-
-plot(SSB_TO$SSB.mean~TC_TO$TC.mean, col=cols,pch=pchs, ylab="", xlab="", ylim=c(0.25, 1.5), xlim=c(0, 20000), cex=2)
-arrows(x0=TC_TO$TC.mean, 
-         y0=SSB_TO$SSB.mean - SSB_TO$SSB.sd,
-         y1=SSB_TO$SSB.mean + SSB_TO$SSB.sd,
-         code=3, angle=90, length=0, col=cols, lwd=1.5)
-  arrows(y0=SSB_TO$SSB.mean, 
-         x0=TC_TO$TC.mean - TC_TO$TC.sd,
-         x1=TC_TO$TC.mean + TC_TO$TC.sd,
-         code=3, angle=90, length=0, col=cols, lwd=1.5)
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\Tradeoff_plot_Mean.png",
+    type="cairo",
+    units="mm",
+    width=200,
+    height=150,
+    pointsize=18,
+    res=300)
+#####
+par(mfrow=c(1,1))
+plot(SSB_TO$pred.mean~TC_TO$pred_BT.mean, col=cols,pch=pchs, ylab="", xlab="", ylim=c(0.25, 1.5), xlim=c(0, 20000), cex=2)
+arrows(x0=TC_TO$pred_BT.mean, 
+       y0=SSB_TO$pred.mean - SSB_TO$SSB.sd,
+       y1=SSB_TO$pred.mean + SSB_TO$SSB.sd,
+       code=3, angle=90, length=0, col=cols, lwd=1.5)
+arrows(y0=SSB_TO$pred.mean, 
+       x0=TC_TO$pred_BT.mean - TC_TO$TC.sd,
+       x1=TC_TO$pred_BT.mean + TC_TO$TC.sd,
+       code=3, angle=90, length=0, col=cols, lwd=1.5)
+points(SSB_TO$pred.mean~TC_TO$pred_BT.mean, col=cols,pch=pchs, cex=2)
 
 mtext("Tradeoff plot", side=3, line=0.25, cex=1.5)
 mtext(expression("SSB"["2015"]*"SSB"["MSY"]), side=2, line=1, cex=1)
 mtext("Total US Commercial Catch", side=1, line=1, cex=1)
 
 legend("bottomright",c("FRQ1","FRQ5","FRQ10","FRQ15","Concept","LoMexRec","HiMexRec"), col=c("black",'deepskyblue','darkolivegreen','purple', 'grey45', 'grey45', 'grey45'), pch=c(18, 18, 18, 18, 15, 16, 17), bty='n', ncol=2, pt.cex=1.5)
+
+#####
+dev.off()
+
+
 
 
 

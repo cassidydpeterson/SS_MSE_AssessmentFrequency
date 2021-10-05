@@ -13,328 +13,352 @@ library(vioplot)
 #### Build Results functions -----------------------------------------------------------------------------------------------------------
 ### NOTE: THIS IS A MODIFIED VARIANT OF SS_output from r4ss (Ian Taylor et al.https://github.com/r4ss/r4ss)
 SS_output_Report <-
-  function(dir="C:/myfiles/mymodels/myrun/", dir.mcmc=NULL,
-           repfile="Report.sso", #compfile="CompReport.sso",covarfile="covar.sso",
-           #forefile="Forecast-report.sso", wtfile="wtatage.ss_new",
-           #warnfile="warning.sso",
-           ncols=NULL, forecast=FALSE, warn=FALSE, covar=FALSE, readwt=FALSE,
-           checkcor=TRUE, cormax=0.95, cormin=0.01, printhighcor=10, printlowcor=10,
-           verbose=TRUE, printstats=TRUE,hidewarn=FALSE, NoCompOK=FALSE,
-           aalmaxbinrange=4)
-  {
+  function(dir = "C:/myfiles/mymodels/myrun/", dir.mcmc = NULL,
+           repfile = "Report.sso", # compfile="CompReport.sso",covarfile="covar.sso",
+           # forefile="Forecast-report.sso", wtfile="wtatage.ss_new",
+           # warnfile="warning.sso",
+           ncols = NULL, forecast = FALSE, warn = FALSE, covar = FALSE, readwt = FALSE,
+           checkcor = TRUE, cormax = 0.95, cormin = 0.01, printhighcor = 10, printlowcor = 10,
+           verbose = TRUE, printstats = TRUE, hidewarn = FALSE, NoCompOK = FALSE,
+           aalmaxbinrange = 4) {
     flush.console()
-    
+
     #################################################################################
     ## embedded functions: emptytest, matchfun and matchfun2
     #################################################################################
-    
-    emptytest <- function(x){
+
+    emptytest <- function(x) {
       # function to help test for empty columns
-      sum(!is.na(x) & x=="")/length(x)
+      sum(!is.na(x) & x == "") / length(x)
     }
-    
-    matchfun <- function(string, obj=rawrep[,1], substr1=TRUE)
-    {
+
+    matchfun <- function(string, obj = rawrep[, 1], substr1 = TRUE) {
       # return a line number from the report file (or other file)
       # substr1 controls whether to compare subsets or the whole line
-      match(string, if(substr1){substring(obj,1,nchar(string))}else{obj} )
+      match(string, if (substr1) {
+        substring(obj, 1, nchar(string))
+      } else {
+        obj
+      })
     }
-    
-    matchfun2 <- function(string1,adjust1,string2,adjust2,cols="nonblank",
-                          matchcol1=1,matchcol2=1,
-                          objmatch=rawrep,objsubset=rawrep,
-                          substr1=TRUE,substr2=TRUE,header=FALSE)
-    {
+
+    matchfun2 <- function(string1, adjust1, string2, adjust2, cols = "nonblank",
+                          matchcol1 = 1, matchcol2 = 1,
+                          objmatch = rawrep, objsubset = rawrep,
+                          substr1 = TRUE, substr2 = TRUE, header = FALSE) {
       # return a subset of values from the report file (or other file)
       # subset is defined by character strings at the start and end, with integer
       # adjustments of the number of lines to above/below the two strings
-      line1 <- match(string1,
-                     if(substr1){
-                       substring(objmatch[,matchcol1],1,nchar(string1))
-                     }else{
-                       objmatch[,matchcol1]
-                     })
-      line2 <- match(string2,
-                     if(substr2){
-                       substring(objmatch[,matchcol2],1,nchar(string2))
-                     }else{
-                       objmatch[,matchcol2]
-                     })
-      if(is.na(line1) | is.na(line2)) return("absent")
-      
-      if(is.numeric(cols))    out <- objsubset[(line1+adjust1):(line2+adjust2),cols]
-      if(cols[1]=="all")      out <- objsubset[(line1+adjust1):(line2+adjust2),]
-      if(cols[1]=="nonblank"){
-        # returns only columns that contain at least one non-empty value
-        out <- objsubset[(line1+adjust1):(line2+adjust2),]
-        out <- out[,apply(out,2,emptytest) < 1]
+      line1 <- match(
+        string1,
+        if (substr1) {
+          substring(objmatch[, matchcol1], 1, nchar(string1))
+        } else {
+          objmatch[, matchcol1]
+        }
+      )
+      line2 <- match(
+        string2,
+        if (substr2) {
+          substring(objmatch[, matchcol2], 1, nchar(string2))
+        } else {
+          objmatch[, matchcol2]
+        }
+      )
+      if (is.na(line1) | is.na(line2)) {
+        return("absent")
       }
-      if(header && nrow(out)>0){
-        out[1,out[1,]==""] <- "NoName"
-        names(out) <- out[1,]
-        out <- out[-1,]
+
+      if (is.numeric(cols)) out <- objsubset[(line1 + adjust1):(line2 + adjust2), cols]
+      if (cols[1] == "all") out <- objsubset[(line1 + adjust1):(line2 + adjust2), ]
+      if (cols[1] == "nonblank") {
+        # returns only columns that contain at least one non-empty value
+        out <- objsubset[(line1 + adjust1):(line2 + adjust2), ]
+        out <- out[, apply(out, 2, emptytest) < 1]
+      }
+      if (header && nrow(out) > 0) {
+        out[1, out[1, ] == ""] <- "NoName"
+        names(out) <- out[1, ]
+        out <- out[-1, ]
       }
       return(out)
     }
-    
-    df.rename <- function(df, oldnames, newnames){
+
+    df.rename <- function(df, oldnames, newnames) {
       # function to replace names in dataframes
       # added to clean up adaptation to more consistent
       # syntax in Report.sso as of SS version 3.30.01.15.
-      for(iname in 1:length(oldnames)){
-        names(df)[names(df)==oldnames[iname]] <- newnames[iname]
+      for (iname in 1:length(oldnames)) {
+        names(df)[names(df) == oldnames[iname]] <- newnames[iname]
       }
       return(df)
     }
-    
+
     get_ncol <- function(file) {
       numcol <- list("yes")
       initial <- 100
       while (!all(numcol[length(numcol)] == "")) {
         numcol <- utils::read.table(file,
-                                    col.names = 1:initial, fill = TRUE, quote = "",
-                                    colClasses = "character", nrows = -1, comment.char = "")
+          col.names = 1:initial, fill = TRUE, quote = "",
+          colClasses = "character", nrows = -1, comment.char = ""
+        )
         initial <- initial + 100
       }
       nummax <- max(which(
-        apply(numcol, 2, function(x) all(x == "")) == FALSE)) + 1
+        apply(numcol, 2, function(x) all(x == "")) == FALSE
+      )) + 1
       return(nummax)
     }
-    
+
     #####
-    
+
     # get info on output files created by Stock Synthesis
     shortrepfile <- repfile
-    repfile <- file.path(dir,repfile)
-    
-    
+    repfile <- file.path(dir, repfile)
+
+
     # read three rows to get start time and version number from rep file
-    rephead <- readLines(con=repfile,n=15)
-    
+    rephead <- readLines(con = repfile, n = 15)
+
     # warn if SS version used to create rep file is too old or too new for this code
     # note: SS_versionCode is new with V3.20
     # perhaps in the future we will use it to replace SS_versionshort throughout r4ss?
-    SS_versionCode <- rephead[grep("#V",rephead)]
-    SS_version <- rephead[grep("Stock_Synthesis",rephead)]
-    SS_version <- SS_version[substring(SS_version,1,2)!="#C"] # remove any version numbering in the comments
-    if(substring(SS_version,1,2)=="#V"){
-      SS_version <- substring(SS_version,3)
+    SS_versionCode <- rephead[grep("#V", rephead)]
+    SS_version <- rephead[grep("Stock_Synthesis", rephead)]
+    SS_version <- SS_version[substring(SS_version, 1, 2) != "#C"] # remove any version numbering in the comments
+    if (substring(SS_version, 1, 2) == "#V") {
+      SS_version <- substring(SS_version, 3)
     }
-    if(substring(SS_version,1,4)=="3.30"){
+    if (substring(SS_version, 1, 4) == "3.30") {
       SS_versionshort <- "3.30"
       SS_versionNumeric <- as.numeric(SS_versionshort)
     }
-    
-    
-    
-    findtime <- function(lines){
+
+
+
+    findtime <- function(lines) {
       # quick function to get model start time from SS output files
-      time <- strsplit(lines[grep("ime",lines)],"ime: ")[[1]]
-      if(length(time)<2) return() else return(time[2])
+      time <- strsplit(lines[grep("ime", lines)], "ime: ")[[1]]
+      if (length(time) < 2) {
+        return()
+      } else {
+        return(time[2])
+      }
     }
     # repfiletime <- findtime(rephead)
-    
-    
+
+
     ##############################
-    #read report file
+    # read report file
     ##############################
     # ncols <- get_ncol(repfile)
-    ncols <- 134 # to save time in my specific example. this step takes a long time ~ 10-12 seconds. 
-    rawrep <- read.table(file=repfile,col.names=1:ncols,fill=TRUE,quote="",
-                         colClasses="character",nrows=-1,comment.char="")
-    
-    
+    ncols <- 134 # to save time in my specific example. this step takes a long time ~ 10-12 seconds.
+    rawrep <- read.table(
+      file = repfile, col.names = 1:ncols, fill = TRUE, quote = "",
+      colClasses = "character", nrows = -1, comment.char = ""
+    )
+
+
     # Ian T.: if the read.table command above had "blank.lines.skip=TRUE" then blank lines could play a role in parsing the report file
-    
+
     # check empty columns
-    nonblanks <- apply(rawrep,2,emptytest) < 1
-    maxnonblank = max(0,(1:ncols)[nonblanks==TRUE])
-    if(maxnonblank==ncols){
-      stop("all columns are used and some data may been missed,\n",
-           "  increase 'ncols' input above current value (ncols=",ncols,")")
+    nonblanks <- apply(rawrep, 2, emptytest) < 1
+    maxnonblank <- max(0, (1:ncols)[nonblanks == TRUE])
+    if (maxnonblank == ncols) {
+      stop(
+        "all columns are used and some data may been missed,\n",
+        "  increase 'ncols' input above current value (ncols=", ncols, ")"
+      )
     }
     flush.console()
-    
+
     ###################
-    # SKIP FORECAST 
+    # SKIP FORECAST
     ####################
     # read forecast report file and get equilibrium yeild (for older versions)
     yielddat <- NA
     sprtarg <- -999
     btarg <- -999
     minbthresh <- -999
-    
+
     # get equilibrium yield for newer versions of SS (3.30),
     # which have SPR/YPR profile in Report.sso
-    yieldraw <- matchfun2("SPR/YPR_Profile",1,"Finish",-2)
+    yieldraw <- matchfun2("SPR/YPR_Profile", 1, "Finish", -2)
     # note: section with "Dynamic_Bzero" is missing before Hessian is run or skipped
-    
-    if(!is.na(yieldraw[[1]][1])){
-      names <- yieldraw[1,]
-      names[names=="SSB/Bzero"] <- "Depletion"
-      yielddat <- yieldraw[c(2:(as.numeric(length(yieldraw[,1])-1))),]
-      yielddat[yielddat=="-nan(ind)"] <- NA # this value sometimes occurs in 3.30 models
+
+    if (!is.na(yieldraw[[1]][1])) {
+      names <- yieldraw[1, ]
+      names[names == "SSB/Bzero"] <- "Depletion"
+      yielddat <- yieldraw[c(2:(as.numeric(length(yieldraw[, 1]) - 1))), ]
+      yielddat[yielddat == "-nan(ind)"] <- NA # this value sometimes occurs in 3.30 models
       names(yielddat) <- names
       yielddat <- type.convert(yielddat, as.is = TRUE)
-      yielddat <- yielddat[order(yielddat$Depletion,decreasing = FALSE),]
+      yielddat <- yielddat[order(yielddat$Depletion, decreasing = FALSE), ]
     }
-    
+
     flush.console()
-    
-    
+
+
     ######################
-    # temporary files 
+    # temporary files
     ######################
     # # check for use of temporary files
     logfile <- NA
     nwarn <- NA
-    
+
     #######################
     # Selectivity
     #######################
     # selectivity read first because it was used to get fleet info
     # this can be moved to join rest of selex stuff after SSv3.11 not supported any more
-    selex <- matchfun2("LEN_SELEX",6,"AGE_SELEX",-1,header=TRUE)
+    selex <- matchfun2("LEN_SELEX", 6, "AGE_SELEX", -1, header = TRUE)
     # update to naming convention associated with 3.30.01.15
     selex <- df.rename(selex,
-                       oldnames=c("fleet", "year", "seas", "gender", "morph", "label"),
-                       newnames=c("Fleet", "Yr", "Seas", "Sex", "Morph", "Label"))
+      oldnames = c("fleet", "year", "seas", "gender", "morph", "label"),
+      newnames = c("Fleet", "Yr", "Seas", "Sex", "Morph", "Label")
+    )
     selex <- type.convert(selex, as.is = TRUE)
-    
-    
+
+
     ############################
     ## DEFINITIONS section (new in SSv3.20)
     ###########################
-    rawdefs <- matchfun2("DEFINITIONS",1,"LIKELIHOOD",-1)
+    rawdefs <- matchfun2("DEFINITIONS", 1, "LIKELIHOOD", -1)
     # new format for definitions (starting with 3.30.12)
-    
-    get.def <- function(string){
+
+    get.def <- function(string) {
       # function to grab numeric value from 2nd column matching string in 1st column
       row <- grep(string, rawdefs$X1)[1]
-      if(length(row) > 0){
+      if (length(row) > 0) {
         return(as.numeric(rawdefs[row, 2]))
-      }else{
+      } else {
         return(NULL)
       }
     }
     # apply function above to get a bunch of things
     # in some cases, duplicate names are used for backward compatibility
-    N_seasons         <- nseasons       <- get.def("N_seasons")
-    N_sub_seasons                       <- get.def("N_sub_seasons")
-    Season_Durations  <- seasdurations  <- as.numeric(rawdefs[grep("Season_Durations",
-                                                                   rawdefs$X1),
-                                                              1+1:nseasons])
-    Spawn_month       <- spawnmonth     <- get.def("Spawn_month")
-    Spawn_seas        <- spawnseas      <- get.def("Spawn_seas")
-    Spawn_timing_in_season              <- get.def("Spawn_timing_in_season")
-    N_areas           <- nareas         <- get.def("N_areas")
-    Start_year        <- startyr        <- get.def("Start_year")
-    End_year          <- endyr          <- get.def("End_year")
-    Retro_year                          <- get.def("Retro_year")
-    N_forecast_yrs                      <- get.def("N_forecast_yrs")
-    N_sexes           <- nsexes         <- get.def("N_sexes")
-    Max_age           <- accuage        <- get.def("Max_age")
-    Empirical_wt_at_age                 <- get.def("Empirical_wt_at_age")
-    N_bio_patterns                      <- get.def("N_bio_patterns")
-    N_platoons                          <- get.def("N_platoons")
+    N_seasons <- nseasons <- get.def("N_seasons")
+    N_sub_seasons <- get.def("N_sub_seasons")
+    Season_Durations <- seasdurations <- as.numeric(rawdefs[
+      grep(
+        "Season_Durations",
+        rawdefs$X1
+      ),
+      1 + 1:nseasons
+    ])
+    Spawn_month <- spawnmonth <- get.def("Spawn_month")
+    Spawn_seas <- spawnseas <- get.def("Spawn_seas")
+    Spawn_timing_in_season <- get.def("Spawn_timing_in_season")
+    N_areas <- nareas <- get.def("N_areas")
+    Start_year <- startyr <- get.def("Start_year")
+    End_year <- endyr <- get.def("End_year")
+    Retro_year <- get.def("Retro_year")
+    N_forecast_yrs <- get.def("N_forecast_yrs")
+    N_sexes <- nsexes <- get.def("N_sexes")
+    Max_age <- accuage <- get.def("Max_age")
+    Empirical_wt_at_age <- get.def("Empirical_wt_at_age")
+    N_bio_patterns <- get.def("N_bio_patterns")
+    N_platoons <- get.def("N_platoons")
     # following quants added in 3.30.13
-    NatMort_option                      <- get.def("NatMort")
-    GrowthModel_option                  <- get.def("GrowthModel")
-    Maturity_option                     <- get.def("Maturity")
-    Fecundity_option                    <- get.def("Fecundity")
+    NatMort_option <- get.def("NatMort")
+    GrowthModel_option <- get.def("GrowthModel")
+    Maturity_option <- get.def("Maturity")
+    Fecundity_option <- get.def("Fecundity")
     # end quants added in 3.30.13
-    Start_from_par                      <- get.def("Start_from_par")
-    Do_all_priors                       <- get.def("Do_all_priors")
-    Use_softbound                       <- get.def("Use_softbound")
-    N_nudata                            <- get.def("N_nudata")
-    Max_phase                           <- get.def("Max_phase")
-    Current_phase                       <- get.def("Current_phase")
-    Jitter                              <- get.def("Jitter")
-    ALK_tolerance                       <- get.def("ALK_tolerance")
+    Start_from_par <- get.def("Start_from_par")
+    Do_all_priors <- get.def("Do_all_priors")
+    Use_softbound <- get.def("Use_softbound")
+    N_nudata <- get.def("N_nudata")
+    Max_phase <- get.def("Max_phase")
+    Current_phase <- get.def("Current_phase")
+    Jitter <- get.def("Jitter")
+    ALK_tolerance <- get.def("ALK_tolerance")
     # table starting with final occurrence of "Fleet" in column 1
-    fleetdefs <- rawdefs[tail(grep("Fleet", rawdefs$X1),1):nrow(rawdefs),]
-    names(fleetdefs) <- fleetdefs[1,] # set names equal to first row
-    fleetdefs <- fleetdefs[-1,] # remove first row
+    fleetdefs <- rawdefs[tail(grep("Fleet", rawdefs$X1), 1):nrow(rawdefs), ]
+    names(fleetdefs) <- fleetdefs[1, ] # set names equal to first row
+    fleetdefs <- fleetdefs[-1, ] # remove first row
     # remove any blank columns beyond Fleet_name
-    fleetdefs <- fleetdefs[,1:grep("fleet_name", tolower(names(fleetdefs)))]
+    fleetdefs <- fleetdefs[, 1:grep("fleet_name", tolower(names(fleetdefs)))]
     # make values numeric (other than Fleet_name)
     fleetdefs <- type.convert(fleetdefs, as.is = TRUE)
-    
+
     fleetdefs <- df.rename(fleetdefs,
-                           oldnames=c("fleet_name"),
-                           newnames=c("Fleet_name"))
+      oldnames = c("fleet_name"),
+      newnames = c("Fleet_name")
+    )
     # fleet_type definitions from TPL:
     # 1=fleet with catch; 2=discard only fleet with F;
     # 3=survey(ignore catch); 4=ignore completely
-    fleet_type   <- fleetdefs$fleet_type
+    fleet_type <- fleetdefs$fleet_type
     fleet_timing <- fleetdefs$timing
-    fleet_area   <- fleetdefs$area
-    catch_units  <- fleetdefs$catch_units
+    fleet_area <- fleetdefs$area
+    catch_units <- fleetdefs$catch_units
     ## equ_catch_se <- fleetdefs$equ_catch_se
     ## catch_se     <- fleetdefs$catch_se
     survey_units <- fleetdefs$survey_units
     survey_error <- fleetdefs$survey_error
-    fleet_ID     <- fleetdefs$Fleet
-    IsFishFleet  <- fleet_type <= 2 # based on definitions above
-    nfishfleets  <- sum(IsFishFleet)
-    FleetNames   <- fleetdefs$Fleet_name
+    fleet_ID <- fleetdefs$Fleet
+    IsFishFleet <- fleet_type <= 2 # based on definitions above
+    nfishfleets <- sum(IsFishFleet)
+    FleetNames <- fleetdefs$Fleet_name
     nfleets <- max(fleet_ID)
-    
+
     # process some season info
-    seasfracs <- round(12*cumsum(seasdurations))/12
-    seasfracs <- seasfracs - seasdurations/2 # should be mid-point of each season as a fraction of the year
-    
+    seasfracs <- round(12 * cumsum(seasdurations)) / 12
+    seasfracs <- seasfracs - seasdurations / 2 # should be mid-point of each season as a fraction of the year
+
     # end new DEFINITIONS format (starting with 3.30.12)
-    
-    
+
+
     ###################
     # CPUE
     ###################
     # which column of INDEX_1 has number of CPUE values (used in reading INDEX_2)
-    
+
     ncpue_column <- 11
-    INDEX_1 <- matchfun2("INDEX_1",1,"INDEX_3",-4, header=TRUE)
+    INDEX_1 <- matchfun2("INDEX_1", 1, "INDEX_3", -4, header = TRUE)
     # remove any comments at the bottom of table
-    INDEX_1 <- INDEX_1[substr(INDEX_1$Fleet, 1, 1) != "#",]
+    INDEX_1 <- INDEX_1[substr(INDEX_1$Fleet, 1, 1) != "#", ]
     # count of observations per index
-    ncpue <- sum(as.numeric(INDEX_1$N), na.rm=TRUE)
-    
-    
+    ncpue <- sum(as.numeric(INDEX_1$N), na.rm = TRUE)
+
+
     #################
     # Compositions
     #################
-    
+
     lbins <- NA
     nlbins <- NA
     #### need to get length bins from somewhere
-    temp <- rawrep[grep("NUMBERS_AT_LENGTH",rawrep[,1])+1,]
-    lbinspop <- as.numeric(temp[temp!=""][-(1:12)])
+    temp <- rawrep[grep("NUMBERS_AT_LENGTH", rawrep[, 1]) + 1, ]
+    lbinspop <- as.numeric(temp[temp != ""][-(1:12)])
     nlbinspop <- length(lbinspop)
     agebins <- NA
     nagebins <- NA
     Lbin_method <- 2
     sizebinlist <- NA
-    
+
     # info on growth morphs (see also section setting mainmorphs below)
-    endcode <- "SIZEFREQ_TRANSLATION" #(this section heading not present in all models)
-    #if(SS_versionshort=="SS-V3.11") shift <- -1 else shift <- -2
+    endcode <- "SIZEFREQ_TRANSLATION" # (this section heading not present in all models)
+    # if(SS_versionshort=="SS-V3.11") shift <- -1 else shift <- -2
     # shift <- -1
-    if(is.na(matchfun(endcode))){
+    if (is.na(matchfun(endcode))) {
       endcode <- "MOVEMENT"
       shift <- -2
     }
-    morph_indexing <- matchfun2("MORPH_INDEXING",1,endcode,shift,cols=1:9,header=TRUE)
+    morph_indexing <- matchfun2("MORPH_INDEXING", 1, endcode, shift, cols = 1:9, header = TRUE)
     morph_indexing <- type.convert(morph_indexing, as.is = TRUE)
     morph_indexing <- df.rename(morph_indexing,
-                                oldnames=c("Gpattern", "Bseas", "Gender"),
-                                newnames=c("GP", "BirthSeas", "Sex"))
+      oldnames = c("Gpattern", "Bseas", "Gender"),
+      newnames = c("GP", "BirthSeas", "Sex")
+    )
     ngpatterns <- max(morph_indexing$GP)
-    
+
     #################
     # Forecast
     #################
     nforecastyears <- NA
-    
+
     #######################
     # Stats List
     #######################
@@ -343,144 +367,153 @@ SS_output_Report <-
     stats$SS_version <- SS_version
     stats$SS_versionshort <- SS_versionshort
     stats$SS_versionNumeric <- SS_versionNumeric
-    
-    stats$StartTime <- paste(as.character(matchfun2("StartTime",0,"StartTime",0,cols=1:6)),collapse=" ")
-    stats$RunTime <- paste(as.character(matchfun2("StartTime",2,"StartTime",2,cols=4:9)),collapse=" ")
-    
+
+    stats$StartTime <- paste(as.character(matchfun2("StartTime", 0, "StartTime", 0, cols = 1:6)), collapse = " ")
+    stats$RunTime <- paste(as.character(matchfun2("StartTime", 2, "StartTime", 2, cols = 4:9)), collapse = " ")
+
     # data return object to fill in various things
     returndat <- list()
-    
-    
-    
+
+
+
     # likelihoods
-    rawlike <- matchfun2("LIKELIHOOD",2,"Fleet:",-2)
+    rawlike <- matchfun2("LIKELIHOOD", 2, "Fleet:", -2)
     # check for new section added in SS version 3.30.13.04 (2019-05-31)
-    laplace_line <- which(rawlike[,1] == "#_info_for_Laplace_calculations")
-    if(length(laplace_line) > 0){
-      rawlike <- rawlike[-laplace_line,]
+    laplace_line <- which(rawlike[, 1] == "#_info_for_Laplace_calculations")
+    if (length(laplace_line) > 0) {
+      rawlike <- rawlike[-laplace_line, ]
     }
     # make numeric, clean up blank values
-    like <- data.frame(signif(as.numeric(rawlike[,2]),digits=7))
+    like <- data.frame(signif(as.numeric(rawlike[, 2]), digits = 7))
     names(like) <- "values"
-    rownames(like) <- rawlike[,1]
-    lambdas <- rawlike[,3]
-    lambdas[lambdas==""] <- NA
+    rownames(like) <- rawlike[, 1]
+    lambdas <- rawlike[, 3]
+    lambdas[lambdas == ""] <- NA
     lambdas <- as.numeric(lambdas)
     like$lambdas <- lambdas
     # separate new section added in SS version 3.30.13.04 (2019-05-31)
-    if(length(laplace_line) > 0){
-      stats$likelihoods_used <- like[1:(laplace_line - 1),]
-      stats$likelihoods_laplace <- like[laplace_line:nrow(like),]
-    }else{
+    if (length(laplace_line) > 0) {
+      stats$likelihoods_used <- like[1:(laplace_line - 1), ]
+      stats$likelihoods_laplace <- like[laplace_line:nrow(like), ]
+    } else {
       stats$likelihoods_used <- like
       stats$likelihoods_laplace <- NULL
     }
-    
+
     # read fleet-specific likelihoods
     likelihoods_by_fleet <-
-      matchfun2("Fleet:",0,"Input_Variance_Adjustment",-1,header=TRUE)
+      matchfun2("Fleet:", 0, "Input_Variance_Adjustment", -1, header = TRUE)
     Parm_devs_detail <- NA
     # read detail on parameters devs (if present, 3.30 only)
-    if(length(grep("Parm_devs_detail", likelihoods_by_fleet[,1]))>0){
+    if (length(grep("Parm_devs_detail", likelihoods_by_fleet[, 1])) > 0) {
       likelihoods_by_fleet <-
-        matchfun2("Fleet:",0,"Parm_devs_detail",-1,header=TRUE)
+        matchfun2("Fleet:", 0, "Parm_devs_detail", -1, header = TRUE)
       Parm_devs_detail <-
-        matchfun2("Parm_devs_detail",1,"Input_Variance_Adjustment",-1,header=TRUE)
+        matchfun2("Parm_devs_detail", 1, "Input_Variance_Adjustment", -1, header = TRUE)
     }
-    
-    
-    
+
+
+
     # clean up fleet-specific likelihoods
-    likelihoods_by_fleet[likelihoods_by_fleet=="_"] <- NA
+    likelihoods_by_fleet[likelihoods_by_fleet == "_"] <- NA
     likelihoods_by_fleet <- type.convert(likelihoods_by_fleet, as.is = TRUE)
-    
+
     # replace numeric column names with fleet names
-    names(likelihoods_by_fleet) <- c("Label","ALL",FleetNames)
+    names(likelihoods_by_fleet) <- c("Label", "ALL", FleetNames)
     labs <- likelihoods_by_fleet$Label
-    
+
     # removing ":" at the end of likelihood components
-    for(irow in 1:length(labs)) labs[irow] <- substr(labs[irow],1,nchar(labs[irow])-1)
+    for (irow in 1:length(labs)) labs[irow] <- substr(labs[irow], 1, nchar(labs[irow]) - 1)
     likelihoods_by_fleet$Label <- labs
-    
+
     stats$likelihoods_by_fleet <- likelihoods_by_fleet
     stats$Parm_devs_detail <- Parm_devs_detail
-    
+
     ##############
     # parameters
     #############
     shift <- -1
-    parameters <- matchfun2("PARAMETERS",1,"DERIVED_QUANTITIES",shift,header=TRUE)
-    
-    
-    temp <- tail(parameters,2)[,1:3]
-    parameters <- parameters[1:(nrow(parameters)-2),]
-    
+    parameters <- matchfun2("PARAMETERS", 1, "DERIVED_QUANTITIES", shift, header = TRUE)
+
+
+    temp <- tail(parameters, 2)[, 1:3]
+    parameters <- parameters[1:(nrow(parameters) - 2), ]
+
     parameters <- df.rename(parameters,
-                            oldnames=c("PR_type","Prior_Like"),
-                            newnames=c("Pr_type","Pr_Like"))
-    parameters[parameters=="_"] <- NA
-    parameters[parameters==" "] <- NA
-    parameters[parameters=="1.#INF"] <- Inf # set infinite values equal to R's infinity
-    
+      oldnames = c("PR_type", "Prior_Like"),
+      newnames = c("Pr_type", "Pr_Like")
+    )
+    parameters[parameters == "_"] <- NA
+    parameters[parameters == " "] <- NA
+    parameters[parameters == "1.#INF"] <- Inf # set infinite values equal to R's infinity
+
     # make values numeric
     parameters <- type.convert(parameters, as.is = TRUE)
-    
-    
+
+
     # fix for duplicate parameter labels in 3.30.03.03,
     # not robust to more than 2 growth patterns but probably will be fixed soon
     ParmLabels <- parameters$Label
     # ParmLabels[duplicated(ParmLabels)] <- paste0(ParmLabels[duplicated(ParmLabels)], "_2")
     # end fix
     rownames(parameters) <- ParmLabels
-    
+
     # names of active parameters
     activepars <- parameters$Label[!is.na(parameters$Active_Cnt)]
-    
+
     # if(!is.na(parfile)){
     #   parline <- read.table(parfile,fill=TRUE,comment.char="",nrows=1)
     # }else{
-    parline <- matrix(NA,1,16)
+    parline <- matrix(NA, 1, 16)
     # }
-    stats$N_estimated_parameters <- parline[1,6]
-    
+    stats$N_estimated_parameters <- parline[1, 6]
+
     # subset to active parameters only
-    pars <- parameters[!is.na(parameters$Active_Cnt),]
-    
-    if(nrow(pars)>0){
+    pars <- parameters[!is.na(parameters$Active_Cnt), ]
+
+    if (nrow(pars) > 0) {
       pars$Afterbound <- ""
       pars$checkdiff <- pars$Value - pars$Min
       pars$checkdiff2 <- pars$Max - pars$Value
-      pars$checkdiff3 <- abs(pars$Value-(pars$Max-(pars$Max-pars$Min)/2))
+      pars$checkdiff3 <- abs(pars$Value - (pars$Max - (pars$Max - pars$Min) / 2))
       pars$Afterbound[pars$checkdiff < 0.001 | pars$checkdiff2 < 0.001 | pars$checkdiff2 < 0.001] <- "CHECK"
       pars$Afterbound[!pars$Afterbound %in% "CHECK"] <- "OK"
     }
     stats$table_of_phases <- table(parameters$Phase)
     # subset columns for printed table of estimated parameters
-    estimated_non_dev_parameters <- pars[,names(pars) %in%
-                                           c("Value", "Phase", "Min", "Max", "Init", "Prior", "Gradient", "Pr_type",
-                                             "Pr_SD", "Pr_Like", "Parm_StDev", "Status", "Afterbound")]
+    estimated_non_dev_parameters <- pars[, names(pars) %in%
+      c(
+        "Value", "Phase", "Min", "Max", "Init", "Prior", "Gradient", "Pr_type",
+        "Pr_SD", "Pr_Like", "Parm_StDev", "Status", "Afterbound"
+      )]
     # exclude parameters that represent recdevs or other deviations
-    devnames <- c("RecrDev", "InitAge", "ForeRecr",
-                  "DEVadd", "DEVmult", "DEVrwalk", "DEV_MR_rwalk", "ARDEV")
+    devnames <- c(
+      "RecrDev", "InitAge", "ForeRecr",
+      "DEVadd", "DEVmult", "DEVrwalk", "DEV_MR_rwalk", "ARDEV"
+    )
     # look for rows in table of parameters that have label indicating deviation
     devrows <- NULL
-    for(iname in 1:length(devnames)){
-      devrows <- unique(c(devrows, grep(devnames[iname],
-                                        rownames(estimated_non_dev_parameters))))
+    for (iname in 1:length(devnames)) {
+      devrows <- unique(c(devrows, grep(
+        devnames[iname],
+        rownames(estimated_non_dev_parameters)
+      )))
     }
-    
+
     # add table to stats that get printed in console
     stats$estimated_non_dev_parameters <- estimated_non_dev_parameters
-    
+
     # Semi-parametric (2D-AR1) selectivity parameters
-    seldev_pars <- parameters[grep("ARDEV", parameters$Label, fixed=TRUE),
-                              names(parameters) %in% c("Label", "Value")]
-    
+    seldev_pars <- parameters[
+      grep("ARDEV", parameters$Label, fixed = TRUE),
+      names(parameters) %in% c("Label", "Value")
+    ]
+
     # if semi-parametric selectivity IS NOT used
     seldev_pars <- NULL
     seldev_matrix <- NULL
-    
-    
+
+
     # # Dirichlet-Multinomial parameters
     # # (new option for comp likelihood that uses these parameters for automated
     # #  data weighting)
@@ -491,32 +524,33 @@ SS_output_Report <-
     # # if D-M parameters are present, then do some extra processing steps
     # age_data_info <- NULL
     # len_data_info <- NULL
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     # # read weight-at-age file
     wtatage <- NULL
-    
+
     # # read MCMC output
     mcmc <- NULL
-    
-    
+
+
     #####################
     # derived quantities
     #####################
-    der <- matchfun2("DERIVED_QUANTITIES",4,"MGparm_By_Year_after_adjustments",-1,
-                     header=TRUE)
+    der <- matchfun2("DERIVED_QUANTITIES", 4, "MGparm_By_Year_after_adjustments", -1,
+      header = TRUE
+    )
     # make older SS output names match current SS output conventions
-    der <- df.rename(der, oldnames="LABEL", newnames="Label")
-    
-    der <- der[der$Label!="Bzero_again",]
-    der[der=="_"] <- NA
-    der[der==""] <- NA
-    
+    der <- df.rename(der, oldnames = "LABEL", newnames = "Label")
+
+    der <- der[der$Label != "Bzero_again", ]
+    der[der == "_"] <- NA
+    der[der == ""] <- NA
+
     # remove bad rows that may go away in future versions of SS 3.30
     test <- grep("Parm_dev_details", der$Label)
     # if(length(test)>0){
@@ -524,54 +558,60 @@ SS_output_Report <-
     # }
     # convert columns to numeric
     der <- type.convert(der, as.is = TRUE)
-    
+
     # replace SPB with SSB as changed in SS version 3.30.10.00 (29 Nov. 2017)
-    der$Label <- gsub("SPB_", "SSB_", der$Label, fixed=TRUE)
+    der$Label <- gsub("SPB_", "SSB_", der$Label, fixed = TRUE)
     # set rownames equal to Label column
     # (skipping any duplicates, such as ln(SPB)_YYYY for models with limited year range)
     rownames(der)[!duplicated(der$Label)] <- der$Label[!duplicated(der$Label)]
-    
-    managementratiolabels <- matchfun2("DERIVED_QUANTITIES",1,"DERIVED_QUANTITIES",3,cols=1:2)
-    names(managementratiolabels) <- c("Ratio","Label")
-    
+
+    managementratiolabels <- matchfun2("DERIVED_QUANTITIES", 1, "DERIVED_QUANTITIES", 3, cols = 1:2)
+    names(managementratiolabels) <- c("Ratio", "Label")
+
     # new message about how forecast selectivity is modeled added in 3.30.06
     # (has impact on read of time-varying parameters below)
-    forecast_selectivity <- grep("forecast_selectivity", rawrep[,1], value=TRUE)
+    forecast_selectivity <- grep("forecast_selectivity", rawrep[, 1], value = TRUE)
     # if(length(forecast_selectivity)==0){
     #   forecast_selectivity <- NA
     #   offset <- -1
     # }else{
     offset <- -2
     # }
-    
+
     ###########################
     # time-varying parameters
     ###########################
-    MGparmAdj <- matchfun2("MGparm_By_Year_after_adjustments",1,
-                           "selparm(Size)_By_Year_after_adjustments",
-                           offset, header=TRUE)
+    MGparmAdj <- matchfun2("MGparm_By_Year_after_adjustments", 1,
+      "selparm(Size)_By_Year_after_adjustments",
+      offset,
+      header = TRUE
+    )
     # make older SS output names match current SS output conventions
-    MGparmAdj <- df.rename(MGparmAdj, oldnames="Year", newnames="Yr")
+    MGparmAdj <- df.rename(MGparmAdj, oldnames = "Year", newnames = "Yr")
     # make values numeric
     # if(nrow(MGparmAdj)>0){
     MGparmAdj <- type.convert(MGparmAdj, as.is = TRUE)
     # }else{
     #   MGparmAdj <- NA
     # }
-    
+
     # time-varying size-selectivity parameters
-    SelSizeAdj <- matchfun2("selparm(Size)_By_Year_after_adjustments",2,
-                            "selparm(Age)_By_Year_after_adjustments",-1)
+    SelSizeAdj <- matchfun2(
+      "selparm(Size)_By_Year_after_adjustments", 2,
+      "selparm(Age)_By_Year_after_adjustments", -1
+    )
     # if(nrow(SelSizeAdj)>2){
-    SelSizeAdj <- SelSizeAdj[,apply(SelSizeAdj,2,emptytest)<1]
-    SelSizeAdj[SelSizeAdj==""] <- NA
+    SelSizeAdj <- SelSizeAdj[, apply(SelSizeAdj, 2, emptytest) < 1]
+    SelSizeAdj[SelSizeAdj == ""] <- NA
     # make values numeric
     SelSizeAdj <- type.convert(SelSizeAdj, as.is = TRUE)
-    
+
     # provide rownames (after testing for extra column added in 3.30.06.02)
     # if(rawrep[matchfun("selparm(Size)_By_Year_after_adjustments")+1, 3] == "Change?"){
-    names(SelSizeAdj) <- c("Fleet","Yr","Change?",
-                           paste("Par",1:(ncol(SelSizeAdj)-3),sep=""))
+    names(SelSizeAdj) <- c(
+      "Fleet", "Yr", "Change?",
+      paste("Par", 1:(ncol(SelSizeAdj) - 3), sep = "")
+    )
     # }else{
     #   names(SelSizeAdj) <- c("Fleet","Yr",
     #                          paste("Par",1:(ncol(SelSizeAdj)-2),sep=""))
@@ -579,68 +619,68 @@ SS_output_Report <-
     # }else{
     #   SelSizeAdj <- NA
     # }
-    
+
     # time-varying age-selectivity parameters
-    SelAgeAdj <- matchfun2("selparm(Age)_By_Year_after_adjustments",2,"RECRUITMENT_DIST",-1)
-    
+    SelAgeAdj <- matchfun2("selparm(Age)_By_Year_after_adjustments", 2, "RECRUITMENT_DIST", -1)
+
     SelAgeAdj <- NA
-    
-    
+
+
     ########## recruitment distribution ################
-    recruitment_dist <- matchfun2("RECRUITMENT_DIST",1,"MORPH_INDEXING",-1,header=TRUE)
+    recruitment_dist <- matchfun2("RECRUITMENT_DIST", 1, "MORPH_INDEXING", -1, header = TRUE)
     # models prior to SSv3.24Q have no additional outputs
-    
+
     # names were changed in SSv3.30
     # if(length(grep("RECRUITMENT_DIST_Bmark",recruitment_dist[,1]))>0){
-    recruitment_dist <- matchfun2("RECRUITMENT_DIST",0,"MORPH_INDEXING",-1,header=FALSE)
+    recruitment_dist <- matchfun2("RECRUITMENT_DIST", 0, "MORPH_INDEXING", -1, header = FALSE)
     # start empty list
     rd <- list()
     # find break points in table
-    rd.line.top   <- 1
-    rd.line.Bmark <- grep("RECRUITMENT_DIST_Bmark", recruitment_dist[,1])
-    rd.line.endyr <- grep("RECRUITMENT_DIST_endyr", recruitment_dist[,1])
-    rd.line.end   <- nrow(recruitment_dist)
+    rd.line.top <- 1
+    rd.line.Bmark <- grep("RECRUITMENT_DIST_Bmark", recruitment_dist[, 1])
+    rd.line.endyr <- grep("RECRUITMENT_DIST_endyr", recruitment_dist[, 1])
+    rd.line.end <- nrow(recruitment_dist)
     # split apart table
-    rd$recruit_dist       <- recruitment_dist[(rd.line.top+1):(rd.line.Bmark-1),]
-    rd$recruit_dist_Bmark <- recruitment_dist[(rd.line.Bmark+1):(rd.line.endyr-1),]
-    rd$recruit_dist_endyr <- recruitment_dist[(rd.line.endyr+1):(rd.line.end),]
-    #}
-    
-    for(i in 1:length(rd)){
+    rd$recruit_dist <- recruitment_dist[(rd.line.top + 1):(rd.line.Bmark - 1), ]
+    rd$recruit_dist_Bmark <- recruitment_dist[(rd.line.Bmark + 1):(rd.line.endyr - 1), ]
+    rd$recruit_dist_endyr <- recruitment_dist[(rd.line.endyr + 1):(rd.line.end), ]
+    # }
+
+    for (i in 1:length(rd)) {
       # convert first row to header
       tmp <- rd[[i]]
-      names(tmp) <- tmp[1,]
-      tmp <- type.convert(tmp[-1,], as.is = TRUE)
+      names(tmp) <- tmp[1, ]
+      tmp <- type.convert(tmp[-1, ], as.is = TRUE)
       rd[[i]] <- tmp
     }
     # provide as same name
     recruitment_dist <- rd
     # }
-    
+
     ######### gradient ###############
     # if(covar & !is.na(corfile)){
     #   stats$log_det_hessian <- read.table(corfile,nrows=1)[1,10]
     # }
     stats$maximum_gradient_component <-
-      as.numeric(matchfun2("Convergence_Level",0,"Convergence_Level",0,cols=2))
-    
-    
-    
+      as.numeric(matchfun2("Convergence_Level", 0, "Convergence_Level", 0, cols = 2))
+
+
+
     # sigma_R
-    
+
     last_row_index <- 11
-    
-    
-    srhead <- matchfun2("SPAWN_RECRUIT",0,"SPAWN_RECRUIT",last_row_index,cols=1:6)
-    rmse_table <- as.data.frame(srhead[-(1:(last_row_index-1)),1:5])
+
+
+    srhead <- matchfun2("SPAWN_RECRUIT", 0, "SPAWN_RECRUIT", last_row_index, cols = 1:6)
+    rmse_table <- as.data.frame(srhead[-(1:(last_row_index - 1)), 1:5])
     rmse_table <- rmse_table[!grepl("SpawnBio", rmse_table[, 2]), ]
     rmse_table <- type.convert(rmse_table, as.is = TRUE)
-    names(rmse_table) <- srhead[last_row_index-1,1:5]
+    names(rmse_table) <- srhead[last_row_index - 1, 1:5]
     names(rmse_table)[4] <- "RMSE_over_sigmaR"
-    sigma_R_in <- as.numeric(srhead[last_row_index-6,1])
+    sigma_R_in <- as.numeric(srhead[last_row_index - 6, 1])
     rmse_table <- rmse_table
     row.names(rmse_table) <- NULL
-    
+
     ############# Bias adjustment ramp ################ --------------------------------------------------------------- REMOVE
     # biascol <- grep("breakpoints_for_bias", srhead)
     # breakpoints_for_bias_adjustment_ramp <- srhead[
@@ -649,18 +689,18 @@ SS_output_Report <-
     #                                                     "first_yr_full", "last_yr_full", "first_yr_recent", "max_bias_adj")
     # rownames(breakpoints_for_bias_adjustment_ramp) <- NULL
     # -------------------------------------------------------------------------------------------------------------------------- END REMOVE
-    
+
     ############## Spawner-recruit curve #####################
     # read SPAWN_RECRUIT table
-    raw_recruit <- matchfun2("SPAWN_RECRUIT", last_row_index+1, "INDEX_2", -1)
-    
-    
+    raw_recruit <- matchfun2("SPAWN_RECRUIT", last_row_index + 1, "INDEX_2", -1)
+
+
     # starting in 3.30.11.00, a new section with the full spawn recr curve was added
-    spawn_recruit_end <- grep("Full_Spawn_Recr_Curve", raw_recruit[,1])
+    spawn_recruit_end <- grep("Full_Spawn_Recr_Curve", raw_recruit[, 1])
     # if(length(spawn_recruit_end) > 0){
     # split the two pieces into separate tables
-    Full_Spawn_Recr_Curve <- raw_recruit[(spawn_recruit_end+1):nrow(raw_recruit), 1:2]
-    raw_recruit <- raw_recruit[1:(spawn_recruit_end-2),]
+    Full_Spawn_Recr_Curve <- raw_recruit[(spawn_recruit_end + 1):nrow(raw_recruit), 1:2]
+    raw_recruit <- raw_recruit[1:(spawn_recruit_end - 2), ]
     # make numeric
     names(Full_Spawn_Recr_Curve) <- Full_Spawn_Recr_Curve[1, ]
     Full_Spawn_Recr_Curve <- Full_Spawn_Recr_Curve[-1, ]
@@ -668,192 +708,197 @@ SS_output_Report <-
     # }else{
     #   Full_Spawn_Recr_Curve <- NULL
     # }
-    
+
     # process SPAWN_RECRUIT table
-    names(raw_recruit) <- raw_recruit[1,]
-    raw_recruit[raw_recruit=="_"] <- NA
-    raw_recruit <- raw_recruit[-(1:2),] # remove header rows
-    recruit <- raw_recruit[-(1:2),] # remove rows for Virg and Init
+    names(raw_recruit) <- raw_recruit[1, ]
+    raw_recruit[raw_recruit == "_"] <- NA
+    raw_recruit <- raw_recruit[-(1:2), ] # remove header rows
+    recruit <- raw_recruit[-(1:2), ] # remove rows for Virg and Init
     # temporary change for model that has bad values in dev column
-    recruit$dev[recruit$dev=="-nan(ind)"] <- NA
-    
+    recruit$dev[recruit$dev == "-nan(ind)"] <- NA
+
     # make values numeric
     recruit <- type.convert(recruit, as.is = TRUE)
-    
+
     # make older SS output names match current SS output conventions
     recruit <- df.rename(recruit,
-                         oldnames=c("year", "spawn_bio", "adjusted"),
-                         newnames=c("Yr", "SpawnBio", "bias_adjusted"))
-    
+      oldnames = c("year", "spawn_bio", "adjusted"),
+      newnames = c("Yr", "SpawnBio", "bias_adjusted")
+    )
+
     ## variance and sample size tuning information
-    vartune <- matchfun2("INDEX_1", 1, "INDEX_1", (nfleets+1), header=TRUE)
+    vartune <- matchfun2("INDEX_1", 1, "INDEX_1", (nfleets + 1), header = TRUE)
     # fill in column name that was missing in SS 3.24 (and perhaps other versions)
     # and replace inconsistent name in some 3.30 versions with standard name
     vartune <- df.rename(vartune,
-                         oldnames=c("NoName", "fleetname"),
-                         newnames=c("Name", "Name"))
-    
+      oldnames = c("NoName", "fleetname"),
+      newnames = c("Name", "Name")
+    )
+
     ############# FIT_LEN_COMPS #######################
     # if(SS_versionNumeric >= 3.3){
     # This section hasn't been read by SS_output in the past,
     # not bother adding to models prior to 3.30
-    fit_len_comps <- matchfun2("FIT_LEN_COMPS",1,"Length_Comp_Fit_Summary",-1,
-                               header=TRUE)
+    fit_len_comps <- matchfun2("FIT_LEN_COMPS", 1, "Length_Comp_Fit_Summary", -1,
+      header = TRUE
+    )
     # }else{
     #   fit_len_comps <- NULL
     # }
     # if(!is.null(dim(fit_len_comps)) && nrow(fit_len_comps)>0){
     # replace underscores with NA
-    fit_len_comps[fit_len_comps=="_"] <- NA
+    fit_len_comps[fit_len_comps == "_"] <- NA
     # make columns numeric (except "Used", which may contain "skip")
     fit_len_comps <- type.convert(fit_len_comps, as.is = TRUE)
     # }else{
     #   fit_len_comps <- NULL
     # }
-    
+
     # Length comp effective N tuning check
-    
-    lenntune <- matchfun2("Length_Comp_Fit_Summary",1,"FIT_AGE_COMPS",-1,header=TRUE)
+
+    lenntune <- matchfun2("Length_Comp_Fit_Summary", 1, "FIT_AGE_COMPS", -1, header = TRUE)
     lenntune <- df.rename(lenntune,
-                          oldnames=c("FleetName"),
-                          newnames=c("Fleet_name"))
-    
+      oldnames = c("FleetName"),
+      newnames = c("Fleet_name")
+    )
+
     # if("Factor" %in% names(lenntune)){
     # format starting with 3.30.12 doesn't need adjustment, just convert to numeric
     lenntune <- type.convert(lenntune, as.is = TRUE)
-    
+
     stats$Length_Comp_Fit_Summary <- lenntune
-    
+
     ############### FIT_AGE_COMPS ################### ----------------------------------------------------------------------- REMOVE
-    
+
     # fit_age_comps <- matchfun2("FIT_AGE_COMPS",1,"Age_Comp_Fit_Summary",-1,
     #                            header=TRUE)
-    
+
     fit_age_comps <- NULL
-    
-    
+
+
     # # Age comp effective N tuning check
-    # 
+    #
     #   agentune <- matchfun2("Age_Comp_Fit_Summary",1,"FIT_SIZE_COMPS",-1,
     #                         header=TRUE)
     # agentune <- df.rename(agentune,
     #                       oldnames=c("FleetName"),
     #                       newnames=c("Fleet_name"))
-    # 
-    # 
+    #
+    #
     #   # format starting with 3.30.12 doesn't need adjustment, just convert to numeric
     #   agentune <- type.convert(agentune, as.is = TRUE)
-    # 
+    #
     # stats$Age_Comp_Fit_Summary <- agentune
-    
+
     ################## FIT_SIZE_COMPS ######################################
     fit_size_comps <- NULL
-    
-    fit_size_comps <- matchfun2("FIT_SIZE_COMPS",1,"OVERALL_COMPS",-1,
-                                header=FALSE)
-    
+
+    fit_size_comps <- matchfun2("FIT_SIZE_COMPS", 1, "OVERALL_COMPS", -1,
+      header = FALSE
+    )
+
     sizentune <- NULL
-    
+
     stats$Size_comp_Eff_N_tuning_check <- sizentune
     # ---------------------------------------------------------------------------------------------------------------------- END REMOVE
-    
-    
+
+
     flush.console()
-    
+
     # add stuff to list to return
-    
-    returndat$definitions  <- fleetdefs
-    returndat$fleet_ID     <- fleet_ID
-    returndat$fleet_type   <- fleet_type
+
+    returndat$definitions <- fleetdefs
+    returndat$fleet_ID <- fleet_ID
+    returndat$fleet_type <- fleet_type
     returndat$fleet_timing <- fleet_timing
-    returndat$fleet_area   <- fleet_area
-    returndat$catch_units  <- catch_units
+    returndat$fleet_area <- fleet_area
+    returndat$catch_units <- catch_units
     # if(exists("catch_se")){
     #   returndat$catch_se     <- catch_se
     #   returndat$equ_catch_se <- equ_catch_se
     # }else{
-    returndat$catch_se     <- NA
+    returndat$catch_se <- NA
     returndat$equ_catch_se <- NA
     # }
-    
-    
+
+
     ################################ simple function to return additional things from the DEFINITIONS ######################################
     # section that were added with SS version 3.30.12
-    return.def <- function(x){
-      if(exists(x)){
+    return.def <- function(x) {
+      if (exists(x)) {
         get(x)
-      }else{
+      } else {
         NULL
       }
     }
-    
-    returndat$mcmc         <- mcmc
+
+    returndat$mcmc <- mcmc
     returndat$survey_units <- survey_units
     returndat$survey_error <- survey_error
     returndat$index_variance_tuning_check <- vartune
-    returndat$IsFishFleet  <- IsFishFleet
-    returndat$nfishfleets  <- nfishfleets
-    
-    returndat$nfleets     <- nfleets
-    returndat$nsexes      <- nsexes
+    returndat$IsFishFleet <- IsFishFleet
+    returndat$nfishfleets <- nfishfleets
+
+    returndat$nfleets <- nfleets
+    returndat$nsexes <- nsexes
     # returndat$ngpatterns  <- ngpatterns
-    returndat$lbins       <- lbins
+    returndat$lbins <- lbins
     returndat$Lbin_method <- Lbin_method
-    returndat$nlbins      <- nlbins
-    returndat$lbinspop    <- lbinspop
-    returndat$nlbinspop   <- nlbinspop
+    returndat$nlbins <- nlbins
+    returndat$lbinspop <- lbinspop
+    returndat$nlbinspop <- nlbinspop
     returndat$sizebinlist <- sizebinlist
     # returndat$age_data_info <- age_data_info
     # returndat$len_data_info <- len_data_info
-    returndat$agebins     <- agebins
-    returndat$nagebins    <- nagebins
-    returndat$accuage     <- accuage
-    returndat$nareas      <- nareas
-    returndat$startyr     <- startyr
-    returndat$endyr       <- endyr
-    returndat$nseasons    <- nseasons
-    returndat$seasfracs   <- seasfracs
+    returndat$agebins <- agebins
+    returndat$nagebins <- nagebins
+    returndat$accuage <- accuage
+    returndat$nareas <- nareas
+    returndat$startyr <- startyr
+    returndat$endyr <- endyr
+    returndat$nseasons <- nseasons
+    returndat$seasfracs <- seasfracs
     returndat$seasdurations <- seasdurations
     returndat$N_sub_seasons <- return.def("N_sub_seasons")
-    returndat$Spawn_month   <- return.def("Spawn_month")
-    returndat$Spawn_seas    <- return.def("Spawn_seas")
+    returndat$Spawn_month <- return.def("Spawn_month")
+    returndat$Spawn_seas <- return.def("Spawn_seas")
     returndat$Spawn_timing_in_season <- return.def("Spawn_timing_in_season")
-    returndat$Retro_year     <- return.def("Retro_year")
+    returndat$Retro_year <- return.def("Retro_year")
     returndat$N_forecast_yrs <- return.def("N_forecast_yrs")
     returndat$Empirical_wt_at_age <- return.def("Empirical_wt_at_age")
     returndat$N_bio_patterns <- return.def("N_bio_patterns")
-    returndat$N_platoons     <- return.def("N_platoons")
+    returndat$N_platoons <- return.def("N_platoons")
     returndat$NatMort_option <- return.def("NatMort_option")
     returndat$GrowthModel_option <- return.def("GrowthModel_option")
-    returndat$Maturity_option  <- return.def("Maturity_option")
+    returndat$Maturity_option <- return.def("Maturity_option")
     returndat$Fecundity_option <- return.def("Fecundity_option")
     returndat$Start_from_par <- return.def("Start_from_par")
-    returndat$Do_all_priors  <- return.def("Do_all_priors")
-    returndat$Use_softbound  <- return.def("Use_softbound")
-    returndat$N_nudata       <- return.def("N_nudata")
-    returndat$Max_phase      <- return.def("Max_phase")
-    returndat$Current_phase  <- return.def("Current_phase")
-    returndat$Jitter         <- return.def("Jitter")
-    returndat$ALK_tolerance  <- return.def("ALK_tolerance")
+    returndat$Do_all_priors <- return.def("Do_all_priors")
+    returndat$Use_softbound <- return.def("Use_softbound")
+    returndat$N_nudata <- return.def("N_nudata")
+    returndat$Max_phase <- return.def("Max_phase")
+    returndat$Current_phase <- return.def("Current_phase")
+    returndat$Jitter <- return.def("Jitter")
+    returndat$ALK_tolerance <- return.def("ALK_tolerance")
     returndat$nforecastyears <- nforecastyears
     returndat$morph_indexing <- morph_indexing
     #  returndat$MGParm_dev_details <- MGParm_dev_details
-    returndat$MGparmAdj   <- MGparmAdj
+    returndat$MGparmAdj <- MGparmAdj
     returndat$forecast_selectivity <- forecast_selectivity
-    returndat$SelSizeAdj  <- SelSizeAdj
-    returndat$SelAgeAdj   <- SelAgeAdj
+    returndat$SelSizeAdj <- SelSizeAdj
+    returndat$SelAgeAdj <- SelAgeAdj
     returndat$recruitment_dist <- recruitment_dist
-    returndat$recruit     <- recruit
+    returndat$recruit <- recruit
     returndat$Full_Spawn_Recr_Curve <- Full_Spawn_Recr_Curve
     # returndat$breakpoints_for_bias_adjustment_ramp <- breakpoints_for_bias_adjustment_ramp
-    
+
     # Static growth
-    begin <- matchfun("N_Used_morphs",rawrep[,6])+1 # keyword "BIOLOGY" not unique enough
-    rawbio <- rawrep[begin:(begin+nlbinspop),1:10]
-    rawbio <- rawbio[,apply(rawbio,2,emptytest) < 1]
-    names(rawbio) <- rawbio[1,]
-    biology <- type.convert(rawbio[-1,], as.is = TRUE)
-    
+    begin <- matchfun("N_Used_morphs", rawrep[, 6]) + 1 # keyword "BIOLOGY" not unique enough
+    rawbio <- rawrep[begin:(begin + nlbinspop), 1:10]
+    rawbio <- rawbio[, apply(rawbio, 2, emptytest) < 1]
+    names(rawbio) <- rawbio[1, ]
+    biology <- type.convert(rawbio[-1, ], as.is = TRUE)
+
     # determine fecundity type
     FecType <- 0
     pl <- parameters$Label
@@ -862,7 +907,7 @@ SS_output_Report <-
     # FecGrep3 <- grep("Eggs_exp_wt_Fem", pl)
     FecGrep4 <- grep("Eggs_slope_len_Fem", pl)
     # FecGrep5 <- grep("Eggs_slope_Wt_Fem", pl)
-    
+
     # if(length(FecGrep1) > 0){
     #   FecType <- 1
     #   FecPar1name <- grep("Eggs/kg_inter_Fem", pl, value=TRUE)[1]
@@ -878,9 +923,9 @@ SS_output_Report <-
     #   FecPar1name <- grep("Eggs_scalar_Fem", pl, value=TRUE)[1]
     #   FecPar2name <- pl[FecGrep3[1]]
     # }
-    if(length(FecGrep4) > 0){
+    if (length(FecGrep4) > 0) {
       FecType <- 4
-      FecPar1name <- grep("Eggs_intercept_Fem", pl, value=TRUE)[1]
+      FecPar1name <- grep("Eggs_intercept_Fem", pl, value = TRUE)[1]
       FecPar2name <- pl[FecGrep4[1]]
     }
     # if(length(FecGrep5) > 0){
@@ -888,28 +933,31 @@ SS_output_Report <-
     #   FecPar1name <- grep("Eggs_intercept_Fem", pl, value=TRUE)[1]
     #   FecPar2name <- pl[FecGrep5[1]]
     # }
-    if(is.na(lbinspop[1])){
-      lbinspop <- biology$Low[biology$GP==1]
+    if (is.na(lbinspop[1])) {
+      lbinspop <- biology$Low[biology$GP == 1]
     }
-    
+
     returndat$biology <- biology
     returndat$FecType <- FecType
     returndat$FecPar1name <- FecPar1name
     returndat$FecPar2name <- FecPar2name
-    
-    returndat$FecPar1 <- parameters$Value[parameters$Label==FecPar1name]
-    returndat$FecPar2 <- parameters$Value[parameters$Label==FecPar2name]
-    
-    
-    
+
+    returndat$FecPar1 <- parameters$Value[parameters$Label == FecPar1name]
+    returndat$FecPar2 <- parameters$Value[parameters$Label == FecPar2name]
+
+
+
     # simple test to figure out if fecundity is proportional to spawning biomass:
     returndat$SpawnOutputUnits <- ifelse(!is.na(biology$Fecundity[1]) &&
-                                           all(biology$Wt_len_F==biology$Fecundity),
-                                         "biomass", "numbers")
-    
+      all(biology$Wt_len_F == biology$Fecundity),
+    "biomass", "numbers"
+    )
+
     # get natural mortality type and vectors of M by age
-    M_type <- as.numeric(gsub(".*([0-9]+)", "\\1",
-                              rawrep[matchfun("Natural_Mortality"),2]))
+    M_type <- as.numeric(gsub(
+      ".*([0-9]+)", "\\1",
+      rawrep[matchfun("Natural_Mortality"), 2]
+    ))
     # in SS 3.30 the number of rows of Natural_Mortality is the product of
     # the number of sexes, growth patterns, settlement events but settlement
     # events didn't exist in 3.24, so it's easier to just use the following
@@ -918,19 +966,21 @@ SS_output_Report <-
     # if(is.na(matchfun(endcode))){
     #   endcode <- "Growth_Parameters" # next keyword in 3.24
     # }
-    M_Parameters <- matchfun2("Natural_Mortality",1,
-                              endcode,-1,
-                              header=TRUE)
+    M_Parameters <- matchfun2("Natural_Mortality", 1,
+      endcode, -1,
+      header = TRUE
+    )
     returndat$M_type <- M_type
     returndat$M_Parameters <- type.convert(M_Parameters, as.is = TRUE)
-    
+
     # get growth parameters
     Growth_Parameters <- matchfun2("Growth_Parameters", 1,
-                                   "Growth_Parameters", 1 + max(morph_indexing$GP),
-                                   header=TRUE)
+      "Growth_Parameters", 1 + max(morph_indexing$GP),
+      header = TRUE
+    )
     Growth_Parameters <- type.convert(Growth_Parameters, as.is = TRUE)
     returndat$Growth_Parameters <- Growth_Parameters
-    
+
     # Seas_Effects <- matchfun2("Seas_Effects",1,"Biology_at_age_in_endyr",-1,header=TRUE)
     # if(Seas_Effects[[1]][1]!="absent"){
     #   Seas_Effects <- type.convert(Seas_Effects, as.is = TRUE)
@@ -938,63 +988,64 @@ SS_output_Report <-
     Seas_Effects <- NA
     # }
     returndat$Seas_Effects <- Seas_Effects
-    
+
     # ending year growth, including pattern for the CV (added in SSv3.22b_Aug3)
-    growthCVtype <- matchfun2("Biology_at_age",0,"Biology_at_age",0,header=FALSE)
+    growthCVtype <- matchfun2("Biology_at_age", 0, "Biology_at_age", 0, header = FALSE)
     # if(nchar(growthCVtype)>31){
-    returndat$growthCVtype <- substring(growthCVtype,30)
+    returndat$growthCVtype <- substring(growthCVtype, 30)
     # }else{
     #   returndat$growthCVtype <- "unknown"
     # }
-    growdat <- matchfun2("Biology_at_age",1,"MEAN_BODY_WT(begin)",-1,header=TRUE)
+    growdat <- matchfun2("Biology_at_age", 1, "MEAN_BODY_WT(begin)", -1, header = TRUE)
     # make older SS output names match current SS output conventions
     growdat <- df.rename(growdat,
-                         oldnames=c("Gender"),
-                         newnames=c("Sex"))
+      oldnames = c("Gender"),
+      newnames = c("Sex")
+    )
     growdat <- type.convert(growdat, as.is = TRUE)
     nmorphs <- max(growdat$Morph)
-    midmorphs <- c(c(0,nmorphs/nsexes)+ceiling(nmorphs/nsexes/2))
+    midmorphs <- c(c(0, nmorphs / nsexes) + ceiling(nmorphs / nsexes / 2))
     returndat$endgrowth <- growdat
-    
+
     # test for use of empirical weight-at-age input file (wtatage.ss)
-    test <- matchfun2("MEAN_BODY_WT(begin)",0,"MEAN_BODY_WT(begin)",0,header=FALSE)
-    wtatage_switch <- length(grep("wtatage.ss",test))>0
+    test <- matchfun2("MEAN_BODY_WT(begin)", 0, "MEAN_BODY_WT(begin)", 0, header = FALSE)
+    wtatage_switch <- length(grep("wtatage.ss", test)) > 0
     returndat$wtatage_switch <- wtatage_switch
-    
+
     # mean body weight
-    mean_body_wt <- matchfun2("MEAN_BODY_WT(begin)",1,"MEAN_SIZE_TIMESERIES",-1,header=TRUE)
+    mean_body_wt <- matchfun2("MEAN_BODY_WT(begin)", 1, "MEAN_SIZE_TIMESERIES", -1, header = TRUE)
     mean_body_wt <- type.convert(mean_body_wt, as.is = TRUE)
     returndat$mean_body_wt <- mean_body_wt
-    
+
     # Time-varying growth
-    rawgrow <- matchfun2("MEAN_SIZE_TIMESERIES",1,"mean_size_Jan_1",-1,cols=1:(4+accuage+1))
+    rawgrow <- matchfun2("MEAN_SIZE_TIMESERIES", 1, "mean_size_Jan_1", -1, cols = 1:(4 + accuage + 1))
     growthvaries <- FALSE
     # if(length(rawgrow)>1){
-    names(rawgrow) <- rawgrow[1,]
-    growdat <- type.convert(rawgrow[-1,], as.is = TRUE)
-    
-    growdat <- growdat[growdat$SubSeas==1 &
-                         growdat$Yr >= startyr &
-                         growdat$Yr < endyr,]
-    
+    names(rawgrow) <- rawgrow[1, ]
+    growdat <- type.convert(rawgrow[-1, ], as.is = TRUE)
+
+    growdat <- growdat[growdat$SubSeas == 1 &
+      growdat$Yr >= startyr &
+      growdat$Yr < endyr, ]
+
     returndat$growthseries <- growdat
     returndat$growthvaries <- growthvaries
-    
-    
+
+
     # Length selex and retention
     # if(!forecast){
-    selex <- selex[selex$Yr <= endyr,]
+    selex <- selex[selex$Yr <= endyr, ]
     # }
     returndat$sizeselex <- selex
-    
+
     # Age based selex <--------------------------------------------------------------------------------------DON'T NEED
     # # # determine which keyword follows the AGE_SELEX section
-    # 
+    #
     #   # a numbers-at-age section occurs here if detailed age-structured reports are
     #   # requested in the starter file, otherwise, a similar section occurs after the
     #   # biology section
     #   ageselex <- matchfun2("AGE_SELEX",4,"NUMBERS_AT_AGE",-1,header=TRUE)
-    # 
+    #
     # ageselex <- df.rename(ageselex,
     #                       oldnames=c("fleet", "year", "seas", "gender",
     #                                  "morph", "label", "factor"),
@@ -1002,108 +1053,116 @@ SS_output_Report <-
     #                                  "Morph", "Label", "Factor"))
     # # filter forecast years from selectivity if no forecast
     # # NOTE: maybe refine this in 3.30
-    # 
+    #
     #   ageselex <- ageselex[ageselex$Yr <= endyr,]
-    # 
+    #
     # ageselex <- type.convert(ageselex, as.is = TRUE)
     # returndat$ageselex <- ageselex
     # -------------------------------------------------------------------------------------------------------END DON'T NEED
-    
+
     ################ exploitation ######################
     exploitation_head <- matchfun2("EXPLOITATION", 1, "EXPLOITATION", 20,
-                                   header=FALSE)
+      header = FALSE
+    )
     # check for new header info added in 3.30.13_beta (14 Feb. 2019)
     # if(exploitation_head[1,1] == "Info:"){
     # NOTE: add read of additional header info here
     exploitation <- matchfun2("EXPLOITATION",
-                              which(exploitation_head[,1] == "Yr"),
-                              "CATCH",-1,header=TRUE)
+      which(exploitation_head[, 1] == "Yr"),
+      "CATCH", -1,
+      header = TRUE
+    )
     # remove meta-data about fleets (filtered by color in 1st column):
     # "Catchunits:","FleetType:","FleetArea:","FleetID:"
-    exploitation <- exploitation[-grep(":", exploitation[,1]),]
+    exploitation <- exploitation[-grep(":", exploitation[, 1]), ]
     # find line with F_method like this "Info: F_Method:=3;.Continuous_F;..."
     # F_method info contains additional information that might be useful elsewhere
-    F_method_info <- exploitation_head[grep("F_Method:",
-                                            exploitation_head[,2]), 2]
-    F_method_info <- gsub(pattern=".", replacement=" ", x=F_method_info, fixed=TRUE)
-    F_method_info <- strsplit(F_method_info, split=";", fixed=TRUE)[[1]]
+    F_method_info <- exploitation_head[grep(
+      "F_Method:",
+      exploitation_head[, 2]
+    ), 2]
+    F_method_info <- gsub(pattern = ".", replacement = " ", x = F_method_info, fixed = TRUE)
+    F_method_info <- strsplit(F_method_info, split = ";", fixed = TRUE)[[1]]
     # get numeric value for F_method
-    F_method <- as.numeric(strsplit(F_method_info[[1]], split="=",
-                                    fixed=TRUE)[[1]][2])
-    
+    F_method <- as.numeric(strsplit(F_method_info[[1]],
+      split = "=",
+      fixed = TRUE
+    )[[1]][2])
+
     returndat$F_method <- F_method
-    
+
     # more processing of exploitation
-    exploitation[exploitation=="_"] <- NA
+    exploitation[exploitation == "_"] <- NA
     # make text numeric
     # "init_yr" not used as of 3.30.13, but must have been in the past
     # "INIT" appears to be used in 3.30.13 and beyond
-    exploitation$Yr[exploitation$Yr %in% c("INIT", "init_yr")] <- startyr-1
+    exploitation$Yr[exploitation$Yr %in% c("INIT", "init_yr")] <- startyr - 1
     # make columns numeric
     exploitation <- type.convert(exploitation, as.is = TRUE)
     returndat$exploitation <- exploitation
-    
-    
+
+
     ###########
-    #catch
+    # catch
     ###########
-    catch <- matchfun2("CATCH",1,"TIME_SERIES",-1,substr1=FALSE,header=TRUE)
+    catch <- matchfun2("CATCH", 1, "TIME_SERIES", -1, substr1 = FALSE, header = TRUE)
     # if table is present, then do processing of it
-    
+
     # update to new column names used starting with 3.30.13
     catch <- df.rename(catch,
-                       oldnames=c("Name",       "Yr.frac"),
-                       newnames=c("Fleet_Name", "Time"))
+      oldnames = c("Name", "Yr.frac"),
+      newnames = c("Fleet_Name", "Time")
+    )
     # fix likelihood associated with 0 catch
-    catch$Like[catch$Like=="-1.#IND"] <- NA
+    catch$Like[catch$Like == "-1.#IND"] <- NA
     # change "INIT" or "init" to year value following convention used elsewhere
-    catch$Yr[tolower(catch$Yr)=="init"] <- startyr-1
+    catch$Yr[tolower(catch$Yr) == "init"] <- startyr - 1
     # make columns numeric
     catch <- type.convert(catch, as.is = TRUE)
-    
+
     returndat$catch <- catch
-    
+
     # age associated with summary biomass
-    summary_age <- rawrep[matchfun("TIME_SERIES"),2]
+    summary_age <- rawrep[matchfun("TIME_SERIES"), 2]
     summary_age <- as.numeric(substring(summary_age, nchar("BioSmry_age:_") + 1))
     returndat$summary_age <- summary_age
-    
+
     ###############
     # time series
     ###############
-    timeseries <- matchfun2("TIME_SERIES",1,"SPR_series",-1,header=TRUE)
+    timeseries <- matchfun2("TIME_SERIES", 1, "SPR_series", -1, header = TRUE)
     # temporary fix for 3.30.03.06
-    timeseries <- timeseries[timeseries$Seas != "recruits",]
-    
-    timeseries[timeseries=="_"] <- NA
+    timeseries <- timeseries[timeseries$Seas != "recruits", ]
+
+    timeseries[timeseries == "_"] <- NA
     timeseries <- type.convert(timeseries, as.is = TRUE)
-    
+
     returndat$timeseries <- timeseries
-    
+
     ############# get spawning season ##################
     # currently (v3.20b), Spawning Biomass is only calculated in a unique spawning season within the year
-    
+
     returndat$spawnseas <- spawnseas
-    
+
     # distribution of recruitment
     # from SSv3.24Q onward, recruitment_dist is a list of tables, not a single table
     rd <- recruitment_dist$recruit_dist_endyr
-    
-    
+
+
     # set mainmorphs as those morphs born in the first season with recruitment
     # and the largest fraction of the platoons (should equal middle platoon when present)
     # if(SS_versionNumeric >= 3.3){
     # new "platoon" label
-    temp <- morph_indexing[morph_indexing$BirthSeas==min(rd$Seas[rd$"Frac/sex">0]) &
-                             morph_indexing$Platoon_Dist==max(morph_indexing$Platoon_Dist),]
-    mainmorphs <- min(temp$Index[temp$Sex==1])
+    temp <- morph_indexing[morph_indexing$BirthSeas == min(rd$Seas[rd$"Frac/sex" > 0]) &
+      morph_indexing$Platoon_Dist == max(morph_indexing$Platoon_Dist), ]
+    mainmorphs <- min(temp$Index[temp$Sex == 1])
     # if(nsexes==2){
-    mainmorphs <- c(mainmorphs, min(temp$Index[temp$Sex==2]))
+    mainmorphs <- c(mainmorphs, min(temp$Index[temp$Sex == 2]))
     # }
     # }
-    
-    returndat$mainmorphs  <- mainmorphs
-    
+
+    returndat$mainmorphs <- mainmorphs
+
     # get birth seasons as vector of seasons with non-zero recruitment
     birthseas <- sort(unique(timeseries$Seas[timeseries$Recruit_0 > 0]))
     # temporary fix for model with missing Recruit_0 values
@@ -1112,451 +1171,467 @@ SS_output_Report <-
     #   birthseas <- sort(unique(morph_indexing$BirthSeas))
     # }
     returndat$birthseas <- birthseas
-    
+
     # stats and dimensions
-    timeseries$Yr <- timeseries$Yr + (timeseries$Seas-1)/nseasons
-    ts <- timeseries[timeseries$Yr <= endyr+1,]
-    tsyears <- ts$Yr[ts$Seas==1]
-    
+    timeseries$Yr <- timeseries$Yr + (timeseries$Seas - 1) / nseasons
+    ts <- timeseries[timeseries$Yr <= endyr + 1, ]
+    tsyears <- ts$Yr[ts$Seas == 1]
+
     ########### Depletion ############
-    tsspaw_bio <- ts$SpawnBio[ts$Seas==spawnseas & ts$Area==1]
-    
-    depletionseries <- tsspaw_bio/tsspaw_bio[1]
+    tsspaw_bio <- ts$SpawnBio[ts$Seas == spawnseas & ts$Area == 1]
+
+    depletionseries <- tsspaw_bio / tsspaw_bio[1]
     stats$SBzero <- tsspaw_bio[1]
     stats$current_depletion <- depletionseries[length(depletionseries)]
-    
+
     ################### total landings #################
     # (in the future, this section should be cleaned up to take advantage of
     # new columns that are in process of being added above, such as $dead_B_sum
-    ls <- nrow(ts)-1
-    totretainedmat <- as.matrix(ts[,substr(names(ts),1,nchar("retain(B)"))=="retain(B)"])
+    ls <- nrow(ts) - 1
+    totretainedmat <- as.matrix(ts[, substr(names(ts), 1, nchar("retain(B)")) == "retain(B)"])
     ts$totretained <- 0
     ts$totretained[3:ls] <- rowSums(totretainedmat)[3:ls]
-    
+
     ########## total catch #############
-    totcatchmat <- as.matrix(ts[,substr(names(ts),1,nchar("enc(B)"))=="enc(B)"])
+    totcatchmat <- as.matrix(ts[, substr(names(ts), 1, nchar("enc(B)")) == "enc(B)"])
     ts$totcatch <- 0
     ts$totcatch[3:ls] <- rowSums(totcatchmat)[3:ls]
-    
+
     ########### harvest rates #############
     # if(F_method==1){
     #   stringmatch <- "Hrate:_"
     # }else{
-    stringmatch <- "F:_" #}
-    Hrates <- as.matrix(ts[,substr(names(ts),1,nchar(stringmatch))==stringmatch])
+    stringmatch <- "F:_" # }
+    Hrates <- as.matrix(ts[, substr(names(ts), 1, nchar(stringmatch)) == stringmatch])
     fmax <- max(Hrates)
-    #stats$fmax <- fmax
-    #stats$endyrcatch <- ts$totcatch[ls]
-    #stats$endyrlandings <- ts$totretained[ls]
-    
+    # stats$fmax <- fmax
+    # stats$endyrcatch <- ts$totcatch[ls]
+    # stats$endyrlandings <- ts$totretained[ls]
+
     #######  depletion ###############
-    depletion_method <- as.numeric(rawrep[matchfun("Depletion_method"),2])
-    depletion_basis <- rawrep[matchfun("B_ratio_denominator"),2]
+    depletion_method <- as.numeric(rawrep[matchfun("Depletion_method"), 2])
+    depletion_basis <- rawrep[matchfun("B_ratio_denominator"), 2]
     # if(depletion_basis=="no_depletion_basis"){
     #   depletion_basis <- "none"
     # }else{
-    depletion_basis <- as.numeric(strsplit(depletion_basis,"%*",fixed=TRUE)[[1]][1])/100
+    depletion_basis <- as.numeric(strsplit(depletion_basis, "%*", fixed = TRUE)[[1]][1]) / 100
     # }
     returndat$depletion_method <- depletion_method
     returndat$depletion_basis <- depletion_basis
-    
+
     ####### discard fractions #########
-    
+
     # degrees of freedom for T-distribution
     # (or indicator 0, -1, -2 for other distributions)
-    
+
     DF_discard <- NA
     shift <- 1
-    discard_spec <- matchfun2("DISCARD_SPECIFICATION",9,"DISCARD_OUTPUT",-2,
-                              cols=1:3,header=TRUE)
+    discard_spec <- matchfun2("DISCARD_SPECIFICATION", 9, "DISCARD_OUTPUT", -2,
+      cols = 1:3, header = TRUE
+    )
     # test for Robbie Emmet's experimental new discard option
     # if(length(grep("trunc_normal", names(discard_spec)))>0){
-    discard_spec <- matchfun2("DISCARD_SPECIFICATION",10,"DISCARD_OUTPUT",-2,
-                              cols=1:3,header=TRUE)
+    discard_spec <- matchfun2("DISCARD_SPECIFICATION", 10, "DISCARD_OUTPUT", -2,
+      cols = 1:3, header = TRUE
+    )
     # }
     discard_spec <- type.convert(discard_spec, as.is = TRUE)
     names(discard_spec)[1] <- "Fleet"
     # }
     # read DISCARD_OUTPUT table
     # discard <- matchfun2("DISCARD_OUTPUT",shift,"MEAN_BODY_WT_OUTPUT",-1,header=TRUE)
-    # 
-    # 
+    #
+    #
     # # rename columns to standard used with 3.30.13 (starting Feb 14, 2019)
     # discard <- df.rename(discard,
     #                      oldnames=c("Name",       "Yr.frac"),
     #                      newnames=c("Fleet_Name", "Time"))
-    
+
     # process discard info if table was present
     discard_type <- NA
-    
+
     discard <- NA
     returndat$discard <- discard
     returndat$discard_type <- discard_type
     returndat$DF_discard <- DF_discard
     returndat$discard_spec <- discard_spec
-    
+
     ############ Average body weight observations #############
     # degrees of freedom for T-distribution
     # DF_mnwgt <- rawrep[matchfun("log(L)_based_on_T_distribution"),1]
-    
+
     DF_mnwgt <- NA
     mnwgt <- NA
-    
+
     # returndat$mnwgt <- mnwgt
     # returndat$DF_mnwgt <- DF_mnwgt
-    
+
     #########  Yield and SPR time-series #####################
-    spr <- matchfun2("SPR_series",5,"SPAWN_RECRUIT",-1,header=TRUE)
+    spr <- matchfun2("SPR_series", 5, "SPAWN_RECRUIT", -1, header = TRUE)
     # read Kobe plot
     # if(length(grep("Kobe_Plot",rawrep[,1]))!=0){
     shift <- -3
     # if(SS_versionNumeric < 3.23) shift <- -1
-    spr <- matchfun2("SPR_series",5,"Kobe_Plot",shift,header=TRUE)
-    
+    spr <- matchfun2("SPR_series", 5, "Kobe_Plot", shift, header = TRUE)
+
     # head of Kobe_Plot section differs by SS version,
     # but I haven't kept track of which is which
-    Kobe_head <- matchfun2("Kobe_Plot",0,"Kobe_Plot",5,header=TRUE)
-    shift <- grep("^Y", Kobe_head[,1]) # may be "Year" or "Yr"
+    Kobe_head <- matchfun2("Kobe_Plot", 0, "Kobe_Plot", 5, header = TRUE)
+    shift <- grep("^Y", Kobe_head[, 1]) # may be "Year" or "Yr"
     Kobe_warn <- NA
     Kobe_MSY_basis <- NA
-    
-    Kobe <- matchfun2("Kobe_Plot",shift,"SPAWN_RECRUIT",-1,header=TRUE)
-    Kobe[Kobe=="_"] <- NA
-    Kobe[Kobe=="1.#INF"] <- NA
-    Kobe[Kobe=="-1.#IND"] <- NA
-    names(Kobe) <- gsub("/", ".", names(Kobe), fixed=TRUE)
+
+    Kobe <- matchfun2("Kobe_Plot", shift, "SPAWN_RECRUIT", -1, header = TRUE)
+    Kobe[Kobe == "_"] <- NA
+    Kobe[Kobe == "1.#INF"] <- NA
+    Kobe[Kobe == "-1.#IND"] <- NA
+    names(Kobe) <- gsub("/", ".", names(Kobe), fixed = TRUE)
     Kobe[, 1:3] <- lapply(Kobe[, 1:3], as.numeric)
-    
-    
+
+
     returndat$Kobe_warn <- Kobe_warn
     returndat$Kobe_MSY_basis <- Kobe_MSY_basis
     returndat$Kobe <- Kobe
-    
+
     # clean up SPR output
     # make older SS output names match current SS output conventions
-    names(spr) <- gsub(pattern="SPB", replacement="SSB", names(spr))
+    names(spr) <- gsub(pattern = "SPB", replacement = "SSB", names(spr))
     spr <- df.rename(spr,
-                     oldnames=c("Year", "spawn_bio", "SPR_std", "Y/R", "F_std"),
-                     newnames=c("Yr", "SpawnBio", "SPR_report", "YPR", "F_report"))
-    spr[spr=="_"] <- NA
-    spr[spr=="&"] <- NA
-    spr[spr=="-1.#IND"] <- NA
+      oldnames = c("Year", "spawn_bio", "SPR_std", "Y/R", "F_std"),
+      newnames = c("Yr", "SpawnBio", "SPR_report", "YPR", "F_report")
+    )
+    spr[spr == "_"] <- NA
+    spr[spr == "&"] <- NA
+    spr[spr == "-1.#IND"] <- NA
     spr <- type.convert(spr, as.is = TRUE)
-    #spr <- spr[spr$Year <= endyr,]
+    # spr <- spr[spr$Year <= endyr,]
     spr$spr <- spr$SPR
     returndat$sprseries <- spr
     stats$last_years_SPR <- spr$spr[nrow(spr)]
-    stats$SPRratioLabel <- managementratiolabels[1,2]
+    stats$SPRratioLabel <- managementratiolabels[1, 2]
     stats$last_years_SPRratio <- spr$SPR_std[nrow(spr)]
-    
+
     returndat$managementratiolabels <- managementratiolabels
     returndat$F_report_basis <- managementratiolabels$Label[2]
     # if(length(grep("%", managementratiolabels$Label[3])) > 0 ) {
     returndat$B_ratio_denominator <-
-      as.numeric(strsplit(managementratiolabels$Label[3],"%")[[1]][1])/100
+      as.numeric(strsplit(managementratiolabels$Label[3], "%")[[1]][1]) / 100
     # } else {
     #   returndat$B_ratio_denominator <- NA
     # }
     returndat$sprtarg <- sprtarg
     returndat$btarg <- btarg
-    
-    
+
+
     returndat$minbthresh <- minbthresh
-    
-    
+
+
     returndat$equil_yield <- yielddat
-    
+
     flush.console()
-    
-    
+
+
     ############## CPUE/Survey series #######################
-    cpue <- matchfun2("INDEX_2",1,"INDEX_2",ncpue+1,header=TRUE)
-    cpue[cpue=="_"] <- NA
+    cpue <- matchfun2("INDEX_2", 1, "INDEX_2", ncpue + 1, header = TRUE)
+    cpue[cpue == "_"] <- NA
     # make older SS output names match current SS output conventions
     # note: "Fleet_name" (formerly "Name") introduced in 3.30.12
     #       and might change as result of discussion on inconsistent use of
     #       similar column names.
     cpue <- df.rename(cpue,
-                      oldnames=c("Yr.S", "Yr.frac", "Supr_Per", "Name"),
-                      newnames=c("Time", "Time",    "SuprPer",  "Fleet_name"))
-    
+      oldnames = c("Yr.S", "Yr.frac", "Supr_Per", "Name"),
+      newnames = c("Time", "Time", "SuprPer", "Fleet_name")
+    )
+
     # make columns numeric
     cpue <- type.convert(cpue, as.is = TRUE)
-    
-    
+
+
     returndat$cpue <- cpue
-    
+
     ################## Numbers at age ###################
-    
-    rawnatage <- matchfun2("NUMBERS_AT_AGE",1,"BIOMASS_AT_AGE",-1,
-                           cols=1:(13+accuage),substr1=FALSE)
-    
-    names(rawnatage) <- rawnatage[1,]
-    rawnatage <- rawnatage[-1,]
+
+    rawnatage <- matchfun2("NUMBERS_AT_AGE", 1, "BIOMASS_AT_AGE", -1,
+      cols = 1:(13 + accuage), substr1 = FALSE
+    )
+
+    names(rawnatage) <- rawnatage[1, ]
+    rawnatage <- rawnatage[-1, ]
     # make older SS output names match current SS output conventions
     rawnatage <- df.rename(rawnatage,
-                           oldnames=c("Gender", "SubMorph"),
-                           newnames=c("Sex", "Platoon"))
+      oldnames = c("Gender", "SubMorph"),
+      newnames = c("Sex", "Platoon")
+    )
     rawnatage <- type.convert(rawnatage, as.is = TRUE)
     returndat$natage <- rawnatage
-    
-    
+
+
     # NUMBERS_AT_AGE_Annual with and without fishery
     natage_annual_1_no_fishery <- matchfun2("NUMBERS_AT_AGE_Annual_1", 1,
-                                            "Z_AT_AGE_Annual_1", -1, header=TRUE)
+      "Z_AT_AGE_Annual_1", -1,
+      header = TRUE
+    )
     natage_annual_2_with_fishery <- matchfun2("NUMBERS_AT_AGE_Annual_2", 1,
-                                              "Z_AT_AGE_Annual_2", -1, header=TRUE)
+      "Z_AT_AGE_Annual_2", -1,
+      header = TRUE
+    )
     # if(natage_annual_1_no_fishery[[1]][1] != "absent"){
     natage_annual_1_no_fishery <- type.convert(natage_annual_1_no_fishery,
-                                               as.is = TRUE)
+      as.is = TRUE
+    )
     natage_annual_2_with_fishery <- type.convert(natage_annual_2_with_fishery,
-                                                 as.is = TRUE)
+      as.is = TRUE
+    )
     # }
     returndat$natage_annual_1_no_fishery <- natage_annual_1_no_fishery
     returndat$natage_annual_2_with_fishery <- natage_annual_2_with_fishery
-    
+
     ################ Biomass at age ##################
     # if(SS_versionNumeric >= 3.3){
     batage <- matchfun2("BIOMASS_AT_AGE", 1, "NUMBERS_AT_LENGTH", -1,
-                        cols=1:(13+accuage), substr1=FALSE)
-    
+      cols = 1:(13 + accuage), substr1 = FALSE
+    )
+
     # if(length(batage)>1){
-    names(batage) <- batage[1,]
-    batage <- type.convert(batage[-1,], as.is = TRUE)
+    names(batage) <- batage[1, ]
+    batage <- type.convert(batage[-1, ], as.is = TRUE)
     returndat$batage <- batage
     # }
-    
+
     ############### Numbers at length ###################
     col.adjust <- 12
-    
-    rawnatlen <- matchfun2("NUMBERS_AT_LENGTH",1,"BIOMASS_AT_LENGTH",-1,
-                           cols=1:(col.adjust+nlbinspop),substr1=FALSE)
+
+    rawnatlen <- matchfun2("NUMBERS_AT_LENGTH", 1, "BIOMASS_AT_LENGTH", -1,
+      cols = 1:(col.adjust + nlbinspop), substr1 = FALSE
+    )
     # if(length(rawnatlen)>1){
-    names(rawnatlen) <- rawnatlen[1,]
-    rawnatlen <- rawnatlen[-1,]
+    names(rawnatlen) <- rawnatlen[1, ]
+    rawnatlen <- rawnatlen[-1, ]
     # make older SS output names match current SS output conventions
     rawnatlen <- df.rename(rawnatlen,
-                           oldnames=c("Gender", "SubMorph"),
-                           newnames=c("Sex", "Platoon"))
+      oldnames = c("Gender", "SubMorph"),
+      newnames = c("Sex", "Platoon")
+    )
     rawnatlen <- type.convert(rawnatlen, as.is = TRUE)
     returndat$natlen <- rawnatlen
     # }
-    
+
     # test ending based on text because sections changed within 3.30 series
     # if(!is.na(matchfun("F_AT_AGE"))){
     end.keyword <- "F_AT_AGE"
     # }else{
     #   end.keyword <- "CATCH_AT_AGE"
     # }
-    
+
     # Biomass at length (first appeared in version 3.24l, 12-5-2012)
     # if(length(grep("BIOMASS_AT_LENGTH",rawrep[,1]))>0){
-    rawbatlen <- matchfun2("BIOMASS_AT_LENGTH",1,end.keyword,-1,
-                           cols=1:(col.adjust+nlbinspop),substr1=FALSE)
+    rawbatlen <- matchfun2("BIOMASS_AT_LENGTH", 1, end.keyword, -1,
+      cols = 1:(col.adjust + nlbinspop), substr1 = FALSE
+    )
     # if(length(rawbatlen)>1){
-    names(rawbatlen) <- rawbatlen[1,]
-    rawbatlen <- type.convert(rawbatlen[-1,], as.is = TRUE)
+    names(rawbatlen) <- rawbatlen[1, ]
+    rawbatlen <- type.convert(rawbatlen[-1, ], as.is = TRUE)
     returndat$batlen <- rawbatlen
     # }
     # }
-    
+
     ########## Movement ###############
     # movement <- matchfun2("MOVEMENT",1,"EXPLOITATION",-1,cols=1:(7+accuage),substr1=FALSE)
     # names(movement) <- c(movement[1,1:6],paste("age",movement[1,-(1:6)],sep=""))
     # movement <- df.rename(movement,
     #                       oldnames=c("Gpattern"),
     #                       newnames=c("GP"))
-    # 
+    #
     # movement <- movement[-1,]
     # for(i in 1:ncol(movement)){
     #   movement[,i] <- as.numeric(movement[,i])
     # }
     # returndat$movement <- movement
-    
+
     ######## reporting rates #############
     # tagreportrates <- matchfun2("Reporting_Rates_by_Fishery",1,
     #                             "See_composition_data_output_for_tag_recapture_details",-1,
     #                             cols=1:3)
-    # 
+    #
     #   returndat$tagreportrates <- NA
-    # 
-    # 
+    #
+    #
     # # tag release table
     # tagrelease <- matchfun2("TAG_Recapture",1,
     #                         "Tags_Alive",-1,
     #                         cols=1:10)
-    # 
+    #
     #   returndat$tagrelease <- NA
     #   returndat$tagfirstperiod <- NA
     #   returndat$tagaccumperiod <- NA
-    # 
-    # 
+    #
+    #
     # # tags alive
     # tagsalive <- matchfun2("Tags_Alive",1,
     #                        "Total_recaptures",-1,
     #                        cols=1:ncols)
-    # 
+    #
     #   returndat$tagsalive <- NA
-    # 
-    # 
+    #
+    #
     # # total recaptures
     # tagtotrecap <- matchfun2("Total_recaptures",1,
     #                          "Reporting_Rates_by_Fishery",-1,
     #                          cols=1:ncols)
-    # 
+    #
     #   returndat$tagtotrecap <- NA
-    # 
-    
+    #
+
     # age-length matrix
     # because of rows like " Seas: 12 Sub_Seas: 2   Morph: 12", the number of columns
     # needs to be at least 6 even if there are fewer ages
-    rawALK <- matchfun2("AGE_LENGTH_KEY",4,"AGE_AGE_KEY",-1,cols=1:max(6, accuage+2))
+    rawALK <- matchfun2("AGE_LENGTH_KEY", 4, "AGE_AGE_KEY", -1, cols = 1:max(6, accuage + 2))
     # if(length(rawALK)>1 & rawALK[[1]][1]!="absent" &&
     #    length(grep("AGE_AGE_KEY", rawALK[,1]))==0){
     morph_col <- 5
-    
-    starts <- grep("Morph:",rawALK[,morph_col])+2
-    ends <- grep("mean",rawALK[,1])-1
+
+    starts <- grep("Morph:", rawALK[, morph_col]) + 2
+    ends <- grep("mean", rawALK[, 1]) - 1
     N_ALKs <- length(starts)
     # 3rd dimension should be either nmorphs or nmorphs*(number of Sub_Seas)
-    ALK <- array(NA, c(nlbinspop, accuage+1, N_ALKs))
-    dimnames(ALK) <- list(Length=rev(lbinspop), TrueAge=0:accuage, Matrix=1:N_ALKs)
-    
-    for(i in 1:N_ALKs){
+    ALK <- array(NA, c(nlbinspop, accuage + 1, N_ALKs))
+    dimnames(ALK) <- list(Length = rev(lbinspop), TrueAge = 0:accuage, Matrix = 1:N_ALKs)
+
+    for (i in 1:N_ALKs) {
       # get matrix of values
       ALKtemp <- rawALK[starts[i]:ends[i], 2 + 0:accuage]
       # loop over ages to convert values to numeric
       ALKtemp <- type.convert(ALKtemp, as.is = TRUE)
       # fill in appropriate slice of array
-      ALK[,,i] <- as.matrix(ALKtemp)
+      ALK[, , i] <- as.matrix(ALKtemp)
       # get info on each matrix (such as "Seas: 1 Sub_Seas: 1 Morph: 1")
-      Matrix.Info <- rawALK[starts[i]-2,]
+      Matrix.Info <- rawALK[starts[i] - 2, ]
       # filter out empty elements
-      Matrix.Info <- Matrix.Info[Matrix.Info!=""]
+      Matrix.Info <- Matrix.Info[Matrix.Info != ""]
       # combine elements to form a label in the dimnames
-      dimnames(ALK)$Matrix[i] <- paste(Matrix.Info, collapse=" ")
+      dimnames(ALK)$Matrix[i] <- paste(Matrix.Info, collapse = " ")
     }
     returndat$ALK <- ALK
     # }
-    
+
     # ageing error matrices -------------------------------------------------------------------------------------------- REMOVE
     # rawAAK <- matchfun2("AGE_AGE_KEY",1,"SELEX_database",-1,cols=1:(accuage+2))
     # # if(length(rawAAK)>1){
     #   starts <- grep("KEY:",rawAAK[,1])
     #   returndat$N_ageerror_defs <- N_ageerror_defs <- length(starts) ------------------------------------------------- END REMOVE
-    #   
-    
+    #
+
     # F at age (first appeared in version 3.30.13, 8-Mar-2019)
     # if(!is.na(matchfun("F_AT_AGE"))){
-    fatage <- matchfun2("F_AT_AGE", 1, "CATCH_AT_AGE", -1, header=TRUE)
+    fatage <- matchfun2("F_AT_AGE", 1, "CATCH_AT_AGE", -1, header = TRUE)
     fatage <- type.convert(fatage, as.is = TRUE)
     # }else{
     #   fatage <- NA
     # }
-    
+
     # test for discard at age section (added with 3.30.12, 29-Aug-2018)
     # if(!is.na(matchfun("DISCARD_AT_AGE"))){
     # read discard at age
     # discard_at_age <- matchfun2("DISCARD_AT_AGE", 1, "BIOLOGY", -1)
     # read catch at age
     catage <- matchfun2("CATCH_AT_AGE", 1, "DISCARD_AT_AGE", -1)
-    
+
     # discard_at_age <- discard_at_age[,apply(discard_at_age,2,emptytest)<1]
     # names(discard_at_age) <- discard_at_age[1,]
     # discard_at_age <- type.convert(discard_at_age[-1,], as.is = TRUE)
-    
-    catage <- catage[,apply(catage,2,emptytest)<1]
-    names(catage) <- catage[1,]
-    catage <- type.convert(catage[-1,], as.is = TRUE)
-    
+
+    catage <- catage[, apply(catage, 2, emptytest) < 1]
+    names(catage) <- catage[1, ]
+    catage <- type.convert(catage[-1, ], as.is = TRUE)
+
     returndat$fatage <- fatage
     returndat$catage <- catage
     # returndat$discard_at_age <- discard_at_age
-    
+
     # if(!is.na(matchfun("Z_AT_AGE"))){
     # Z at age
-    #With_fishery
-    #No_fishery_for_Z=M_and_dynamic_Bzero
-    Z_at_age <- matchfun2("Z_AT_AGE_Annual_2",1,"Spawning_Biomass_Report_1",-2,header=TRUE)
-    M_at_age <- matchfun2("Z_AT_AGE_Annual_1",1,"-ln(Nt+1",-1,matchcol2=5, header=TRUE)
+    # With_fishery
+    # No_fishery_for_Z=M_and_dynamic_Bzero
+    Z_at_age <- matchfun2("Z_AT_AGE_Annual_2", 1, "Spawning_Biomass_Report_1", -2, header = TRUE)
+    M_at_age <- matchfun2("Z_AT_AGE_Annual_1", 1, "-ln(Nt+1", -1, matchcol2 = 5, header = TRUE)
     # if(nrow(Z_at_age)>0){
-    Z_at_age[Z_at_age=="_"] <- NA
-    M_at_age[M_at_age=="_"] <- NA
+    Z_at_age[Z_at_age == "_"] <- NA
+    M_at_age[M_at_age == "_"] <- NA
     # if birth season is not season 1, you can get infinite values
-    Z_at_age[Z_at_age=="-1.#INF"] <- NA
-    M_at_age[M_at_age=="-1.#INF"] <- NA
+    Z_at_age[Z_at_age == "-1.#INF"] <- NA
+    M_at_age[M_at_age == "-1.#INF"] <- NA
     # if(Z_at_age[[1]][1]!="absent" && nrow(Z_at_age>0)){
     Z_at_age <- type.convert(Z_at_age, as.is = TRUE)
     M_at_age <- type.convert(M_at_age, as.is = TRUE)
-    
+
     returndat$Z_at_age <- Z_at_age
     returndat$M_at_age <- M_at_age
-    
+
     # Dynamic_Bzero output "with fishery"
-    Dynamic_Bzero1 <- matchfun2("Spawning_Biomass_Report_2",1,"NUMBERS_AT_AGE_Annual_2",-1)
+    Dynamic_Bzero1 <- matchfun2("Spawning_Biomass_Report_2", 1, "NUMBERS_AT_AGE_Annual_2", -1)
     # Dynamic_Bzero output "no fishery"
-    Dynamic_Bzero2 <- matchfun2("Spawning_Biomass_Report_1",1,"NUMBERS_AT_AGE_Annual_1",-1)
-    
-    Dynamic_Bzero <- cbind(Dynamic_Bzero1,Dynamic_Bzero2[,3])
-    names(Dynamic_Bzero) <- c("Yr","Era","SSB","SSB_nofishing")
+    Dynamic_Bzero2 <- matchfun2("Spawning_Biomass_Report_1", 1, "NUMBERS_AT_AGE_Annual_1", -1)
+
+    Dynamic_Bzero <- cbind(Dynamic_Bzero1, Dynamic_Bzero2[, 3])
+    names(Dynamic_Bzero) <- c("Yr", "Era", "SSB", "SSB_nofishing")
     # if(nareas==1 & ngpatterns==1){ # for simpler models, do some cleanup
-    Dynamic_Bzero <- type.convert(Dynamic_Bzero[-(1:2),], as.is = TRUE)
-    names(Dynamic_Bzero) <- c("Yr","Era","SSB","SSB_nofishing")
-    
+    Dynamic_Bzero <- type.convert(Dynamic_Bzero[-(1:2), ], as.is = TRUE)
+    names(Dynamic_Bzero) <- c("Yr", "Era", "SSB", "SSB_nofishing")
+
     returndat$Dynamic_Bzero <- Dynamic_Bzero
-    
-    
+
+
     returndat$comp_data_exists <- FALSE
-    
+
     # tables on fit to comps and mean age stuff from within Report.sso
     returndat$len_comp_fit_table <- fit_len_comps
     returndat$age_comp_fit_table <- fit_age_comps
     returndat$size_comp_fit_table <- fit_size_comps
-    
+
     returndat$derived_quants <- der
     returndat$parameters <- parameters
     returndat$FleetNames <- FleetNames
     # returndat$repfiletime <- repfiletime
-    returndat$SRRtype <- as.numeric(rawrep[matchfun("SPAWN_RECRUIT"),3]) # type of stock recruit relationship
-    
+    returndat$SRRtype <- as.numeric(rawrep[matchfun("SPAWN_RECRUIT"), 3]) # type of stock recruit relationship
+
     # get "sigma" used by Pacific Council in P-star calculations
-    SSB_final_Label <- paste0("SSB_",endyr+1)
+    SSB_final_Label <- paste0("SSB_", endyr + 1)
     # if(SSB_final_Label %in% der$Label){
-    SSB_final_EST <- der$Value[der$Label==SSB_final_Label]
-    SSB_final_SD <- der$StdDev[der$Label==SSB_final_Label]
-    returndat$Pstar_sigma <- sqrt(log((SSB_final_SD/SSB_final_EST)^2+1))
+    SSB_final_EST <- der$Value[der$Label == SSB_final_Label]
+    SSB_final_SD <- der$StdDev[der$Label == SSB_final_Label]
+    returndat$Pstar_sigma <- sqrt(log((SSB_final_SD / SSB_final_EST)^2 + 1))
     # }else{
     #   returndat$Pstar_sigma <- NULL
     # }
     # get alternative "sigma" based on OFL catch used by Pacific Council
     # (added 23 Sept 2019 based on decision by PFMC SSC)
-    OFL_final_Label <- paste0("OFLCatch_",endyr+1)
+    OFL_final_Label <- paste0("OFLCatch_", endyr + 1)
     # if(OFL_final_Label %in% der$Label){
-    OFL_final_EST <- der$Value[der$Label==OFL_final_Label]
-    OFL_final_SD <- der$StdDev[der$Label==OFL_final_Label]
-    returndat$OFL_sigma <- sqrt(log((OFL_final_SD/OFL_final_EST)^2+1))
+    OFL_final_EST <- der$Value[der$Label == OFL_final_Label]
+    OFL_final_SD <- der$StdDev[der$Label == OFL_final_Label]
+    returndat$OFL_sigma <- sqrt(log((OFL_final_SD / OFL_final_EST)^2 + 1))
     # }else{
     #   returndat$OFL_sigma <- NULL
     # }
-    
-    
-    
+
+
+
     # extract parameter lines representing annual recruit devs
-    recdevEarly   <- parameters[substring(parameters$Label,1,13)=="Early_RecrDev",]
-    early_initage <- parameters[substring(parameters$Label,1,13)=="Early_InitAge",]
-    main_initage  <- parameters[substring(parameters$Label,1,12)=="Main_InitAge",]
-    recdev        <- parameters[substring(parameters$Label,1,12)=="Main_RecrDev",]
-    recdevFore    <- parameters[substring(parameters$Label,1, 8)=="ForeRecr",]
-    recdevLate    <- parameters[substring(parameters$Label,1,12)=="Late_RecrDev",]
-    
+    recdevEarly <- parameters[substring(parameters$Label, 1, 13) == "Early_RecrDev", ]
+    early_initage <- parameters[substring(parameters$Label, 1, 13) == "Early_InitAge", ]
+    main_initage <- parameters[substring(parameters$Label, 1, 12) == "Main_InitAge", ]
+    recdev <- parameters[substring(parameters$Label, 1, 12) == "Main_RecrDev", ]
+    recdevFore <- parameters[substring(parameters$Label, 1, 8) == "ForeRecr", ]
+    recdevLate <- parameters[substring(parameters$Label, 1, 12) == "Late_RecrDev", ]
+
     # empty variable to fill in sections
     recruitpars <- NULL
-    
+
     # assign "type" label to each one and identify year
-    
-    if(nrow(recdevEarly)>0){
-      recdevEarly$type   <- "Early_RecrDev"
-      recdevEarly$Yr   <- as.numeric(substring(recdevEarly$Label,15))
+
+    if (nrow(recdevEarly) > 0) {
+      recdevEarly$type <- "Early_RecrDev"
+      recdevEarly$Yr <- as.numeric(substring(recdevEarly$Label, 15))
       recruitpars <- rbind(recruitpars, recdevEarly)
     }
     # if(nrow(main_initage)>0){
@@ -1564,216 +1639,241 @@ SS_output_Report <-
     #   main_initage$Yr  <- startyr - as.numeric(substring(main_initage$Label,14))
     #   recruitpars <- rbind(recruitpars, main_initage)
     # }
-    if(nrow(recdev)>0){
-      recdev$type        <- "Main_RecrDev"
-      recdev$Yr        <- as.numeric(substring(recdev$Label,14))
+    if (nrow(recdev) > 0) {
+      recdev$type <- "Main_RecrDev"
+      recdev$Yr <- as.numeric(substring(recdev$Label, 14))
       recruitpars <- rbind(recruitpars, recdev)
     }
-    if(nrow(recdevFore)>0){
-      recdevFore$type    <- "ForeRecr"
-      recdevFore$Yr <- as.numeric(substring(recdevFore$Label,10))
+    if (nrow(recdevFore) > 0) {
+      recdevFore$type <- "ForeRecr"
+      recdevFore$Yr <- as.numeric(substring(recdevFore$Label, 10))
       recruitpars <- rbind(recruitpars, recdevFore)
     }
-    if(nrow(recdevLate)>0){
-      recdevLate$type    <- "Late_RecrDev"
-      recdevLate$Yr <- as.numeric(substring(recdevLate$Label,14))
+    if (nrow(recdevLate) > 0) {
+      recdevLate$type <- "Late_RecrDev"
+      recdevLate$Yr <- as.numeric(substring(recdevLate$Label, 14))
       recruitpars <- rbind(recruitpars, recdevLate)
     }
-    
+
     # sort by year and remove any retain only essential columns
     # if(!is.null(recruitpars)){
-    recruitpars <- recruitpars[order(recruitpars$Yr),
-                               c("Value","Parm_StDev","type","Yr")]
+    recruitpars <- recruitpars[
+      order(recruitpars$Yr),
+      c("Value", "Parm_StDev", "type", "Yr")
+    ]
     # }
-    
+
     # add recruitpars to list of stuff that gets returned
     returndat$recruitpars <- recruitpars
-    
+
     # if(is.null(recruitpars)){
     #   sigma_R_info <- NULL
     # }else{
     # calculating values related to tuning SigmaR
-    sigma_R_info <- data.frame(period = c("Main","Early+Main","Early+Main+Late"),
-                               N_devs = 0,
-                               SD_of_devs = NA,
-                               Var_of_devs = NA,
-                               mean_SE = NA,
-                               mean_SEsquared = NA)
-    
+    sigma_R_info <- data.frame(
+      period = c("Main", "Early+Main", "Early+Main+Late"),
+      N_devs = 0,
+      SD_of_devs = NA,
+      Var_of_devs = NA,
+      mean_SE = NA,
+      mean_SEsquared = NA
+    )
+
     # calculate recdev stats  for Main period
     subset <- recruitpars$type %in% c("Main_InitAge", "Main_RecrDev")
-    within_period <- sigma_R_info$period=="Main"
+    within_period <- sigma_R_info$period == "Main"
     sigma_R_info$N_devs[within_period] <- sum(subset)
     sigma_R_info$SD_of_devs[within_period] <- sd(recruitpars$Value[subset])
     sigma_R_info$mean_SE[within_period] <- mean(recruitpars$Parm_StDev[subset])
     sigma_R_info$mean_SEsquared[within_period] <-
       mean((recruitpars$Parm_StDev[subset])^2)
-    
+
     # calculate recdev stats  for Early+Main periods
-    subset <- recruitpars$type %in% c("Early_RecrDev", "Early_InitAge",
-                                      "Main_InitAge", "Main_RecrDev")
-    within_period <- sigma_R_info$period=="Early+Main"
+    subset <- recruitpars$type %in% c(
+      "Early_RecrDev", "Early_InitAge",
+      "Main_InitAge", "Main_RecrDev"
+    )
+    within_period <- sigma_R_info$period == "Early+Main"
     sigma_R_info$N_devs[within_period] <- sum(subset)
     sigma_R_info$SD_of_devs[within_period] <- sd(recruitpars$Value[subset])
     sigma_R_info$mean_SE[within_period] <- mean(recruitpars$Parm_StDev[subset])
     sigma_R_info$mean_SEsquared[within_period] <-
       mean((recruitpars$Parm_StDev[subset])^2)
-    
+
     # calculate recdev stats for Early+Main+Late periods
-    subset <- recruitpars$type %in% c("Early_RecrDev", "Early_InitAge",
-                                      "Main_InitAge", "Main_RecrDev", "Late_RecrDev")
-    within_period <- sigma_R_info$period=="Early+Main+Late"
+    subset <- recruitpars$type %in% c(
+      "Early_RecrDev", "Early_InitAge",
+      "Main_InitAge", "Main_RecrDev", "Late_RecrDev"
+    )
+    within_period <- sigma_R_info$period == "Early+Main+Late"
     sigma_R_info$N_devs[within_period] <- sum(subset)
     sigma_R_info$SD_of_devs[within_period] <- sd(recruitpars$Value[subset])
     sigma_R_info$mean_SE[within_period] <- mean(recruitpars$Parm_StDev[subset])
     sigma_R_info$mean_SEsquared[within_period] <-
       mean((recruitpars$Parm_StDev[subset])^2)
-    
+
     # add variance as square of SD
     sigma_R_info$Var_of_devs <- sigma_R_info$SD_of_devs^2
-    
+
     # add sqrt of sum
     sigma_R_info$sqrt_sum_of_components <- sqrt(sigma_R_info$Var_of_devs +
-                                                  sigma_R_info$mean_SEsquared)
+      sigma_R_info$mean_SEsquared)
     # ratio of sqrt of sum to sigmaR
-    sigma_R_info$SD_of_devs_over_sigma_R <- sigma_R_info$SD_of_devs/sigma_R_in
-    sigma_R_info$sqrt_sum_over_sigma_R <- sigma_R_info$sqrt_sum_of_components/sigma_R_in
+    sigma_R_info$SD_of_devs_over_sigma_R <- sigma_R_info$SD_of_devs / sigma_R_in
+    sigma_R_info$sqrt_sum_over_sigma_R <- sigma_R_info$sqrt_sum_of_components / sigma_R_in
     sigma_R_info$alternative_sigma_R <- sigma_R_in * sigma_R_info$sqrt_sum_over_sigma_R
-    #}
-    stats$sigma_R_in   <- sigma_R_in
+    # }
+    stats$sigma_R_in <- sigma_R_in
     stats$sigma_R_info <- sigma_R_info
-    stats$rmse_table   <- rmse_table
-    
+    stats$rmse_table <- rmse_table
+
     # process adjustments to recruit devs
-    RecrDistpars <- parameters[substring(parameters$Label,1,8)=="RecrDist",]
+    RecrDistpars <- parameters[substring(parameters$Label, 1, 8) == "RecrDist", ]
     returndat$RecrDistpars <- RecrDistpars
-    
+
     # adding read of wtatage file
     returndat$wtatage <- wtatage
-    
+
     # adding new jitter info table
     # returndat$jitter_info <- jitter_info
-    
+
     # add list of stats to list that gets returned
     returndat <- c(returndat, stats)
-    
+
     # add info on semi-parametric selectivity deviations
     returndat$seldev_pars <- seldev_pars
     returndat$seldev_matrix <- seldev_matrix
-    
-    
+
+
     # add log file to list that gets returned
     returndat$logfile <- logfile
-    
-    
+
+
     # return the inputs to this function so they can be used by SS_plots
     # or other functions
     inputs <- list()
-    inputs$dir      <- dir
-    inputs$repfile  <- repfile
+    inputs$dir <- dir
+    inputs$repfile <- repfile
     inputs$forecast <- forecast
-    inputs$warn     <- warn
-    inputs$covar    <- covar
-    inputs$verbose  <- verbose
-    
+    inputs$warn <- warn
+    inputs$covar <- covar
+    inputs$verbose <- verbose
+
     returndat$inputs <- inputs
-    
+
     # if(verbose) cat("completed SS_output\n")
     invisible(returndat)
-    
   } # end function
 
 
 
 
-GET_MSE_RESULTS = function(OM="Base_Concept", hlist=c(1,5,10,15), iters=seq(47,245, by=2), years=1960:2115, base_dir="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\"){
-  
-  iters0=iters
-  
-  for(h in hlist){
-    
-    iters=iters0
-    
+GET_MSE_RESULTS <- function(OM = "Base_Concept", hlist = c(1, 5, 10, 15), iters = seq(47, 245, by = 2), years = 1960:2115, base_dir = "") {
+  iters0 <- iters
+
+  for (h in hlist) {
+    iters <- iters0
+
     # REMOVE RUNS THAT WERE NOT COMPLETED.
-    lst_files = list.files(path=file.path(base_dir, paste0("OM_",OM), paste0("FRQ",h),"StoreResults") )
-    for(i in 1:length(iters0)){
-      iters[i] <- ifelse( length(which(lst_files %like% paste0("_",iters0[i],".")) )>0 ,iters0[i],NA)
+    lst_files <- list.files(path = file.path(base_dir, paste0("OM_", OM), paste0("FRQ", h), "StoreResults"))
+    for (i in 1:length(iters0)) {
+      iters[i] <- ifelse(length(which(lst_files %like% paste0("_", iters0[i], "."))) > 0, iters0[i], NA)
     }
-    iters<- iters[complete.cases(iters)]
+    iters <- iters[complete.cases(iters)]
     # if(h==13){iters=iters0[-which(iters==153)]} # for Hih_LoMexRec
     # iters = seq(47,245, by=2)
     # years = 1960:2115
-    
-    # create results data frames: 
+
+    # create results data frames:
     #  timeseries
-    SSB = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(SSB) <- iters
-    SSB_SSBMSY = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(SSB_SSBMSY) <- iters
-    SSB_SSB0 = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(SSB_SSB0) <- iters
-    Biomass = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(Biomass) <- iters
-    FM = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(FM) <- iters
-    FM_FMMSY = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(FM_FMMSY) <- iters
-    GOM_catch = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(GOM_catch) <- iters
-    Atl_catch = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(Atl_catch) <- iters
-    MEX_Rec_catch = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(MEX_Rec_catch) <- iters
-    MEN_bycatch = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(MEN_bycatch) <- iters
-    Com_catch = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(Com_catch) <- iters
-    Tot_catch = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(Tot_catch) <- iters
-    AvgLen_F = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(AvgLen_F) <- iters
-    AvgLen_M = as.data.frame( matrix(NA, nrow=length(years), ncol=length(iters)), row.names=years ) ; colnames(AvgLen_M) <- iters
-    
+    SSB <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(SSB) <- iters
+    SSB_SSBMSY <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(SSB_SSBMSY) <- iters
+    SSB_SSB0 <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(SSB_SSB0) <- iters
+    Biomass <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(Biomass) <- iters
+    FM <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(FM) <- iters
+    FM_FMMSY <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(FM_FMMSY) <- iters
+    GOM_catch <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(GOM_catch) <- iters
+    Atl_catch <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(Atl_catch) <- iters
+    MEX_Rec_catch <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(MEX_Rec_catch) <- iters
+    MEN_bycatch <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(MEN_bycatch) <- iters
+    Com_catch <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(Com_catch) <- iters
+    Tot_catch <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(Tot_catch) <- iters
+    AvgLen_F <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(AvgLen_F) <- iters
+    AvgLen_M <- as.data.frame(matrix(NA, nrow = length(years), ncol = length(iters)), row.names = years)
+    colnames(AvgLen_M) <- iters
+
     # values
-    SSB_MSY = as.data.frame(vector(length=length(iters)), row.names=as.character(iters) ) ; colnames(SSB_MSY) <- "SSB_MSY"
-    F_MSY = as.data.frame(vector(length=length(iters)), row.names=as.character(iters) ) ; colnames(F_MSY) <- "F_MSY"
-    MSY = as.data.frame(vector(length=length(iters)), row.names=as.character(iters) ) ; colnames(MSY) <- "MSY"
-    SSB0 = as.data.frame(vector(length=length(iters)), row.names=as.character(iters) ) ; colnames(SSB0) <- "SSB0"
-    SSB_MSY = as.data.frame(vector(length=length(iters)), row.names=as.character(iters) ) ; colnames(SSB_MSY) <- "SSB_MSY"
-    
-    for(i in 1:length(iters)){
-      j=iters[i]
-      
-      #Get Results from Report File
-      xx = SS_output_Report(dir=file.path(paste0(base_dir,"OM_",OM,"\\FRQ",h,"\\StoreResults")), repfile=paste0("OMReport_",j,".sso") )
-      
+    SSB_MSY <- as.data.frame(vector(length = length(iters)), row.names = as.character(iters))
+    colnames(SSB_MSY) <- "SSB_MSY"
+    F_MSY <- as.data.frame(vector(length = length(iters)), row.names = as.character(iters))
+    colnames(F_MSY) <- "F_MSY"
+    MSY <- as.data.frame(vector(length = length(iters)), row.names = as.character(iters))
+    colnames(MSY) <- "MSY"
+    SSB0 <- as.data.frame(vector(length = length(iters)), row.names = as.character(iters))
+    colnames(SSB0) <- "SSB0"
+    SSB_MSY <- as.data.frame(vector(length = length(iters)), row.names = as.character(iters))
+    colnames(SSB_MSY) <- "SSB_MSY"
+
+    for (i in 1:length(iters)) {
+      j <- iters[i]
+
+      # Get Results from Report File
+      xx <- SS_output_Report(dir = file.path(paste0(base_dir, "OM_", OM, "\\FRQ", h, "\\StoreResults")), repfile = paste0("OMReport_", j, ".sso"))
+
       # Timeseries
       # Get F values
-      FM_FMMSY[,i] = xx$derived_quants[ rownames(xx$derived_quants) %like% "F_", "Value"][1:(nrow(xx$timeseries)-3)]
-      FM[,i] = xx$derived_quants[ rownames(xx$derived_quants) %like% "F_", "Value"][1:(nrow(xx$timeseries)-3)] * xx$derived_quants["annF_MSY","Value"]
+      FM_FMMSY[, i] <- xx$derived_quants[rownames(xx$derived_quants) %like% "F_", "Value"][1:(nrow(xx$timeseries) - 3)]
+      FM[, i] <- xx$derived_quants[rownames(xx$derived_quants) %like% "F_", "Value"][1:(nrow(xx$timeseries) - 3)] * xx$derived_quants["annF_MSY", "Value"]
       # FM is equivalent to below with rounding error.
-      # FM[,i] = xx$timeseries$`F:_1`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`F:_2`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`F:_3`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`F:_4`[3:(nrow(xx$timeseries)-1)] 
-      
+      # FM[,i] = xx$timeseries$`F:_1`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`F:_2`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`F:_3`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`F:_4`[3:(nrow(xx$timeseries)-1)]
+
       # Get B values
-      SSB_SSB0[,i] = xx$derived_quants[ rownames(xx$derived_quants) %like% "Bratio_", "Value"][1:(nrow(xx$timeseries)-3)]
-      SSB_SSBMSY[,i] = xx$timeseries$SpawnBio[3:(nrow(xx$timeseries)-1)] / xx$derived_quants["SSB_MSY","Value"]
-      SSB[,i] = xx$timeseries$SpawnBio[3:(nrow(xx$timeseries)-1)]
-      Biomass[,i] = xx$timeseries$Bio_all[3:(nrow(xx$timeseries)-1)]
-      
+      SSB_SSB0[, i] <- xx$derived_quants[rownames(xx$derived_quants) %like% "Bratio_", "Value"][1:(nrow(xx$timeseries) - 3)]
+      SSB_SSBMSY[, i] <- xx$timeseries$SpawnBio[3:(nrow(xx$timeseries) - 1)] / xx$derived_quants["SSB_MSY", "Value"]
+      SSB[, i] <- xx$timeseries$SpawnBio[3:(nrow(xx$timeseries) - 1)]
+      Biomass[, i] <- xx$timeseries$Bio_all[3:(nrow(xx$timeseries) - 1)]
+
       # Get catch values
-      GOM_catch[,i] = xx$timeseries$`retain(B):_1`[3:(nrow(xx$timeseries)-1)]
-      Atl_catch[,i] = xx$timeseries$`retain(B):_2`[3:(nrow(xx$timeseries)-1)]
-      MEX_Rec_catch[,i] = xx$timeseries$`retain(B):_3`[3:(nrow(xx$timeseries)-1)]
-      MEN_bycatch[,i] = xx$timeseries$`retain(B):_4`[3:(nrow(xx$timeseries)-1)]
-      Com_catch[,i] = xx$timeseries$`retain(B):_1`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`retain(B):_2`[3:(nrow(xx$timeseries)-1)]
-      Tot_catch[,i] = xx$timeseries$`retain(B):_1`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`retain(B):_2`[3:(nrow(xx$timeseries)-1)] + 
-        xx$timeseries$`retain(B):_3`[3:(nrow(xx$timeseries)-1)] + xx$timeseries$`retain(B):_4`[3:(nrow(xx$timeseries)-1)]
-      
+      GOM_catch[, i] <- xx$timeseries$`retain(B):_1`[3:(nrow(xx$timeseries) - 1)]
+      Atl_catch[, i] <- xx$timeseries$`retain(B):_2`[3:(nrow(xx$timeseries) - 1)]
+      MEX_Rec_catch[, i] <- xx$timeseries$`retain(B):_3`[3:(nrow(xx$timeseries) - 1)]
+      MEN_bycatch[, i] <- xx$timeseries$`retain(B):_4`[3:(nrow(xx$timeseries) - 1)]
+      Com_catch[, i] <- xx$timeseries$`retain(B):_1`[3:(nrow(xx$timeseries) - 1)] + xx$timeseries$`retain(B):_2`[3:(nrow(xx$timeseries) - 1)]
+      Tot_catch[, i] <- xx$timeseries$`retain(B):_1`[3:(nrow(xx$timeseries) - 1)] + xx$timeseries$`retain(B):_2`[3:(nrow(xx$timeseries) - 1)] +
+        xx$timeseries$`retain(B):_3`[3:(nrow(xx$timeseries) - 1)] + xx$timeseries$`retain(B):_4`[3:(nrow(xx$timeseries) - 1)]
+
       # Avg Lengths
-      l = as.numeric(names(xx$natlen[xx$natlen$'Beg/Mid'=="B",13:ncol(xx$natlen)]))
-      avgL = apply(xx$natlen[xx$natlen$'Beg/Mid'=="B",13:ncol(xx$natlen)] * sapply(l, rep, nrow(xx$natlen[xx$natlen$'Beg/Mid'=="B",13:ncol(xx$natlen)])), 1, sum) / 
-        apply(xx$natlen[xx$natlen$'Beg/Mid'=="B",13:ncol(xx$natlen)] , 1, sum)
-      avgL2 = as.data.frame(cbind(xx$natlen[xx$natlen$'Beg/Mid'=="B",]$Yr,xx$natlen[xx$natlen$'Beg/Mid'=="B",]$Sex, avgL)) ; colnames(avgL2) <- c("Yr","Sex","avgL")
-      AvgLen_F[,i] = avgL2[avgL2$Sex==1 & avgL2$Yr<2116,"avgL"]
-      AvgLen_M[,i] = avgL2[avgL2$Sex==2 & avgL2$Yr<2116,"avgL"]
-      
+      l <- as.numeric(names(xx$natlen[xx$natlen$"Beg/Mid" == "B", 13:ncol(xx$natlen)]))
+      avgL <- apply(xx$natlen[xx$natlen$"Beg/Mid" == "B", 13:ncol(xx$natlen)] * sapply(l, rep, nrow(xx$natlen[xx$natlen$"Beg/Mid" == "B", 13:ncol(xx$natlen)])), 1, sum) /
+        apply(xx$natlen[xx$natlen$"Beg/Mid" == "B", 13:ncol(xx$natlen)], 1, sum)
+      avgL2 <- as.data.frame(cbind(xx$natlen[xx$natlen$"Beg/Mid" == "B", ]$Yr, xx$natlen[xx$natlen$"Beg/Mid" == "B", ]$Sex, avgL))
+      colnames(avgL2) <- c("Yr", "Sex", "avgL")
+      AvgLen_F[, i] <- avgL2[avgL2$Sex == 1 & avgL2$Yr < 2116, "avgL"]
+      AvgLen_M[, i] <- avgL2[avgL2$Sex == 2 & avgL2$Yr < 2116, "avgL"]
+
       # Get MSY reference points
-      F_MSY[i,] = xx$derived_quants["annF_MSY","Value"]
-      SSB_MSY[i,] = xx$derived_quants["SSB_MSY","Value"]
-      SSB0[i,] = xx$derived_quants["SSB_unfished","Value"]
-      MSY[i,] = xx$derived_quants["Dead_Catch_MSY","Value"]
-      
-      print(paste0("End FRQ ", h, " - iter ", j) )
+      F_MSY[i, ] <- xx$derived_quants["annF_MSY", "Value"]
+      SSB_MSY[i, ] <- xx$derived_quants["SSB_MSY", "Value"]
+      SSB0[i, ] <- xx$derived_quants["SSB_unfished", "Value"]
+      MSY[i, ] <- xx$derived_quants["Dead_Catch_MSY", "Value"]
+
+      print(paste0("End FRQ ", h, " - iter ", j))
     } # End iter loop
-    
-    # Save results in list for each FRQ 
+
+    # Save results in list for each FRQ
     listx <- list()
     listx[["SSB"]] <- SSB
     listx[["SSB_SSB0"]] <- SSB_SSB0
@@ -1793,20 +1893,20 @@ GET_MSE_RESULTS = function(OM="Base_Concept", hlist=c(1,5,10,15), iters=seq(47,2
     listx[["SSB_MSY"]] <- SSB_MSY
     listx[["SSB0"]] <- SSB0
     listx[["MSY"]] <- MSY
-    
-    assign(paste0("FRQ_",h), listx)
-    
-    print(paste0("End FRQ ",h) )
+
+    assign(paste0("FRQ_", h), listx)
+
+    print(paste0("End FRQ ", h))
   } # for each FRQ
-  
+
   # Collate results for each FRQ within each OM
   listy <- list()
-  for(hh in hlist){
-    listy[[paste0("FRQ_",hh)]] <- get(paste0("FRQ_",hh))
+  for (hh in hlist) {
+    listy[[paste0("FRQ_", hh)]] <- get(paste0("FRQ_", hh))
   }
-  assign(paste0("OM_",OM), listy)
-  
-  return(list=(  assign(paste0("OM_",OM), listy) )) 
+  assign(paste0("OM_", OM), listy)
+
+  return(list = (assign(paste0("OM_", OM), listy)))
 }
 
 # GET_MSE_
@@ -1815,12 +1915,9 @@ GET_MSE_RESULTS = function(OM="Base_Concept", hlist=c(1,5,10,15), iters=seq(47,2
 
 
 
-
-
-
 ##### Get Results Function -----------------------------------------------------------------------------------------------------------
 
-OM_List = c("Base","BH","Hih","lnR0","Loh","M_BH")
+OM_List <- c("Base", "BH", "Hih", "lnR0", "Loh", "M_BH")
 # OM="Hih"
 # iters=seq(47,49, by=2)
 # for(OM in OM_List){
@@ -1828,24 +1925,24 @@ OM_List = c("Base","BH","Hih","lnR0","Loh","M_BH")
 
 ### GET RESULTS ###
 # implementation 1 (HiMexRec)
-OM_Base_HiMexRec<-GET_MSE_RESULTS(OM="Base_HiMexRec")
-save(OM_Base_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Base_HiMexRec_Results.RData")
+OM_Base_HiMexRec <- GET_MSE_RESULTS(OM = "Base_HiMexRec")
+save(OM_Base_HiMexRec, file = "OM_Base_HiMexRec_Results.RData")
 
-OM_BH_HiMexRec<-GET_MSE_RESULTS(OM="BH_HiMexRec")
-save(OM_BH_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_BH_HiMexRec_Results.RData")
+OM_BH_HiMexRec <- GET_MSE_RESULTS(OM = "BH_HiMexRec")
+save(OM_BH_HiMexRec, file = "OM_BH_HiMexRec_Results.RData")
 
-OM_Hih_HiMexRec<-GET_MSE_RESULTS(OM="Hih_HiMexRec")
-save(OM_Hih_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Hih_HiMexRec_Results.RData")
+OM_Hih_HiMexRec <- GET_MSE_RESULTS(OM = "Hih_HiMexRec")
+save(OM_Hih_HiMexRec, file = "OM_Hih_HiMexRec_Results.RData")
 
-OM_Loh_HiMexRec<-GET_MSE_RESULTS(OM="Loh_HiMexRec")
-save(OM_Loh_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Loh_HiMexRec_Results.RData")
+OM_Loh_HiMexRec <- GET_MSE_RESULTS(OM = "Loh_HiMexRec")
+save(OM_Loh_HiMexRec, file = "OM_Loh_HiMexRec_Results.RData")
 
-OM_lnR0_HiMexRec<-GET_MSE_RESULTS(OM="lnR0_HiMexRec")
-save(OM_lnR0_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_lnR0_HiMexRec_Results.RData")
+OM_lnR0_HiMexRec <- GET_MSE_RESULTS(OM = "lnR0_HiMexRec")
+save(OM_lnR0_HiMexRec, file = "OM_lnR0_HiMexRec_Results.RData")
 
-OM_M_BH_HiMexRec<-GET_MSE_RESULTS(OM="M_BH_HiMexRec")
-save(OM_M_BH_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_M_BH_HiMexRec_Results.RData")
-# 
+OM_M_BH_HiMexRec <- GET_MSE_RESULTS(OM = "M_BH_HiMexRec")
+save(OM_M_BH_HiMexRec, file = "OM_M_BH_HiMexRec_Results.RData")
+#
 # OM_Base_HiMexRec=OM_Base
 # OM_BH_HiMexRec=OM_BH
 # OM_Hih_HiMexRec=OM_Hih
@@ -1854,23 +1951,23 @@ save(OM_M_BH_HiMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Resul
 # OM_M_BH_HiMexRec=OM_M_BH
 
 # implementation 2 (Concept)
-OM_Base_Concept<-GET_MSE_RESULTS(OM="Base_Concept")
-save(OM_Base_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Base_Concept_Results.RData")
+OM_Base_Concept <- GET_MSE_RESULTS(OM = "Base_Concept")
+save(OM_Base_Concept, file = "OM_Base_Concept_Results.RData")
 
-OM_BH_Concept<-GET_MSE_RESULTS(OM="BH_Concept")
-save(OM_BH_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_BH_Concept_Results.RData")
+OM_BH_Concept <- GET_MSE_RESULTS(OM = "BH_Concept")
+save(OM_BH_Concept, file = "OM_BH_Concept_Results.RData")
 
-OM_Hih_Concept<-GET_MSE_RESULTS(OM="Hih_Concept")
-save(OM_Hih_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Hih_Concept_Results.RData")
+OM_Hih_Concept <- GET_MSE_RESULTS(OM = "Hih_Concept")
+save(OM_Hih_Concept, file = "OM_Hih_Concept_Results.RData")
 
-OM_Loh_Concept<-GET_MSE_RESULTS(OM="Loh_Concept")
-save(OM_Loh_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Loh_Concept_Results.RData")
+OM_Loh_Concept <- GET_MSE_RESULTS(OM = "Loh_Concept")
+save(OM_Loh_Concept, file = "OM_Loh_Concept_Results.RData")
 
-OM_lnR0_Concept<-GET_MSE_RESULTS(OM="lnR0_Concept")
-save(OM_lnR0_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_lnR0_Concept_Results.RData")
+OM_lnR0_Concept <- GET_MSE_RESULTS(OM = "lnR0_Concept")
+save(OM_lnR0_Concept, file = "OM_lnR0_Concept_Results.RData")
 
-OM_M_BH_Concept<-GET_MSE_RESULTS(OM="M_BH_Concept")
-save(OM_M_BH_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_M_BH_Concept_Results.RData")
+OM_M_BH_Concept <- GET_MSE_RESULTS(OM = "M_BH_Concept")
+save(OM_M_BH_Concept, file = "OM_M_BH_Concept_Results.RData")
 
 # OM_Base_Concept=OM_Base_MexRec
 # OM_BH_Concept=OM_BH_MexRec
@@ -1881,23 +1978,23 @@ save(OM_M_BH_Concept, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Result
 
 
 # implementation 3 (LoMexRec)
-OM_Base_LoMexRec<-GET_MSE_RESULTS(OM="Base_LoMexRec")
-save(OM_Base_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Base_LoMexRec_Results.RData")
+OM_Base_LoMexRec <- GET_MSE_RESULTS(OM = "Base_LoMexRec")
+save(OM_Base_LoMexRec, file = "OM_Base_LoMexRec_Results.RData")
 
-OM_BH_LoMexRec<-GET_MSE_RESULTS(OM="BH_LoMexRec")
-save(OM_BH_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_BH_LoMexRec_Results.RData")
+OM_BH_LoMexRec <- GET_MSE_RESULTS(OM = "BH_LoMexRec")
+save(OM_BH_LoMexRec, file = "OM_BH_LoMexRec_Results.RData")
 
-OM_Hih_LoMexRec<-GET_MSE_RESULTS(OM="Hih_LoMexRec")
-save(OM_Hih_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Hih_LoMexRec_Results.RData")
+OM_Hih_LoMexRec <- GET_MSE_RESULTS(OM = "Hih_LoMexRec")
+save(OM_Hih_LoMexRec, file = "OM_Hih_LoMexRec_Results.RData")
 
-OM_Loh_LoMexRec<-GET_MSE_RESULTS(OM="Loh_LoMexRec")
-save(OM_Loh_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Loh_LoMexRec_Results.RData")
+OM_Loh_LoMexRec <- GET_MSE_RESULTS(OM = "Loh_LoMexRec")
+save(OM_Loh_LoMexRec, file = "OM_Loh_LoMexRec_Results.RData")
 
-OM_lnR0_LoMexRec<-GET_MSE_RESULTS(OM="lnR0_LoMexRec")
-save(OM_lnR0_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_lnR0_LoMexRec_Results.RData")
+OM_lnR0_LoMexRec <- GET_MSE_RESULTS(OM = "lnR0_LoMexRec")
+save(OM_lnR0_LoMexRec, file = "OM_lnR0_LoMexRec_Results.RData")
 
-OM_M_BH_LoMexRec<-GET_MSE_RESULTS(OM="M_BH_LoMexRec")
-save(OM_M_BH_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_M_BH_LoMexRec_Results.RData")
+OM_M_BH_LoMexRec <- GET_MSE_RESULTS(OM = "M_BH_LoMexRec")
+save(OM_M_BH_LoMexRec, file = "OM_M_BH_LoMexRec_Results.RData")
 
 
 
@@ -1910,915 +2007,966 @@ save(OM_M_BH_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Resul
 # MSE_Results_List[["OM_lnR0"]] <- OM_lnR0
 # MSE_Results_List[["OM_Loh"]] <- OM_Loh
 # MSE_Results_List[["OM_M_BH"]] <- OM_M_BH
-# 
+#
 # save(MSE_Results_List, file="")
 
 # NOTE RESULTS STRUCTURE: MSE_RESULTS_LIST >> OM >> FRQ >> Value
 
 
 #### LOAD RESULTS ####
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Base_HiMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_BH_HiMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Hih_HiMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Loh_HiMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_lnR0_HiMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_M_BH_HiMexRec_Results.RData")
+load(file = "OM_Base_HiMexRec_Results.RData")
+load(file = "OM_BH_HiMexRec_Results.RData")
+load(file = "OM_Hih_HiMexRec_Results.RData")
+load(file = "OM_Loh_HiMexRec_Results.RData")
+load(file = "OM_lnR0_HiMexRec_Results.RData")
+load(file = "OM_M_BH_HiMexRec_Results.RData")
 
 
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Base_Concept_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_BH_Concept_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Hih_Concept_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Loh_Concept_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_lnR0_Concept_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_M_BH_Concept_Results.RData")
+load(file = "OM_Base_Concept_Results.RData")
+load(file = "OM_BH_Concept_Results.RData")
+load(file = "OM_Hih_Concept_Results.RData")
+load(file = "OM_Loh_Concept_Results.RData")
+load(file = "OM_lnR0_Concept_Results.RData")
+load(file = "OM_M_BH_Concept_Results.RData")
 
 
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Base_LoMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_BH_LoMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Hih_LoMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_Loh_LoMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_lnR0_LoMexRec_Results.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\OM_M_BH_LoMexRec_Results.RData")
+load(file = "OM_Base_LoMexRec_Results.RData")
+load(file = "OM_BH_LoMexRec_Results.RData")
+load(file = "OM_Hih_LoMexRec_Results.RData")
+load(file = "OM_Loh_LoMexRec_Results.RData")
+load(file = "OM_lnR0_LoMexRec_Results.RData")
+load(file = "OM_M_BH_LoMexRec_Results.RData")
 
 
 #### TEST PLOT #####
-years=1960:2115;  hlist=c(1,5,10,15);iters=seq(47,245, by=2)
-iters = seq(47,245, by=2)
-years = 1960:2115
-col_list = c(rgb(0.75, 0.75, 0.75, 0.20),rgb(0.33, 0.80, 0.92, 0.15),rgb(0.79, 0.9, 0.44, 0.3),rgb(0.86, 0.44, 0.84, 0.2))
-col_list2 = c("black","deepskyblue3","forestgreen","darkorchid")
-lty_list = c(1,1,2,2)
+years <- 1960:2115
+hlist <- c(1, 5, 10, 15)
+iters <- seq(47, 245, by = 2)
+iters <- seq(47, 245, by = 2)
+years <- 1960:2115
+col_list <- c(rgb(0.75, 0.75, 0.75, 0.20), rgb(0.33, 0.80, 0.92, 0.15), rgb(0.79, 0.9, 0.44, 0.3), rgb(0.86, 0.44, 0.84, 0.2))
+col_list2 <- c("black", "deepskyblue3", "forestgreen", "darkorchid")
+lty_list <- c(1, 1, 2, 2)
 
-col_lista = rep(col_list, (24/4))
-col_list2a = rep(col_list2, (24/4))
-lty_lista = rep(lty_list, (24/4))
-
-
-OM_Plot = OM_BH_LoMexRec
-OM_Name = "OM_Base_LoMexRec"
+col_lista <- rep(col_list, (24 / 4))
+col_list2a <- rep(col_list2, (24 / 4))
+lty_lista <- rep(lty_list, (24 / 4))
 
 
-par(mfrow=c(2,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
+OM_Plot <- OM_BH_LoMexRec
+OM_Name <- "OM_Base_LoMexRec"
+
+
+par(mfrow = c(2, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
 # for(k in flist){
 
-plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-# mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-# legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-abline(h=1)
-for(h in hlist){
-  for(i in 1:length(iters)){
-    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
-      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(hlist==h)])
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[, 1], type = "l", col = "white", ylim = c(0, 2.5), ylab = "")
+# mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+# legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+abline(h = 1)
+for (h in hlist) {
+  for (i in 1:length(iters)) {
+    if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY)) { # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY[, i], col = col_list[which(hlist == h)])
     } # end if
   } # end for i
 } # end for h
-for(h in hlist){
-  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(hlist==h)], lty=lty_list[which(hlist==h)])
+for (h in hlist) {
+  lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY, 1, median), type = "l", lwd = 2, col = col_list2a[which(hlist == h)], lty = lty_list[which(hlist == h)])
 }
 # } # end k loop
-mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-mtext(expression("SSB/SSB"["MSY"])  , side=2,  cex = 1.5, line=1)
+mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+mtext(expression("SSB/SSB"["MSY"]), side = 2, cex = 1.5, line = 1)
 
 # par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
 # for(k in flist){
 
-plot(years, OM_Plot$FRQ_1$FM_FMMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-# mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-# legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-abline(h=1)
-for(h in hlist){
-  for(i in 1:length(iters)){
-    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$FM_FMMSY) ){                     # to skip over missing iterations
-      lines(years, OM_Plot[[paste0("FRQ_",h)]]$FM_FMMSY[,i], col=col_list[which(hlist==h)])
+plot(years, OM_Plot$FRQ_1$FM_FMMSY[, 1], type = "l", col = "white", ylim = c(0, 2.5), ylab = "")
+# mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+# legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+abline(h = 1)
+for (h in hlist) {
+  for (i in 1:length(iters)) {
+    if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$FM_FMMSY)) { # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_", h)]]$FM_FMMSY[, i], col = col_list[which(hlist == h)])
     } # end if
   } # end for i
 } # end for h
-for(h in hlist){
-  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$FM_FMMSY, 1, median), type='l', lwd=2, col=col_list2[which(hlist==h)], lty=lty_list[which(hlist==h)])
+for (h in hlist) {
+  lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$FM_FMMSY, 1, median), type = "l", lwd = 2, col = col_list2[which(hlist == h)], lty = lty_list[which(hlist == h)])
 }
 # } # end k loop
-mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-mtext(expression("F/F"["MSY"])  , side=2,  cex = 1.5, line=1)
+mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+mtext(expression("F/F"["MSY"]), side = 2, cex = 1.5, line = 1)
 
 
 ### MANIPULATE AND PLOT RESULTS FUNCTION --------------------------------------------------------------------------------------
 
-flist=c(1,5,10,15)
+flist <- c(1, 5, 10, 15)
 
-MANIP_RESULTS <- function(OM_Plot, OM_Name, plot=TRUE,flist=c(1,5,10,15)){
-  
+MANIP_RESULTS <- function(OM_Plot, OM_Name, plot = TRUE, flist = c(1, 5, 10, 15)) {
+
   ##### GET RESULTS ######
-  
+
   ## Get AAV ##
-  AAV_all = matrix(nrow=100, ncol=length(flist))
-  row.names(AAV_all) <- names(seq(47, 245, by=2))
-  colnames(AAV_all) <- paste0("FRQ_",flist)
-  AAV=rep(NA,100)
-  
-  for(frq in flist){
-    FRQ_iter = OM_Plot[[paste0("FRQ_",frq)]]
-    
-    for(n in names(FRQ_iter$Com_catch)){
-      
-      j=which(seq(47, 245, by=2)==n)
-      
-      bb = FRQ_iter$Com_catch[,n]
-      numsum = 0
-      denomsum = 0
-      for(i in (which(rownames(FRQ_iter$Com_catch)=='2017')):(which(rownames(FRQ_iter$Com_catch)=='2115'))  ){
-        numsum = numsum + abs(bb[i] - bb[i-1])
-        denomsum = denomsum + bb[i]
+  AAV_all <- matrix(nrow = 100, ncol = length(flist))
+  row.names(AAV_all) <- names(seq(47, 245, by = 2))
+  colnames(AAV_all) <- paste0("FRQ_", flist)
+  AAV <- rep(NA, 100)
+
+  for (frq in flist) {
+    FRQ_iter <- OM_Plot[[paste0("FRQ_", frq)]]
+
+    for (n in names(FRQ_iter$Com_catch)) {
+      j <- which(seq(47, 245, by = 2) == n)
+
+      bb <- FRQ_iter$Com_catch[, n]
+      numsum <- 0
+      denomsum <- 0
+      for (i in (which(rownames(FRQ_iter$Com_catch) == "2017")):(which(rownames(FRQ_iter$Com_catch) == "2115"))) {
+        numsum <- numsum + abs(bb[i] - bb[i - 1])
+        denomsum <- denomsum + bb[i]
       } # end i loop
-      
-      AAV[j] = ( numsum / denomsum )
-      
+
+      AAV[j] <- (numsum / denomsum)
     } # end j loop
-    
+
     # AAVe = ifelse(is.na(AAV), 0, AAV)
-    AAV_all[,which(flist==frq)] = AAV
+    AAV_all[, which(flist == frq)] <- AAV
   }
-  
-  AAV_FRQ = apply(AAV_all , 2 , median, na.rm=T)
-  
-  
-  
+
+  AAV_FRQ <- apply(AAV_all, 2, median, na.rm = T)
+
+
+
   ## Get SSB/SSBMSY 2115 ##
-  
-  SSB_SSBMSY_2115 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    ssb = t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_",f)]]$SSB_SSBMSY["2115",], 'iter'=as.numeric(colnames(OM_Plot[[paste0("FRQ_",f)]]$SSB_SSBMSY["2115",])) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    SSB_SSBMSY_2115[,which(flist==f)] = merge(ssb, xx, all.y=T)[,2]
+
+  SSB_SSBMSY_2115 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    ssb <- t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_", f)]]$SSB_SSBMSY["2115", ], "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$SSB_SSBMSY["2115", ])))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    SSB_SSBMSY_2115[, which(flist == f)] <- merge(ssb, xx, all.y = T)[, 2]
   }
   SSB_SSBMSY_2115 <- as.data.frame(SSB_SSBMSY_2115)
-  row.names(SSB_SSBMSY_2115) <- seq(from=47, to=245, by=2)
-  names(SSB_SSBMSY_2115) <- paste0("FRQ_",flist)
-  
+  row.names(SSB_SSBMSY_2115) <- seq(from = 47, to = 245, by = 2)
+  names(SSB_SSBMSY_2115) <- paste0("FRQ_", flist)
 
-  
-  
+
+
+
   ## Get SSB/SSBMSY 2065 ##
-  
-  SSB_SSBMSY_2065 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    ssb=t(as.data.frame(rbind( OM_Plot[[paste0("FRQ_",f)]]$SSB_SSBMSY["2065",] , 'iter'=as.numeric(colnames( OM_Plot[[paste0("FRQ_",f)]]$SSB_SSBMSY["2065",] )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    SSB_SSBMSY_2065[,which(flist==f)] = merge(ssb, xx, all.y=T)[,2]
+
+  SSB_SSBMSY_2065 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    ssb <- t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_", f)]]$SSB_SSBMSY["2065", ], "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$SSB_SSBMSY["2065", ])))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    SSB_SSBMSY_2065[, which(flist == f)] <- merge(ssb, xx, all.y = T)[, 2]
   }
   SSB_SSBMSY_2065 <- as.data.frame(SSB_SSBMSY_2065)
-  row.names(SSB_SSBMSY_2065) <- seq(from=47, to=245, by=2)
-  names(SSB_SSBMSY_2065) <- paste0("FRQ_",flist)
-  
-  
-  
+  row.names(SSB_SSBMSY_2065) <- seq(from = 47, to = 245, by = 2)
+  names(SSB_SSBMSY_2065) <- paste0("FRQ_", flist)
+
+
+
   ## Get Get F/FBMSY 2115 ##
-  
-  FM_FMMSY_2115 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    fmsy = t(as.data.frame(rbind( OM_Plot[[paste0("FRQ_",f)]]$FM_FMMSY["2115",] , 'iter'=as.numeric(colnames( OM_Plot[[paste0("FRQ_",f)]]$FM_FMMSY["2115",] )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    FM_FMMSY_2115[,which(flist==f)] = merge(fmsy, xx, all.y=T)[,2]
+
+  FM_FMMSY_2115 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    fmsy <- t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_", f)]]$FM_FMMSY["2115", ], "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$FM_FMMSY["2115", ])))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    FM_FMMSY_2115[, which(flist == f)] <- merge(fmsy, xx, all.y = T)[, 2]
   }
   FM_FMMSY_2115 <- as.data.frame(FM_FMMSY_2115)
-  row.names(FM_FMMSY_2115) <- seq(from=47, to=245, by=2)
-  names(FM_FMMSY_2115) <- paste0("FRQ_",flist)
-  
-  
-  
+  row.names(FM_FMMSY_2115) <- seq(from = 47, to = 245, by = 2)
+  names(FM_FMMSY_2115) <- paste0("FRQ_", flist)
+
+
+
   ## Get F/FBMSY 2065 ##
-  
-  FM_FMMSY_2065 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    fmsy = t(as.data.frame(rbind( OM_Plot[[paste0("FRQ_",f)]]$FM_FMMSY["2065",] , 'iter'=as.numeric(colnames( OM_Plot[[paste0("FRQ_",f)]]$FM_FMMSY["2065",] )) ) ) )
-  xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-  
-    FM_FMMSY_2065[,which(flist==f)] = merge(fmsy, xx, all.y=T)[,2]
+
+  FM_FMMSY_2065 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    fmsy <- t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_", f)]]$FM_FMMSY["2065", ], "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$FM_FMMSY["2065", ])))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    FM_FMMSY_2065[, which(flist == f)] <- merge(fmsy, xx, all.y = T)[, 2]
   }
   FM_FMMSY_2065 <- as.data.frame(FM_FMMSY_2065)
-  row.names(FM_FMMSY_2065) <- seq(from=47, to=245, by=2)
-  names(FM_FMMSY_2065) <- paste0("FRQ_",flist)
-  
-  
-  
+  row.names(FM_FMMSY_2065) <- seq(from = 47, to = 245, by = 2)
+  names(FM_FMMSY_2065) <- paste0("FRQ_", flist)
+
+
+
   ## Get cumulative Catch 2016-2115 ##
-  
-  Com_Catch_cumulative =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    CCC = t(as.data.frame(rbind( apply(OM_Plot[[paste0("FRQ_",f)]]$Com_catch[as.character(2016:2115),] , 2, sum) , 'iter'=as.numeric(names( apply(OM_Plot[[paste0("FRQ_",f)]]$Com_catch[as.character(2016:2115),] , 2, sum) )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    
-    Com_Catch_cumulative[,which(flist==f)] = merge(CCC, xx, all.y=T)[,2]
+
+  Com_Catch_cumulative <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    CCC <- t(as.data.frame(rbind(apply(OM_Plot[[paste0("FRQ_", f)]]$Com_catch[as.character(2016:2115), ], 2, sum), "iter" = as.numeric(names(apply(OM_Plot[[paste0("FRQ_", f)]]$Com_catch[as.character(2016:2115), ], 2, sum))))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+
+    Com_Catch_cumulative[, which(flist == f)] <- merge(CCC, xx, all.y = T)[, 2]
   }
   Com_Catch_cumulative <- as.data.frame(Com_Catch_cumulative)
-  row.names(Com_Catch_cumulative) <-seq(from=47, to=245, by=2)
-  names(Com_Catch_cumulative) <- paste0("FRQ_",flist)
-  
-  
-  
-  
+  row.names(Com_Catch_cumulative) <- seq(from = 47, to = 245, by = 2)
+  names(Com_Catch_cumulative) <- paste0("FRQ_", flist)
+
+
+
+
   ## Get cumulative total Catch 2016-2115 ##
-  
- Tot_Catch_cumulative =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    TCC =  t(as.data.frame(rbind( apply(OM_Plot[[paste0("FRQ_",f)]]$Tot_catch[as.character(2016:2115),] , 2, sum) , 'iter'=as.numeric(names( apply(OM_Plot[[paste0("FRQ_",f)]]$Tot_catch[as.character(2016:2115),] , 2, sum) )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    Tot_Catch_cumulative[,which(flist==f)] = merge(TCC, xx, all.y=T)[,2]
+
+  Tot_Catch_cumulative <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    TCC <- t(as.data.frame(rbind(apply(OM_Plot[[paste0("FRQ_", f)]]$Tot_catch[as.character(2016:2115), ], 2, sum), "iter" = as.numeric(names(apply(OM_Plot[[paste0("FRQ_", f)]]$Tot_catch[as.character(2016:2115), ], 2, sum))))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    Tot_Catch_cumulative[, which(flist == f)] <- merge(TCC, xx, all.y = T)[, 2]
   }
- Tot_Catch_cumulative <- as.data.frame(Tot_Catch_cumulative)
-  row.names(Tot_Catch_cumulative) <- seq(from=47, to=245, by=2)
-  names(Tot_Catch_cumulative) <- paste0("FRQ_",flist)
-  
-  
-  
-  
+  Tot_Catch_cumulative <- as.data.frame(Tot_Catch_cumulative)
+  row.names(Tot_Catch_cumulative) <- seq(from = 47, to = 245, by = 2)
+  names(Tot_Catch_cumulative) <- paste0("FRQ_", flist)
+
+
+
+
   ## Get Avg Catch 2106-2115 ##
-  
-  Com_Catch_2115 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    CC =  t(as.data.frame(rbind( apply(OM_Plot[[paste0("FRQ_",f)]]$Com_catch[as.character(2106:2115),] , 2, mean) , 'iter'=as.numeric(names( apply(OM_Plot[[paste0("FRQ_",f)]]$Com_catch[as.character(2106:2115),] , 2, mean) )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    Com_Catch_2115[,which(flist==f)] = merge(CC, xx, all.y=T)[,2]
+
+  Com_Catch_2115 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    CC <- t(as.data.frame(rbind(apply(OM_Plot[[paste0("FRQ_", f)]]$Com_catch[as.character(2106:2115), ], 2, mean), "iter" = as.numeric(names(apply(OM_Plot[[paste0("FRQ_", f)]]$Com_catch[as.character(2106:2115), ], 2, mean))))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    Com_Catch_2115[, which(flist == f)] <- merge(CC, xx, all.y = T)[, 2]
   }
   Com_Catch_2115 <- as.data.frame(Com_Catch_2115)
-  row.names(Com_Catch_2115) <- seq(from=47, to=245, by=2)
-  names(Com_Catch_2115) <- paste0("FRQ_",flist)
-  
-  
+  row.names(Com_Catch_2115) <- seq(from = 47, to = 245, by = 2)
+  names(Com_Catch_2115) <- paste0("FRQ_", flist)
+
+
   ## Get Avg Catch 2056-2065 ##
-  
-  Com_Catch_2065 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    CC =  t(as.data.frame(rbind( apply(OM_Plot[[paste0("FRQ_",f)]]$Com_catch[as.character(2056:2065),] , 2, mean) , 'iter'=as.numeric(names( apply(OM_Plot[[paste0("FRQ_",f)]]$Com_catch[as.character(2056:2065),] , 2, mean) )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    Com_Catch_2065[,which(flist==f)] = merge(CC, xx, all.y=T)[,2]
+
+  Com_Catch_2065 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    CC <- t(as.data.frame(rbind(apply(OM_Plot[[paste0("FRQ_", f)]]$Com_catch[as.character(2056:2065), ], 2, mean), "iter" = as.numeric(names(apply(OM_Plot[[paste0("FRQ_", f)]]$Com_catch[as.character(2056:2065), ], 2, mean))))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    Com_Catch_2065[, which(flist == f)] <- merge(CC, xx, all.y = T)[, 2]
   }
   Com_Catch_2065 <- as.data.frame(Com_Catch_2065)
-  row.names(Com_Catch_2065) <- seq(from=47, to=245, by=2)
-  names(Com_Catch_2065) <- paste0("FRQ_",flist)
-  
-  
-  
-  
-  
+  row.names(Com_Catch_2065) <- seq(from = 47, to = 245, by = 2)
+  names(Com_Catch_2065) <- paste0("FRQ_", flist)
+
+
+
+
+
   ## Get avg len F 2115 ##
-  
-  AvgLen_F_2115 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    AL = t(as.data.frame(rbind( OM_Plot[[paste0("FRQ_",f)]]$AvgLen_F["2115",] , 'iter'=as.numeric(colnames( OM_Plot[[paste0("FRQ_",f)]]$AvgLen_F["2115",] )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    
-    AvgLen_F_2115[,which(flist==f)] = merge(AL, xx, all.y=T)[,2]
+
+  AvgLen_F_2115 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    AL <- t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_", f)]]$AvgLen_F["2115", ], "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$AvgLen_F["2115", ])))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+
+    AvgLen_F_2115[, which(flist == f)] <- merge(AL, xx, all.y = T)[, 2]
   }
   AvgLen_F_2115 <- as.data.frame(AvgLen_F_2115)
-  row.names(AvgLen_F_2115) <- seq(from=47, to=245, by=2)
-  names(AvgLen_F_2115) <- paste0("FRQ_",flist)
-  
-  
-  
+  row.names(AvgLen_F_2115) <- seq(from = 47, to = 245, by = 2)
+  names(AvgLen_F_2115) <- paste0("FRQ_", flist)
+
+
+
   ## Get avg len F 2065 ##
-  
-  AvgLen_F_2065 =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    AL = t(as.data.frame(rbind( OM_Plot[[paste0("FRQ_",f)]]$AvgLen_F["2065",] , 'iter'=as.numeric(colnames( OM_Plot[[paste0("FRQ_",f)]]$AvgLen_F["2065",] )) ) ) )
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
-    
-    AvgLen_F_2065[,which(flist==f)] = merge(AL, xx, all.y=T)[,2]
+
+  AvgLen_F_2065 <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    AL <- t(as.data.frame(rbind(OM_Plot[[paste0("FRQ_", f)]]$AvgLen_F["2065", ], "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$AvgLen_F["2065", ])))))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter" # DO THIS TO ACCOUNT FOR MISSING ITERATIONS
+
+    AvgLen_F_2065[, which(flist == f)] <- merge(AL, xx, all.y = T)[, 2]
   }
   AvgLen_F_2065 <- as.data.frame(AvgLen_F_2065)
-  row.names(AvgLen_F_2065) <- seq(from=47, to=245, by=2)
-  names(AvgLen_F_2065) <- paste0("FRQ_",flist)
-  
-  
-  
-  
+  row.names(AvgLen_F_2065) <- seq(from = 47, to = 245, by = 2)
+  names(AvgLen_F_2065) <- paste0("FRQ_", flist)
+
+
+
+
   ### GET Prob overfishing ###
-  
-  ProbOF =  matrix(nrow=100, ncol=length(flist)) 
-  for(f in flist){
-    POF_a = OM_Plot[[paste0("FRQ_",f)]]$FM_FMMSY[as.character(2016:2115),]
-    POF_b = ifelse(POF_a>1, 1, 0)
-    POF_c = cbind('POF'=apply(POF_b, 2, sum) / nrow(POF_b), 'iter'=as.numeric(colnames( OM_Plot[[paste0("FRQ_",f)]]$FM_FMMSY["2115",] )) ) 
-    xx = as.data.frame(seq(from=47, to=245, by=2)); colnames(xx)="iter"
-    ProbOF[,which(flist==f)] = merge(POF_c, xx, all.y=T)[,2]
-    
+
+  ProbOF <- matrix(nrow = 100, ncol = length(flist))
+  for (f in flist) {
+    POF_a <- OM_Plot[[paste0("FRQ_", f)]]$FM_FMMSY[as.character(2016:2115), ]
+    POF_b <- ifelse(POF_a > 1, 1, 0)
+    POF_c <- cbind("POF" = apply(POF_b, 2, sum) / nrow(POF_b), "iter" = as.numeric(colnames(OM_Plot[[paste0("FRQ_", f)]]$FM_FMMSY["2115", ])))
+    xx <- as.data.frame(seq(from = 47, to = 245, by = 2))
+    colnames(xx) <- "iter"
+    ProbOF[, which(flist == f)] <- merge(POF_c, xx, all.y = T)[, 2]
   } # end Flist
   ProbOF <- as.data.frame(ProbOF)
-  row.names(ProbOF) <- seq(from=47, to=245, by=2)
-  names(ProbOF) <- paste0("FRQ_",flist)
-    
-    
-  
-  
-  ll = list()
-  
-  ll[["AAV_FRQ"]] = AAV_FRQ
-  ll[["AAV_all"]] = as.data.frame(AAV_all)
-  
-  ll[["SSB_SSBMSY_2115"]] = SSB_SSBMSY_2115 
-  
-  ll[["SSB_SSBMSY_2065"]] = SSB_SSBMSY_2065 
-  
-  ll[["FM_FMMSY_2115"]] = FM_FMMSY_2115
-  
-  ll[["FM_FMMSY_2065"]] = FM_FMMSY_2065 
-  
-  ll[["ProbOF"]] = ProbOF 
-  
-  ll[["Com_Catch_cumulative"]] = Com_Catch_cumulative 
-  
-  ll[["Tot_Catch_cumulative"]] = Tot_Catch_cumulative 
-  
-  ll[["Com_Catch_2115"]] = Com_Catch_2115 
-  
-  ll[["Com_Catch_2065"]] = Com_Catch_2065 
-  
-  ll[["AvgLen_F_2115"]] = AvgLen_F_2115 
-  
-  ll[["AvgLen_F_2065"]] = AvgLen_F_2065 
-  
-  assign(paste0("Results_",OM_Name), ll, envir = .GlobalEnv)
-  
-  
-  
+  row.names(ProbOF) <- seq(from = 47, to = 245, by = 2)
+  names(ProbOF) <- paste0("FRQ_", flist)
+
+
+
+
+  ll <- list()
+
+  ll[["AAV_FRQ"]] <- AAV_FRQ
+  ll[["AAV_all"]] <- as.data.frame(AAV_all)
+
+  ll[["SSB_SSBMSY_2115"]] <- SSB_SSBMSY_2115
+
+  ll[["SSB_SSBMSY_2065"]] <- SSB_SSBMSY_2065
+
+  ll[["FM_FMMSY_2115"]] <- FM_FMMSY_2115
+
+  ll[["FM_FMMSY_2065"]] <- FM_FMMSY_2065
+
+  ll[["ProbOF"]] <- ProbOF
+
+  ll[["Com_Catch_cumulative"]] <- Com_Catch_cumulative
+
+  ll[["Tot_Catch_cumulative"]] <- Tot_Catch_cumulative
+
+  ll[["Com_Catch_2115"]] <- Com_Catch_2115
+
+  ll[["Com_Catch_2065"]] <- Com_Catch_2065
+
+  ll[["AvgLen_F_2115"]] <- AvgLen_F_2115
+
+  ll[["AvgLen_F_2065"]] <- AvgLen_F_2065
+
+  assign(paste0("Results_", OM_Name), ll, envir = .GlobalEnv)
+
+
+
   ####################
-  # PLOT 
+  # PLOT
   #################### --------------------------------------------------------------------
-  if(plot==TRUE){
-    
+  if (plot == TRUE) {
     library(fmsb)
     library(vioplot)
-    
-    iters = seq(47,245, by=2)
-    years = 1960:2115
-    col_list = c(rgb(0.75, 0.75, 0.75, 0.20),rgb(0.33, 0.80, 0.92, 0.15),rgb(0.79, 0.9, 0.44, 0.3),rgb(0.86, 0.44, 0.84, 0.2))
-    col_list2 = c("black","deepskyblue3","forestgreen","darkorchid")
-    lty_list = c(1,1,2,2)
-    
+
+    iters <- seq(47, 245, by = 2)
+    years <- 1960:2115
+    col_list <- c(rgb(0.75, 0.75, 0.75, 0.20), rgb(0.33, 0.80, 0.92, 0.15), rgb(0.79, 0.9, 0.44, 0.3), rgb(0.86, 0.44, 0.84, 0.2))
+    col_list2 <- c("black", "deepskyblue3", "forestgreen", "darkorchid")
+    lty_list <- c(1, 1, 2, 2)
+
     # col_lista = rep(col_list, (24/4))
     # col_list2a = rep(col_list2, (24/4))
     # lty_lista = rep(lty_list, (24/4))
-    
-    
-    flist=c(1,5,10,15)
-    hlist=flist
-    
+
+
+    flist <- c(1, 5, 10, 15)
+    hlist <- flist
+
     ####### Worm Plots ----------------------------------------------------------------------------------
-    
+
     # SSB/SSBMSY
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_SSBSSBMSY.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_SSBSSBMSY.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
     # for(k in flist){
-      
-      plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-      # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-      # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-      abline(h=1)
-      for(h in rev(hlist)){
-        for(i in 1:length(iters)){
-          if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
-            lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
-          } # end if
-        } # end for i
-      } # end for h
-      for(h in rev(hlist)){
-        lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
-      }
+
+    plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[, 1], type = "l", col = "white", ylim = c(0, 2.5), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY[, i], col = col_list[which(flist == h)])
+        } # end if
+      } # end for i
+    } # end for h
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY, 1, median), type = "l", lwd = 2, col = col_list2a[which(flist == h)], lty = lty_lista[which(flist == h)])
+    }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext(expression("SSB/SSB"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext(expression("SSB/SSB"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     #####
     dev.off()
-    
-   
-    
+
+
+
     # F/FMSY
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_FFMSY.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_FFMSY.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
     # for(k in flist){
-      
-      plot(years, OM_Plot$FRQ_1$FM_FMMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-      # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-      # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-      abline(h=1)
-      for(h in rev(hlist)){
-        for(i in 1:length(iters)){
-          if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$FM_FMMSY) ){                     # to skip over missing iterations
-            lines(years, OM_Plot[[paste0("FRQ_",h)]]$FM_FMMSY[,i], col=col_list[which(flist==h)])
-          } # end if
-        } # end for i
-      } # end for h
-      for(h in rev(hlist)){
-        lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$FM_FMMSY, 1, median), type='l', lwd=2, col=col_list2[which(flist==h)], lty=lty_list[which(flist==h)])
-      }
+
+    plot(years, OM_Plot$FRQ_1$FM_FMMSY[, 1], type = "l", col = "white", ylim = c(0, 2.5), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$FM_FMMSY)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$FM_FMMSY[, i], col = col_list[which(flist == h)])
+        } # end if
+      } # end for i
+    } # end for h
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$FM_FMMSY, 1, median), type = "l", lwd = 2, col = col_list2[which(flist == h)], lty = lty_list[which(flist == h)])
+    }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext(expression("F/F"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext(expression("F/F"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     #####
-    
+
     dev.off()
-    
-    
-    
+
+
+
     # Commercial Catch
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_ComCatch.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_ComCatch.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
     # for(k in flist){
-      
-      plot(years, OM_Plot$FRQ_1$Com_catch[,1], type='l', col="white", ylim=c(0, 1000), ylab="")
-      # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-      # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-      abline(h=1)
-      for(h in rev(hlist)){
-        for(i in 1:length(iters)){
-          if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$Com_catch) ){                     # to skip over missing iterations
-            lines(years, OM_Plot[[paste0("FRQ_",h)]]$Com_catch[,i], col=col_list[which(flist==h)])
-          } # end if
-        } # end for i
-      } # end for h
-      for(h in rev(hlist)){
-        lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$Com_catch, 1, median), type='l', lwd=2, col=col_list2[which(flist==h)], lty=lty_list[which(flist==h)])
-      }
+
+    plot(years, OM_Plot$FRQ_1$Com_catch[, 1], type = "l", col = "white", ylim = c(0, 1000), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$Com_catch)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$Com_catch[, i], col = col_list[which(flist == h)])
+        } # end if
+      } # end for i
+    } # end for h
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$Com_catch, 1, median), type = "l", lwd = 2, col = col_list2[which(flist == h)], lty = lty_list[which(flist == h)])
+    }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext("Commercial Catch"  , side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext("Commercial Catch", side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     #####
-    
+
     dev.off()
-    
-    
-    
+
+
+
     # MEX Catch
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_MEXRecCatch.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_MEXRecCatch.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
-    
-    plot(years, OM_Plot$FRQ_1$MEX_Rec_catch[,1], type='l', col="white", ylim=c(0, 1000), ylab="")
-    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-    abline(h=1)
-    for(h in rev(hlist)){
-      for(i in 1:length(iters)){
-        if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$MEX_Rec_catch) ){                     # to skip over missing iterations
-          lines(years, OM_Plot[[paste0("FRQ_",h)]]$MEX_Rec_catch[,i], col=col_list[which(flist==h)])
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
+
+    plot(years, OM_Plot$FRQ_1$MEX_Rec_catch[, 1], type = "l", col = "white", ylim = c(0, 1000), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$MEX_Rec_catch)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$MEX_Rec_catch[, i], col = col_list[which(flist == h)])
         } # end if
       } # end for i
     } # end for h
-    for(h in rev(hlist)){
-      lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$MEX_Rec_catch, 1, median), type='l', lwd=2, col=col_list2[which(flist==h)], lty=lty_list[which(flist==h)])
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$MEX_Rec_catch, 1, median), type = "l", lwd = 2, col = col_list2[which(flist == h)], lty = lty_list[which(flist == h)])
     }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext("Mexican & Recreational Catch", side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext("Mexican & Recreational Catch", side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     #####
     dev.off()
-    
-    
-    
+
+
+
     # Total Catch
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_TotalCatch.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_TotalCatch.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
-    
-    plot(years, OM_Plot$FRQ_1$Tot_catch[,1], type='l', col="white", ylim=c(0, 1000), ylab="")
-    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-    abline(h=1)
-    for(h in rev(hlist)){
-      for(i in 1:length(iters)){
-        if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$Tot_catch) ){                     # to skip over missing iterations
-          lines(years, OM_Plot[[paste0("FRQ_",h)]]$Tot_catch[,i], col=col_list[which(flist==h)])
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
+
+    plot(years, OM_Plot$FRQ_1$Tot_catch[, 1], type = "l", col = "white", ylim = c(0, 1000), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$Tot_catch)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$Tot_catch[, i], col = col_list[which(flist == h)])
         } # end if
       } # end for i
     } # end for h
-    for(h in rev(hlist)){
-      lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$Tot_catch, 1, median), type='l', lwd=2, col=col_list2[which(flist==h)], lty=lty_list[which(flist==h)])
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$Tot_catch, 1, median), type = "l", lwd = 2, col = col_list2[which(flist == h)], lty = lty_list[which(flist == h)])
     }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext("Total Catch", side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext("Total Catch", side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     #####
     dev.off()
-    
-    
+
+
     # SSB/SSB0
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_SSBSSB0.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_SSBSSB0.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
-    
-    plot(years, OM_Plot$FRQ_1$SSB_SSB0[,1], type='l', col="white", ylim=c(0, 1.1), ylab="")
-    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-    abline(h=1)
-    for(h in rev(hlist)){
-      for(i in 1:length(iters)){
-        if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSB0) ){                     # to skip over missing iterations
-          lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSB0[,i], col=col_list[which(flist==h)])
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
+
+    plot(years, OM_Plot$FRQ_1$SSB_SSB0[, 1], type = "l", col = "white", ylim = c(0, 1.1), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSB0)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$SSB_SSB0[, i], col = col_list[which(flist == h)])
         } # end if
       } # end for i
     } # end for h
-    for(h in rev(hlist)){
-      lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSB0, 1, median), type='l', lwd=2, col=col_list2[which(flist==h)], lty=lty_list[which(flist==h)])
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSB0, 1, median), type = "l", lwd = 2, col = col_list2[which(flist == h)], lty = lty_list[which(flist == h)])
     }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext(expression("SSB/SSB"[0])  , side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext(expression("SSB/SSB"[0]), side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     #####
-  
+
     dev.off()
-    
-    
-    
-    # avg length 
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_WORM_AvgLen.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    
+
+
+
+    # avg length
+    png(
+      filename = paste0("Plots\\", OM_Name, "_WORM_AvgLen.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+
     #####
-    par(mfrow=c(1,1),  mar=c(1.1, 1.6, 1.5, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma = c(0, 1, 2, 0))
-    
-    plot(years, OM_Plot$FRQ_1$AvgLen_F[,1], type='l', col="white", ylim=c(85, 130), ylab="")
-    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8) 
-    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n') 
-    abline(h=1)
-    for(h in rev(hlist)){
-      for(i in 1:length(iters)){
-        if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$AvgLen_F) ){                     # to skip over missing iterations
-          lines(years, OM_Plot[[paste0("FRQ_",h)]]$AvgLen_F[,i], col=col_list[which(flist==h)])
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1.5, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1, 2, 0))
+
+    plot(years, OM_Plot$FRQ_1$AvgLen_F[, 1], type = "l", col = "white", ylim = c(85, 130), ylab = "")
+    # mtext(expression("F"["lim"]*"= F"["MSY"]), side=3, line=0, cex=0.8)
+    # legend("topright",c(),col=col_list2, lty=lty_list, cex=0.7, bty='n')
+    abline(h = 1)
+    for (h in rev(hlist)) {
+      for (i in 1:length(iters)) {
+        if (i <= ncol(OM_Plot[[paste0("FRQ_", h)]]$AvgLen_F)) { # to skip over missing iterations
+          lines(years, OM_Plot[[paste0("FRQ_", h)]]$AvgLen_F[, i], col = col_list[which(flist == h)])
         } # end if
       } # end for i
     } # end for h
-    for(h in rev(hlist)){
-      lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$AvgLen_F, 1, median), type='l', lwd=2, col=col_list2[which(flist==h)], lty=lty_list[which(flist==h)])
+    for (h in rev(hlist)) {
+      lines(years, apply(OM_Plot[[paste0("FRQ_", h)]]$AvgLen_F, 1, median), type = "l", lwd = 2, col = col_list2[which(flist == h)], lty = lty_list[which(flist == h)])
     }
     # } # end k loop
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.2)
-    mtext("Average Length"  , side=2, outer = TRUE, cex = 1.5, line=-0.5)
-    legend("topright", c("FRQ1","FRQ5","FRQ10","FRQ15"), col=col_list2, lty=lty_list, bty='n')
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.2)
+    mtext("Average Length", side = 2, outer = TRUE, cex = 1.5, line = -0.5)
+    legend("topright", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"), col = col_list2, lty = lty_list, bty = "n")
     ######
     dev.off()
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     ####### RADAR PLOTS ---------------------------------------------------------------------------------
-    
-    
-    
-    ### Format data table 
+
+
+
+    ### Format data table
     # FOR FRQ 1-4:
-    hl=c(1, 5, 10, 15)
+    hl <- c(1, 5, 10, 15)
     # h=1
-    
-    data1 = matrix(c(1.5, 1, 50000, 1, 120, 0, 0, 0, 0, 80), ncol=5, byrow=T)
-    for(h in hl){
-      
-        data1 = rbind(data1, c(
-          apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median)[length(years)] ,
-          1-median(ProbOF[,paste0("FRQ_",h)]),
-          mean( apply(OM_Plot[[paste0("FRQ_",h)]]$Com_catch, 2, sum) ) ,
-          1-AAV_FRQ[paste0("FRQ_",h)] ,
-          mean( apply(OM_Plot[[paste0("FRQ_",h)]]$AvgLen_F, 1, median)[(length(years)-4):length(years)] ) 
-        ) )
-    
-    } # end h loop. 
-    
-    colnames(data1) <- c("SSB2115/SSBMSY","1-POF", "Cum Com Catch","1-AAV","Avg Len 2110-2115")
-    row.names(data1) <- c("max",'min','FRQ1','FRQ5','FRQ10','FRQ15')
-    data1 = as.data.frame(data1)
-    years = 1960:2115
-   
-    
+
+    data1 <- matrix(c(1.5, 1, 50000, 1, 120, 0, 0, 0, 0, 80), ncol = 5, byrow = T)
+    for (h in hl) {
+      data1 <- rbind(data1, c(
+        apply(OM_Plot[[paste0("FRQ_", h)]]$SSB_SSBMSY, 1, median)[length(years)],
+        1 - median(ProbOF[, paste0("FRQ_", h)]),
+        mean(apply(OM_Plot[[paste0("FRQ_", h)]]$Com_catch, 2, sum)),
+        1 - AAV_FRQ[paste0("FRQ_", h)],
+        mean(apply(OM_Plot[[paste0("FRQ_", h)]]$AvgLen_F, 1, median)[(length(years) - 4):length(years)])
+      ))
+    } # end h loop.
+
+    colnames(data1) <- c("SSB2115/SSBMSY", "1-POF", "Cum Com Catch", "1-AAV", "Avg Len 2110-2115")
+    row.names(data1) <- c("max", "min", "FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    data1 <- as.data.frame(data1)
+    years <- 1960:2115
+
+
     # plot
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_RADAR.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=150,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(0.5, 1, 0.5, 1), oma = c(0, 0, 1.1, 0))
+    png(
+      filename = paste0("Plots\\", OM_Name, "_RADAR.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 150,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(0.5, 1, 0.5, 1), oma = c(0, 0, 1.1, 0))
     # colors_border=c( rgb(0,0,1,1), rgb(1,0,0,1) , rgb(0,1,0,1), rgb(0.627, 0.125, 0.941, 1) )
     # colors_in=c( rgb(0,0,1,0.2), rgb(1,0,0,0.2) , rgb(0,1,0,0.2) , rgb(0.627, 0.125, 0.941, 0.2))
     # plty_list=c(1, 2, 1, 2)
-    colors_border=col_list2
-    colors_in = col_list
-    plty_list = lty_list
-    
-   d=data1
-      
-      radarchart( d  , axistype=1 ,
-                  #custom polygon
-                  pcol=colors_border , pfcol=colors_in , plwd=2 , plty=plty_list, #plty is line type of polygon
-                  #custom the grid
-                  cglcol="grey", cglty=1, axislabcol="grey", cglwd=0.8,
-                  #custom labels
-                  vlcex=1
-      )
-      
-      # mtext(OM_Name, side=3, line=-2, cex=1.2) 
-    legend("bottom",c("FRQ1","FRQ5","FRQ10","FRQ15"), 
-                              col=colors_border, lty=plty_list, cex=1, bty='n', ncol=4) 
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=-0.8)
-  
-    dev.off()
-    
-    
-    
-    
-    
-    
-    
-    
-    ######## Violin Plots ---------------------------------------------------------------------------
-    
-    
-    
-    ## Get SSB/SSBMSY 2115 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_SSBSSBMSY2115.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(SSB_SSBMSY_2115[,r], SSB_SSBMSY_2115[,(r+1)], SSB_SSBMSY_2115[,(r+2)], SSB_SSBMSY_2115[,(r+3)], 
-            col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 1.5), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-    abline(h=1)
-    
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("SSB"[2115]*"/SSB"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    
-    ## Get SSB/SSBMSY 2065 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_SSBSSBMSY2065.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(SSB_SSBMSY_2065[,r], SSB_SSBMSY_2065[,(r+1)], SSB_SSBMSY_2065[,(r+2)], SSB_SSBMSY_2065[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 1.5), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-      abline(h=1)
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("SSB"[2065]*"/SSB"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    ## Get Get F/FBMSY 2115 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_FFMSY2115.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(FM_FMMSY_2115[,r], FM_FMMSY_2115[,(r+1)], FM_FMMSY_2115[,(r+2)], FM_FMMSY_2115[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 2.5), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-      abline(h=1)
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("F"[2115]*"/F"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    ## Get F/FBMSY 2065 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_FFMSY2065.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(FM_FMMSY_2065[,r], FM_FMMSY_2065[,(r+1)], FM_FMMSY_2065[,(r+2)], FM_FMMSY_2065[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 4), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-      abline(h=1)
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("F"[2065]*"/F"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    
-    
-    ## cumulative Catch  ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_ComCatchCum.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(Com_Catch_cumulative[,r], Com_Catch_cumulative[,(r+1)], Com_Catch_cumulative[,(r+2)], Com_Catch_cumulative[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 25000), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext("Cumulative Commercial Catch"  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    
-    
-    
-    ## Get SSB/SSBMSY 2115 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_SSBSSBMSY2115.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(SSB_SSBMSY_2115[,r], SSB_SSBMSY_2115[,(r+1)], SSB_SSBMSY_2115[,(r+2)], SSB_SSBMSY_2115[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 1.5), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-      abline(h=1)
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("SSB"[2115]*"/SSB"["MSY"])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    
-    ## Get Avg Catch 2106-2115 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_ComCatch2115.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(Com_Catch_2115[,r], Com_Catch_2115[,(r+1)], Com_Catch_2115[,(r+2)], Com_Catch_2115[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 800), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("Commercial Catch"[2115])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    
-    ## Get Avg Catch 2061-2065 ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_ComCatch2065.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(Com_Catch_2065[,r], Com_Catch_2065[,(r+1)], Com_Catch_2065[,(r+2)], Com_Catch_2065[,(r+3)], 
-              col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 400), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-     
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext(expression("Commercial Catch"[2065])  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
-    dev.off()
-    
-    
-    
-    
-    ## Get AAV ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_AAV.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(AAV_all[,r], AAV_all[,(r+1)], AAV_all[,(r+2)], AAV_all[,(r+3)], 
-            col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 1.0), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-    abline(h=1)
-    
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext("AAV"  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
+    colors_border <- col_list2
+    colors_in <- col_list
+    plty_list <- lty_list
+
+    d <- data1
+
+    radarchart(d,
+      axistype = 1,
+      # custom polygon
+      pcol = colors_border, pfcol = colors_in, plwd = 2, plty = plty_list, # plty is line type of polygon
+      # custom the grid
+      cglcol = "grey", cglty = 1, axislabcol = "grey", cglwd = 0.8,
+      # custom labels
+      vlcex = 1
+    )
+
+    # mtext(OM_Name, side=3, line=-2, cex=1.2)
+    legend("bottom", c("FRQ1", "FRQ5", "FRQ10", "FRQ15"),
+      col = colors_border, lty = plty_list, cex = 1, bty = "n", ncol = 4
+    )
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = -0.8)
+
     dev.off()
 
-    
-    
-    ## Get POF ##
-    png(filename=paste0("D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\",OM_Name,"_VIOLIN_POF.png"),
-        type="cairo",
-        units="mm",
-        width=150,
-        height=100,
-        pointsize=16,
-        res=300)
-    par(mfrow=c(1,1), mar=c(1.1, 1.6, 1, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=1, oma=c(0,1.5,2,0))
-    r=1
-    vioplot(ProbOF[,r], ProbOF[,(r+1)], ProbOF[,(r+2)], ProbOF[,(r+3)], 
-            col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0, 1.5), names=c("FRQ1","FRQ5","FRQ10","FRQ15") )
-    abline(h=1)
-    
-    mtext(OM_Name, outer = TRUE, cex = 1.5, line=0)
-    mtext("Probability of overfishing"  , side=2, outer = TRUE, cex = 1.5, line=-0.3)
+
+
+
+
+
+
+
+    ######## Violin Plots ---------------------------------------------------------------------------
+
+
+
+    ## Get SSB/SSBMSY 2115 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_SSBSSBMSY2115.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(SSB_SSBMSY_2115[, r], SSB_SSBMSY_2115[, (r + 1)], SSB_SSBMSY_2115[, (r + 2)], SSB_SSBMSY_2115[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 1.5), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("SSB"[2115] * "/SSB"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
     dev.off()
-    
-    
-    
+
+
+
+    ## Get SSB/SSBMSY 2065 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_SSBSSBMSY2065.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(SSB_SSBMSY_2065[, r], SSB_SSBMSY_2065[, (r + 1)], SSB_SSBMSY_2065[, (r + 2)], SSB_SSBMSY_2065[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 1.5), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("SSB"[2065] * "/SSB"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+    ## Get Get F/FBMSY 2115 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_FFMSY2115.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(FM_FMMSY_2115[, r], FM_FMMSY_2115[, (r + 1)], FM_FMMSY_2115[, (r + 2)], FM_FMMSY_2115[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 2.5), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("F"[2115] * "/F"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+    ## Get F/FBMSY 2065 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_FFMSY2065.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(FM_FMMSY_2065[, r], FM_FMMSY_2065[, (r + 1)], FM_FMMSY_2065[, (r + 2)], FM_FMMSY_2065[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 4), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("F"[2065] * "/F"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+
+
+    ## cumulative Catch  ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_ComCatchCum.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(Com_Catch_cumulative[, r], Com_Catch_cumulative[, (r + 1)], Com_Catch_cumulative[, (r + 2)], Com_Catch_cumulative[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 25000), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext("Cumulative Commercial Catch", side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+
+
+
+    ## Get SSB/SSBMSY 2115 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_SSBSSBMSY2115.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(SSB_SSBMSY_2115[, r], SSB_SSBMSY_2115[, (r + 1)], SSB_SSBMSY_2115[, (r + 2)], SSB_SSBMSY_2115[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 1.5), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("SSB"[2115] * "/SSB"["MSY"]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+
+    ## Get Avg Catch 2106-2115 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_ComCatch2115.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(Com_Catch_2115[, r], Com_Catch_2115[, (r + 1)], Com_Catch_2115[, (r + 2)], Com_Catch_2115[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 800), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("Commercial Catch"[2115]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+
+    ## Get Avg Catch 2061-2065 ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_ComCatch2065.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(Com_Catch_2065[, r], Com_Catch_2065[, (r + 1)], Com_Catch_2065[, (r + 2)], Com_Catch_2065[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 400), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext(expression("Commercial Catch"[2065]), side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+
+
+    ## Get AAV ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_AAV.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(AAV_all[, r], AAV_all[, (r + 1)], AAV_all[, (r + 2)], AAV_all[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 1.0), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext("AAV", side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
+
+
+
+    ## Get POF ##
+    png(
+      filename = paste0("Plots\\", OM_Name, "_VIOLIN_POF.png"),
+      type = "cairo",
+      units = "mm",
+      width = 150,
+      height = 100,
+      pointsize = 16,
+      res = 300
+    )
+    par(mfrow = c(1, 1), mar = c(1.1, 1.6, 1, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 1, oma = c(0, 1.5, 2, 0))
+    r <- 1
+    vioplot(ProbOF[, r], ProbOF[, (r + 1)], ProbOF[, (r + 2)], ProbOF[, (r + 3)],
+      col = c("dimgrey", "deepskyblue3", "forestgreen", "darkorchid"), ylim = c(0, 1.5), names = c("FRQ1", "FRQ5", "FRQ10", "FRQ15")
+    )
+    abline(h = 1)
+
+    mtext(OM_Name, outer = TRUE, cex = 1.5, line = 0)
+    mtext("Probability of overfishing", side = 2, outer = TRUE, cex = 1.5, line = -0.3)
+    dev.off()
   } # END IF PLOT==T
-  
 } # END FUNCTION
 
 
-#### HIMEXREC 
-MANIP_RESULTS(OM_Plot=OM_Base_HiMexRec, OM_Name="Base_HiMexRec", plot=TRUE)
+#### HIMEXREC
+MANIP_RESULTS(OM_Plot = OM_Base_HiMexRec, OM_Name = "Base_HiMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_BH_HiMexRec, OM_Name="BH_HiMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_BH_HiMexRec, OM_Name = "BH_HiMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_Hih_HiMexRec, OM_Name="Hih_HiMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Hih_HiMexRec, OM_Name = "Hih_HiMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_lnR0_HiMexRec, OM_Name="lnR0_HiMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_lnR0_HiMexRec, OM_Name = "lnR0_HiMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_Loh_HiMexRec, OM_Name="Loh_HiMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Loh_HiMexRec, OM_Name = "Loh_HiMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_M_BH_HiMexRec, OM_Name="M_BH_HiMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_M_BH_HiMexRec, OM_Name = "M_BH_HiMexRec", plot = TRUE)
 
 
 # DON"T PLOT ; Just read in data
-MANIP_RESULTS(OM_Plot=OM_Base_HiMexRec, OM_Name="Base_HiMexRec", plot=FALSE)
-MANIP_RESULTS(OM_Plot=OM_BH_HiMexRec, OM_Name="BH_HiMexRec", plot=FALSE)
-MANIP_RESULTS(OM_Plot=OM_Hih_HiMexRec, OM_Name="Hih_HiMexRec", plot=FALSE)
-MANIP_RESULTS(OM_Plot=OM_lnR0_HiMexRec, OM_Name="lnR0_HiMexRec", plot=FALSE)
-MANIP_RESULTS(OM_Plot=OM_Loh_HiMexRec, OM_Name="Loh_HiMexRec", plot=FALSE)
-MANIP_RESULTS(OM_Plot=OM_M_BH_HiMexRec, OM_Name="M_BH_HiMexRec", plot=FALSE)
+MANIP_RESULTS(OM_Plot = OM_Base_HiMexRec, OM_Name = "Base_HiMexRec", plot = FALSE)
+MANIP_RESULTS(OM_Plot = OM_BH_HiMexRec, OM_Name = "BH_HiMexRec", plot = FALSE)
+MANIP_RESULTS(OM_Plot = OM_Hih_HiMexRec, OM_Name = "Hih_HiMexRec", plot = FALSE)
+MANIP_RESULTS(OM_Plot = OM_lnR0_HiMexRec, OM_Name = "lnR0_HiMexRec", plot = FALSE)
+MANIP_RESULTS(OM_Plot = OM_Loh_HiMexRec, OM_Name = "Loh_HiMexRec", plot = FALSE)
+MANIP_RESULTS(OM_Plot = OM_M_BH_HiMexRec, OM_Name = "M_BH_HiMexRec", plot = FALSE)
 
 
 
@@ -2827,26 +2975,26 @@ MANIP_RESULTS(OM_Plot=OM_M_BH_HiMexRec, OM_Name="M_BH_HiMexRec", plot=FALSE)
 
 
 # CONCEPT
-MANIP_RESULTS(OM_Plot=OM_Base_Concept, OM_Name="Base_Concept", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Base_Concept, OM_Name = "Base_Concept", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_BH_Concept, OM_Name="BH_Concept", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_BH_Concept, OM_Name = "BH_Concept", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_Hih_Concept, OM_Name="Hih_Concept", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Hih_Concept, OM_Name = "Hih_Concept", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_lnR0_Concept, OM_Name="lnR0_Concept", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_lnR0_Concept, OM_Name = "lnR0_Concept", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_Loh_Concept, OM_Name="Loh_Concept", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Loh_Concept, OM_Name = "Loh_Concept", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_M_BH_Concept, OM_Name="M_BH_Concept", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_M_BH_Concept, OM_Name = "M_BH_Concept", plot = TRUE)
 
 
 # CONCEPT  DON"T PLOT ; Just read in data
-MANIP_RESULTS(OM_Plot=OM_Base_Concept, OM_Name="Base_Concept", plot=F)
-MANIP_RESULTS(OM_Plot=OM_BH_Concept, OM_Name="BH_Concept", plot=F)
-MANIP_RESULTS(OM_Plot=OM_Hih_Concept, OM_Name="Hih_Concept", plot=F)
-MANIP_RESULTS(OM_Plot=OM_lnR0_Concept, OM_Name="lnR0_Concept", plot=F)
-MANIP_RESULTS(OM_Plot=OM_Loh_Concept, OM_Name="Loh_Concept", plot=F)
-MANIP_RESULTS(OM_Plot=OM_M_BH_Concept, OM_Name="M_BH_Concept", plot=F)
+MANIP_RESULTS(OM_Plot = OM_Base_Concept, OM_Name = "Base_Concept", plot = F)
+MANIP_RESULTS(OM_Plot = OM_BH_Concept, OM_Name = "BH_Concept", plot = F)
+MANIP_RESULTS(OM_Plot = OM_Hih_Concept, OM_Name = "Hih_Concept", plot = F)
+MANIP_RESULTS(OM_Plot = OM_lnR0_Concept, OM_Name = "lnR0_Concept", plot = F)
+MANIP_RESULTS(OM_Plot = OM_Loh_Concept, OM_Name = "Loh_Concept", plot = F)
+MANIP_RESULTS(OM_Plot = OM_M_BH_Concept, OM_Name = "M_BH_Concept", plot = F)
 
 
 
@@ -2856,136 +3004,116 @@ MANIP_RESULTS(OM_Plot=OM_M_BH_Concept, OM_Name="M_BH_Concept", plot=F)
 
 
 # Lo MEX REC
-MANIP_RESULTS(OM_Plot=OM_Base_LoMexRec, OM_Name="Base_LoMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Base_LoMexRec, OM_Name = "Base_LoMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_BH_LoMexRec, OM_Name="BH_LoMexRec", plot=TRUE) ##
+MANIP_RESULTS(OM_Plot = OM_BH_LoMexRec, OM_Name = "BH_LoMexRec", plot = TRUE) ##
 
-MANIP_RESULTS(OM_Plot=OM_Hih_LoMexRec, OM_Name="Hih_LoMexRec", plot=TRUE) ###
+MANIP_RESULTS(OM_Plot = OM_Hih_LoMexRec, OM_Name = "Hih_LoMexRec", plot = TRUE) ###
 
-MANIP_RESULTS(OM_Plot=OM_lnR0_LoMexRec, OM_Name="lnR0_LoMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_lnR0_LoMexRec, OM_Name = "lnR0_LoMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_Loh_LoMexRec, OM_Name="Loh_LoMexRec", plot=TRUE)
+MANIP_RESULTS(OM_Plot = OM_Loh_LoMexRec, OM_Name = "Loh_LoMexRec", plot = TRUE)
 
-MANIP_RESULTS(OM_Plot=OM_M_BH_LoMexRec, OM_Name="M_BH_LoMexRec", plot=TRUE) ###
+MANIP_RESULTS(OM_Plot = OM_M_BH_LoMexRec, OM_Name = "M_BH_LoMexRec", plot = TRUE) ###
 
 
 # Lo MEX REC DON"T PLOT ; Just read in data
-MANIP_RESULTS(OM_Plot=OM_Base_LoMexRec, OM_Name="Base_LoMexRec", plot=F)
-MANIP_RESULTS(OM_Plot=OM_BH_LoMexRec, OM_Name="BH_LoMexRec", plot=F)
-MANIP_RESULTS(OM_Plot=OM_Hih_LoMexRec, OM_Name="Hih_LoMexRec", plot=F)
-MANIP_RESULTS(OM_Plot=OM_lnR0_LoMexRec, OM_Name="lnR0_LoMexRec", plot=F)
-MANIP_RESULTS(OM_Plot=OM_Loh_LoMexRec, OM_Name="Loh_LoMexRec", plot=F)
-MANIP_RESULTS(OM_Plot=OM_M_BH_LoMexRec, OM_Name="M_BH_LoMexRec", plot=F)
+MANIP_RESULTS(OM_Plot = OM_Base_LoMexRec, OM_Name = "Base_LoMexRec", plot = F)
+MANIP_RESULTS(OM_Plot = OM_BH_LoMexRec, OM_Name = "BH_LoMexRec", plot = F)
+MANIP_RESULTS(OM_Plot = OM_Hih_LoMexRec, OM_Name = "Hih_LoMexRec", plot = F)
+MANIP_RESULTS(OM_Plot = OM_lnR0_LoMexRec, OM_Name = "lnR0_LoMexRec", plot = F)
+MANIP_RESULTS(OM_Plot = OM_Loh_LoMexRec, OM_Name = "Loh_LoMexRec", plot = F)
+MANIP_RESULTS(OM_Plot = OM_M_BH_LoMexRec, OM_Name = "M_BH_LoMexRec", plot = F)
 
 
 
 #### Save Results
-# save(Results_BASE, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Base_HiMexRec.RData")
-# save(Results_BH, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_BH_HiMexRec.RData")
-# save(Results_Hih, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Hih_HiMexRec.RData")
-# save(Results_lnR0, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_lnR0_HiMexRec.RData")
-# save(Results_Loh, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Loh_HiMexRec.RData")
-# save(Results_M_BH, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_M_BH_HiMexRec.RData")
-# 
-# save(Results_Base_MexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Base_Concept.RData")
-# save(Results_BH_MexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_BH_Concept.RData")
-# save(Results_Hih_MexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Hih_Concept.RData")
-# save(Results_lnR0_MexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_lnR0_Concept.RData")
-# save(Results_Loh_MexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Loh_Concept.RData")
-# save(Results_M_BH_MexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_M_BH_Concept.RData")
-# 
-# save(Results_Base_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Base_LoMexRec.RData")
-# save(Results_BH_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_BH_LoMexRec.RData")
-# save(Results_Hih_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Hih_LoMexRec.RData")
-# save(Results_lnR0_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_lnR0_LoMexRec.RData")
-# save(Results_Loh_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Loh_LoMexRec.RData")
-# save(Results_M_BH_LoMexRec, file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_M_BH_LoMexRec.RData")
+# save(Results_BASE, file="Results_Base_HiMexRec.RData")
+# save(Results_BH, file="Results_BH_HiMexRec.RData")
+# save(Results_Hih, file="Results_Hih_HiMexRec.RData")
+# save(Results_lnR0, file="Results_lnR0_HiMexRec.RData")
+# save(Results_Loh, file="Results_Loh_HiMexRec.RData")
+# save(Results_M_BH, file="Results_M_BH_HiMexRec.RData")
+#
+# save(Results_Base_MexRec, file="Results_Base_Concept.RData")
+# save(Results_BH_MexRec, file="Results_BH_Concept.RData")
+# save(Results_Hih_MexRec, file="Results_Hih_Concept.RData")
+# save(Results_lnR0_MexRec, file="Results_lnR0_Concept.RData")
+# save(Results_Loh_MexRec, file="Results_Loh_Concept.RData")
+# save(Results_M_BH_MexRec, file="Results_M_BH_Concept.RData")
+#
+# save(Results_Base_LoMexRec, file="Results_Base_LoMexRec.RData")
+# save(Results_BH_LoMexRec, file="Results_BH_LoMexRec.RData")
+# save(Results_Hih_LoMexRec, file="Results_Hih_LoMexRec.RData")
+# save(Results_lnR0_LoMexRec, file="Results_lnR0_LoMexRec.RData")
+# save(Results_Loh_LoMexRec, file="Results_Loh_LoMexRec.RData")
+# save(Results_M_BH_LoMexRec, file="Results_M_BH_LoMexRec.RData")
 
-#### Load Saved Results 
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Base_HiMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_BH_HiMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Hih_HiMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_lnR0_HiMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Loh_HiMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_M_BH_HiMexRec.RData")
+#### Load Saved Results
+load(file = "Results_Base_HiMexRec.RData")
+load(file = "Results_BH_HiMexRec.RData")
+load(file = "Results_Hih_HiMexRec.RData")
+load(file = "Results_lnR0_HiMexRec.RData")
+load(file = "Results_Loh_HiMexRec.RData")
+load(file = "Results_M_BH_HiMexRec.RData")
 
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Base_Concept.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_BH_Concept.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Hih_Concept.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_lnR0_Concept.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Loh_Concept.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_M_BH_Concept.RData")
+load(file = "Results_Base_Concept.RData")
+load(file = "Results_BH_Concept.RData")
+load(file = "Results_Hih_Concept.RData")
+load(file = "Results_lnR0_Concept.RData")
+load(file = "Results_Loh_Concept.RData")
+load(file = "Results_M_BH_Concept.RData")
 
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Base_LoMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_BH_LoMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Hih_LoMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_lnR0_LoMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_Loh_LoMexRec.RData")
-load(file="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Results_M_BH_LoMexRec.RData")
-
-
+load(file = "Results_Base_LoMexRec.RData")
+load(file = "Results_BH_LoMexRec.RData")
+load(file = "Results_Hih_LoMexRec.RData")
+load(file = "Results_lnR0_LoMexRec.RData")
+load(file = "Results_Loh_LoMexRec.RData")
+load(file = "Results_M_BH_LoMexRec.RData")
 
 
-OM_lnR0$FRQ_23$SSB[nrow(OM_lnR0$FRQ_23$SSB),]
 
-MANIP_RESULTS(OM_Plot=OM_BASE_MexRec, OM_Name="Base_MexRec", plot=FALSE)
+
+OM_lnR0$FRQ_23$SSB[nrow(OM_lnR0$FRQ_23$SSB), ]
+
+MANIP_RESULTS(OM_Plot = OM_BASE_MexRec, OM_Name = "Base_MexRec", plot = FALSE)
 
 
 
 
 ### PLOT MSY ACROSS OMS AND IMPLEMENTATION MODELS ####
-par(mfrow=c(2,3))
-vioplot(c(OM_Base_Concept$FRQ_1$MSY)$MSY, c(OM_Base_LoMexRec$FRQ_1$MSY)$MSY, c(OM_Base_HiMexRec$FRQ_1$MSY)$MSY, col=c('grey','deepskyblue','red'), ylim=c(0, 1600), names=rep("",3))
-mtext('Base', 3, line=-1.5)
-vioplot(c(OM_BH_Concept$FRQ_1$MSY)$MSY, c(OM_BH_LoMexRec$FRQ_1$MSY)$MSY, c(OM_BH_HiMexRec$FRQ_1$MSY)$MSY, col=c('grey','deepskyblue','red'), ylim=c(0, 1600), names=rep("",3))
-mtext('BH', 3, line=-1.5)
-vioplot(c(OM_Hih_Concept$FRQ_1$MSY)$MSY, c(OM_Hih_LoMexRec$FRQ_1$MSY)$MSY, c(OM_Hih_HiMexRec$FRQ_1$MSY)$MSY, col=c('grey','deepskyblue','red'), ylim=c(0, 1600), names=rep("",3))
-mtext('Hi h', 3, line=-1.5)
-vioplot(c(OM_lnR0_Concept$FRQ_1$MSY)$MSY, c(OM_lnR0_LoMexRec$FRQ_1$MSY)$MSY, c(OM_lnR0_HiMexRec$FRQ_1$MSY)$MSY, col=c('grey','deepskyblue','red'), ylim=c(0, 1600), names=rep("",3))
-mtext('2*R0', 3, line=-1.5)
-vioplot(c(OM_Loh_Concept$FRQ_1$MSY)$MSY, c(OM_Loh_LoMexRec$FRQ_1$MSY)$MSY, c(OM_Loh_HiMexRec$FRQ_1$MSY)$MSY, col=c('grey','deepskyblue','red'), ylim=c(0, 1600), names=rep("",3))
-mtext('Lo h', 3, line=-1.5)
-vioplot(c(OM_M_BH_Concept$FRQ_1$MSY)$MSY, c(OM_M_BH_LoMexRec$FRQ_1$MSY)$MSY, c(OM_M_BH_HiMexRec$FRQ_1$MSY)$MSY, col=c('grey','deepskyblue','red'), ylim=c(0, 1600), names=rep("",3))
-mtext('1/2 M & BH', 3, line=-1.5)
-legend("topright", c("Concept","LoMexRex","HiMexRec"),pch=15, pt.cex=2, col=c('grey','deepskyblue','red'), bty='n')
-mtext("MSY",outer=T, line=0, cex=1.4)
+png(
+  filename = "Plots\\MSY_Across_OM_IMP.png",
+  type = "cairo",
+  units = "mm",
+  width = 300,
+  height = 200,
+  pointsize = 18,
+  res = 300
+)
+par(mfrow = c(2, 3), mar = c(1.1, 1.1, 0.3, 0.3), tcl = -0.1, mgp = c(0.8, 0.1, 0), cex = 0.7, oma = c(0, 0, 1.5, 0))
+vioplot(c(OM_Base_Concept$FRQ_1$MSY)$MSY, c(OM_Base_LoMexRec$FRQ_1$MSY)$MSY, c(OM_Base_HiMexRec$FRQ_1$MSY)$MSY, col = c("grey", "deepskyblue", "red"), ylim = c(0, 1600), names = rep("", 3))
+abline(h = 531, col = "grey45")
+mtext("Base", 3, line = -1.5)
+vioplot(c(OM_BH_Concept$FRQ_1$MSY)$MSY, c(OM_BH_LoMexRec$FRQ_1$MSY)$MSY, c(OM_BH_HiMexRec$FRQ_1$MSY)$MSY, col = c("grey", "deepskyblue", "red"), ylim = c(0, 1600), names = rep("", 3))
+abline(h = 375, col = "grey45")
+# abline(h=588, col='grey45', lty=2)
+mtext("BH", 3, line = -1.5)
+vioplot(c(OM_Hih_Concept$FRQ_1$MSY)$MSY, c(OM_Hih_LoMexRec$FRQ_1$MSY)$MSY, c(OM_Hih_HiMexRec$FRQ_1$MSY)$MSY, col = c("grey", "deepskyblue", "red"), ylim = c(0, 1600), names = rep("", 3))
+abline(h = 691, col = "grey45")
+mtext("Hi h", 3, line = -1.5)
+vioplot(c(OM_lnR0_Concept$FRQ_1$MSY)$MSY, c(OM_lnR0_LoMexRec$FRQ_1$MSY)$MSY, c(OM_lnR0_HiMexRec$FRQ_1$MSY)$MSY, col = c("grey", "deepskyblue", "red"), ylim = c(0, 1600), names = rep("", 3))
+abline(h = 992, col = "grey45")
+mtext("2*R0", 3, line = -1.5)
+vioplot(c(OM_Loh_Concept$FRQ_1$MSY)$MSY, c(OM_Loh_LoMexRec$FRQ_1$MSY)$MSY, c(OM_Loh_HiMexRec$FRQ_1$MSY)$MSY, col = c("grey", "deepskyblue", "red"), ylim = c(0, 1600), names = rep("", 3))
+abline(h = 367, col = "grey45")
+mtext("Lo h", 3, line = -1.5)
+vioplot(c(OM_M_BH_Concept$FRQ_1$MSY)$MSY, c(OM_M_BH_LoMexRec$FRQ_1$MSY)$MSY, c(OM_M_BH_HiMexRec$FRQ_1$MSY)$MSY, col = c("grey", "deepskyblue", "red"), ylim = c(0, 1600), names = rep("", 3))
+abline(h = 300, col = "grey45")
+mtext("1/2 M & BH", 3, line = -1.5)
+legend("right", c("Concept", "LoMexRex", "HiMexRec"), pch = 15, pt.cex = 2, col = c("grey", "deepskyblue", "red"), bty = "n")
+mtext("MSY", outer = T, line = 0, cex = 1.4)
+dev.off()
 
-
-
-##### FILTER RESULTS FOR COLLAPSED STOCKS ???  #########  ???  ######### 
-# Try to re-run with upper bound on catch and see how results pan out for Loh (just FRQ1 for now... )
-# for(FRQ in list("FRQ_1", "FRQ_2", "FRQ_3", "FRQ_4", "FRQ_5", "FRQ_6", "FRQ_7", "FRQ_8", "FRQ_9", "FRQ_10", "FRQ_11", "FRQ_12", 
-#                 "FRQ_13", "FRQ_14", "FRQ_15", "FRQ_16", "FRQ_17", "FRQ_18", "FRQ_19", "FRQ_20", "FRQ_21", "FRQ_22", "FRQ_23", "FRQ_24") ){
-#   bb = OM_Loh[[FRQ]]$SSB
-#   iters_col = which(bb[nrow(bb),]<1)
-#   # bb_collapsed = bb[,which(bb[nrow(bb),]<1)]
-#   #   names(bb)[iters_col]
-#   #   print(FRQ)
-#   #   print( names(bb)[iters_col] )
-#   #   
-#   # }
-#   
-#   yr_col = c()
-#   for(i in iters_col){
-#     yr_col = c(yr_col, min(which(bb[,i]<1)) )
-#   }
-#   
-#   # cbind(iters_col, yr_col)
-#   View(OM_Loh[[FRQ]]$FM_FMMSY[,which(bb[nrow(bb),]<1)])
-#   View(OM_Loh[[FRQ]]$Com_catch[,which(bb[nrow(bb),]<1)])
-#   
-#   for(j in 1:length(iters_col)){
-#     OM_Loh[[FRQ]]$FM_FMMSY[(yr_col[j]:nrow(bb)),iters_col[j]] = rep(NA, length=length(OM_Loh[[FRQ]]$FM_FMMSY[(yr_col[j]:nrow(bb)),iters_col[j]]) )
-#     OM_Loh[[FRQ]]$Com_catch[(yr_col[j]:nrow(bb)),iters_col[j]] = rep(NA, length=length(OM_Loh[[FRQ]]$FM_FMMSY[(yr_col[j]:nrow(bb)),iters_col[j]]) )
-#     
-#   }
-#   
-#   
-# } # END FRQ Loop
-# 
-# bb = OM_Loh$FRQ_1$SSB
-# list=which(bb[nrow(bb),]<1)
-# bb_collapse = bb[,which(bb[nrow(bb),]<1)]
-# View(round(bb_collapse))
 
 

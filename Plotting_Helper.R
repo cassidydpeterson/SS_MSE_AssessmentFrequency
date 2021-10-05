@@ -4,12 +4,16 @@ library(vioplot)
 iters = seq(47,245, by=2)
 years = 1960:2115
 col_list = c(rgb(0.75, 0.75, 0.75, 0.20),rgb(0.33, 0.80, 0.92, 0.15),rgb(0.79, 0.9, 0.44, 0.3),rgb(0.86, 0.44, 0.84, 0.2))
+col_list3 = c(rgb(0.75, 0.75, 0.75, 0.50),rgb(0.33, 0.80, 0.92, 0.5),rgb(0.79, 0.9, 0.44, 0.5),rgb(0.86, 0.44, 0.84, 0.5))
+
 col_list2 = c("black","deepskyblue3","forestgreen","darkorchid")
 lty_list = c(2,1,2,1)
 
 col_lista = rep(col_list, (24/4))
 col_list2a = rep(col_list2, (24/4))
 lty_lista = rep(lty_list, (24/4))
+hlist=c(1,5,10,15)
+flist=c(1,5,10,15)
 
 
 
@@ -25,9 +29,9 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_
     width=300,
     height=200,
     pointsize=18,
-    res=300)
+    res=600)
 #####
-par(mfrow=c(3,6),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 2.5, 3, 0))
+par(mfrow=c(3,6),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(2.5, 2.5, 3, 0))
 # OM_list = c('OM_BASE','OM_BH','OM_M_BH','OM_Hih','OM_Loh','OM_lnR0')
 OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
 for(o in 1:6){
@@ -110,10 +114,219 @@ for(o in 1:6){
 legend("topright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2, lty=lty_lista[1:4], col=col_list2a[1:4], bty='n')
 
 mtext(expression("SSB/SSB"["MSY"])  , side=3, outer = TRUE, cex = 1, line=1)
+mtext("Year" , side=1, outer = TRUE, cex = 1, line=1)
 
 
 #####
 dev.off()
+
+
+
+
+# SSB/SSBMSY
+tiff(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_WORM_SSBSSBMSY.tiff",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=600)
+#####
+par(mfrow=c(3,6),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(2.5, 2.5, 3, 0))
+# OM_list = c('OM_BASE','OM_BH','OM_M_BH','OM_Hih','OM_Loh','OM_lnR0')
+OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
+for(o in 1:6){
+  if(o==1) { OM_Plot=OM_Base_Concept } 
+  if(o==2) { OM_Plot=OM_BH_Concept } 
+  if(o==3) { OM_Plot=OM_Hih_Concept } 
+  if(o==4) { OM_Plot=OM_Loh_Concept } 
+  if(o==5) { OM_Plot=OM_lnR0_Concept }
+  if(o==6) { OM_Plot=OM_M_BH_Concept } 
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+  if(o==1) {  mtext("Concept", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    for(i in 1:length(iters)){
+      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+      } # end if
+    } # end for i
+  } # end for h
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+  }
+  mtext(OM_labs[o], side=3, cex=1, line=0.25)
+  
+} # end o loop
+
+# LoMexRec
+for(o in 1:6){
+  if(o==1) { OM_Plot=OM_Base_LoMexRec } 
+  if(o==2) { OM_Plot=OM_BH_LoMexRec } 
+  if(o==3) { OM_Plot=OM_Hih_LoMexRec } 
+  if(o==4) { OM_Plot=OM_Loh_LoMexRec } 
+  if(o==5) { OM_Plot=OM_lnR0_LoMexRec }
+  if(o==6) { OM_Plot=OM_M_BH_LoMexRec } 
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+  if(o==1) {  mtext("LoMexRec", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    for(i in 1:length(iters)){
+      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+      } # end if
+    } # end for i
+  } # end for h
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+  }
+  # mtext(OM_labs[o], side=3, cex=1, line=0.25)
+  
+} # end o loop
+
+
+## HiMexRec
+for(o in 1:6){
+  if(o==1) { OM_Plot=OM_Base_HiMexRec } 
+  if(o==2) { OM_Plot=OM_BH_HiMexRec } 
+  if(o==3) { OM_Plot=OM_Hih_HiMexRec } 
+  if(o==4) { OM_Plot=OM_Loh_HiMexRec } 
+  if(o==5) { OM_Plot=OM_lnR0_HiMexRec }
+  if(o==6) { OM_Plot=OM_M_BH_HiMexRec } 
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+  if(o==1) {  mtext("HiMexRec", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    for(i in 1:length(iters)){
+      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+      } # end if
+    } # end for i
+  } # end for h
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+  }
+  # mtext(OM_labs[o], side=3, cex=1, line=0.25)
+  
+} # end o loop
+legend("topright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2, lty=lty_lista[1:4], col=col_list2a[1:4], bty='n')
+
+mtext(expression("SSB/SSB"["MSY"])  , side=3, outer = TRUE, cex = 1, line=1)
+mtext("Year" , side=1, outer = TRUE, cex = 1, line=1)
+
+
+#####
+dev.off()
+
+
+
+
+# SSB/SSBMSY
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\ALL_WORM_SSBSSBMSY.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=300)
+#####
+par(mfrow=c(3,6),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 2.5, 3, 0))
+# OM_list = c('OM_BASE','OM_BH','OM_M_BH','OM_Hih','OM_Loh','OM_lnR0')
+OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
+for(o in 1:6){
+  if(o==1) { OM_Plot=OM_Base_Concept } 
+  if(o==2) { OM_Plot=OM_BH_Concept } 
+  if(o==3) { OM_Plot=OM_Hih_Concept } 
+  if(o==4) { OM_Plot=OM_Loh_Concept } 
+  if(o==5) { OM_Plot=OM_lnR0_Concept }
+  if(o==6) { OM_Plot=OM_M_BH_Concept } 
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+  abline(v=c(seq(from=2015, to=2115, by=5)), lty=3, col='grey75')
+  abline(v=c(seq(from=2015, to=2115, by=10)), lty=2, col='grey75')
+  abline(v=c(seq(from=2015, to=2115, by=15)), lty=1, col='grey75')
+  if(o==1) {  mtext("Concept", side=2, cex = 1, line=1) }
+  abline(h=1)
+    for(i in c(3,4,6,10)){
+      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+        
+        for(h in rev(hlist)){
+        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list2[which(flist==h)],lty=i)
+      } # end if
+    } # end for i
+  } # end for h
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+  }
+  mtext(OM_labs[o], side=3, cex=1, line=0.25)
+  
+} # end o loop
+
+# LoMexRec
+for(o in 1:6){
+  if(o==1) { OM_Plot=OM_Base_LoMexRec } 
+  if(o==2) { OM_Plot=OM_BH_LoMexRec } 
+  if(o==3) { OM_Plot=OM_Hih_LoMexRec } 
+  if(o==4) { OM_Plot=OM_Loh_LoMexRec } 
+  if(o==5) { OM_Plot=OM_lnR0_LoMexRec }
+  if(o==6) { OM_Plot=OM_M_BH_LoMexRec } 
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+  if(o==1) {  mtext("LoMexRec", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    for(i in 1:length(iters)){
+      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+      } # end if
+    } # end for i
+  } # end for h
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+  }
+  # mtext(OM_labs[o], side=3, cex=1, line=0.25)
+  
+} # end o loop
+
+
+## HiMexRec
+for(o in 1:6){
+  if(o==1) { OM_Plot=OM_Base_HiMexRec } 
+  if(o==2) { OM_Plot=OM_BH_HiMexRec } 
+  if(o==3) { OM_Plot=OM_Hih_HiMexRec } 
+  if(o==4) { OM_Plot=OM_Loh_HiMexRec } 
+  if(o==5) { OM_Plot=OM_lnR0_HiMexRec }
+  if(o==6) { OM_Plot=OM_M_BH_HiMexRec } 
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+  if(o==1) {  mtext("HiMexRec", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    for(i in 1:length(iters)){
+      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+      } # end if
+    } # end for i
+  } # end for h
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+  }
+  # mtext(OM_labs[o], side=3, cex=1, line=0.25)
+  
+} # end o loop
+legend("topright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2, lty=lty_lista[1:4], col=col_list2a[1:4], bty='n')
+
+mtext(expression("SSB/SSB"["MSY"])  , side=3, outer = TRUE, cex = 1, line=1)
+
+
+#####
+dev.off()
+
+
+
 
 
 
@@ -701,62 +914,62 @@ png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\BASE
 par(mfrow=c(3,1),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 2.5, 3, 0))
 # OM_list = c('OM_BASE','OM_BH','OM_M_BH','OM_Hih','OM_Loh','OM_lnR0')
 OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
- OM_Plot=OM_Base_Concept 
-  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-    mtext("Concept", side=2, cex = 1, line=1) 
-  abline(h=1)
-  for(h in rev(hlist)){
-    for(i in 1:length(iters)){
-      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
-        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
-      } # end if
-    } # end for i
-  } # end for h
-  abline(h=1)
-  for(h in rev(hlist)){
-    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
-  }
-  mtext(OM_labs[1], side=3, cex=1, line=0.25)
-  
+OM_Plot=OM_Base_Concept 
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+mtext("Concept", side=2, cex = 1, line=1) 
+abline(h=1)
+for(h in rev(hlist)){
+  for(i in 1:length(iters)){
+    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+    } # end if
+  } # end for i
+} # end for h
+abline(h=1)
+for(h in rev(hlist)){
+  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+}
+mtext(OM_labs[1], side=3, cex=1, line=0.25)
+
 
 # LoMexRec
- OM_Plot=OM_Base_LoMexRec 
-  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-    mtext("LoMexRec", side=2, cex = 1, line=1) 
-  abline(h=1)
-  for(h in rev(hlist)){
-    for(i in 1:length(iters)){
-      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
-        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
-      } # end if
-    } # end for i
-  } # end for h
-  abline(h=1)
-  for(h in rev(hlist)){
-    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
-  }
-  # mtext(OM_labs[o], side=3, cex=1, line=0.25)
-  
+OM_Plot=OM_Base_LoMexRec 
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+mtext("LoMexRec", side=2, cex = 1, line=1) 
+abline(h=1)
+for(h in rev(hlist)){
+  for(i in 1:length(iters)){
+    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+    } # end if
+  } # end for i
+} # end for h
+abline(h=1)
+for(h in rev(hlist)){
+  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+}
+# mtext(OM_labs[o], side=3, cex=1, line=0.25)
+
 
 
 ## HiMexRec
 OM_Plot=OM_Base_HiMexRec 
-  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
-    mtext("HiMexRec", side=2, cex = 1, line=1) 
-  abline(h=1)
-  for(h in rev(hlist)){
-    for(i in 1:length(iters)){
-      if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
-        lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
-      } # end if
-    } # end for i
-  } # end for h
-  abline(h=1)
-  for(h in rev(hlist)){
-    lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
-  }
-  # mtext(OM_labs[o], side=3, cex=1, line=0.25)
-  
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0, 2.5), ylab="")
+mtext("HiMexRec", side=2, cex = 1, line=1) 
+abline(h=1)
+for(h in rev(hlist)){
+  for(i in 1:length(iters)){
+    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+    } # end if
+  } # end for i
+} # end for h
+abline(h=1)
+for(h in rev(hlist)){
+  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+}
+# mtext(OM_labs[o], side=3, cex=1, line=0.25)
+
 legend("topright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2, lty=lty_lista[1:4], col=col_list2a[1:4], bty='n')
 
 mtext(expression("SSB/SSB"["MSY"])  , side=3, outer = TRUE, cex = 1, line=1)
@@ -766,3 +979,256 @@ mtext(expression("SSB/SSB"["MSY"])  , side=3, outer = TRUE, cex = 1, line=1)
 dev.off()
 
 
+
+# SSB/SSBMSY
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\BASE_AllIs_WORM_SSBSSBMSY2.png",
+    type="cairo",
+    units="mm",
+    width=450,
+    height=150,
+    pointsize=18,
+    res=300)
+#####
+par(mfrow=c(1,3),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 2.5, 3, 0))
+# OM_list = c('OM_BASE','OM_BH','OM_M_BH','OM_Hih','OM_Loh','OM_lnR0')
+OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
+OM_Plot=OM_Base_Concept 
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0.25, 2.25), ylab="")
+mtext("Concept", side=3, cex = 1, line=0.25) 
+abline(h=1)
+for(h in rev(hlist)){
+  for(i in 1:length(iters)){
+    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+    } # end if
+  } # end for i
+} # end for h
+abline(h=1)
+for(h in rev(hlist)){
+  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+}
+mtext(OM_labs[1], side=3, cex=1.2, line=1.2,outer=T)
+mtext(expression("SSB/SSB"["MSY"])  , side=2, outer = F, cex = 1, line=1)
+
+
+# LoMexRec
+OM_Plot=OM_Base_LoMexRec 
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0.25, 2.25), ylab="")
+mtext("LoMexRec", side=3, cex = 1, line=0.25) 
+abline(h=1)
+for(h in rev(hlist)){
+  for(i in 1:length(iters)){
+    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+    } # end if
+  } # end for i
+} # end for h
+abline(h=1)
+for(h in rev(hlist)){
+  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+}
+# mtext(OM_labs[o], side=3, cex=1, line=0.25)
+
+
+
+## HiMexRec
+OM_Plot=OM_Base_HiMexRec 
+plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0.25, 2.25), ylab="")
+mtext("HiMexRec", side=3, cex = 1, line=0.25) 
+abline(h=1)
+for(h in rev(hlist)){
+  for(i in 1:length(iters)){
+    if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+      lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list[which(flist==h)])
+    } # end if
+  } # end for i
+} # end for h
+abline(h=1)
+for(h in rev(hlist)){
+  lines(years, apply(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY, 1, median), type='l', lwd=2, col=col_list2a[which(flist==h)], lty=lty_lista[which(flist==h)])
+}
+# mtext(OM_labs[o], side=3, cex=1, line=0.25)
+
+legend("topright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2, lty=lty_lista[1:4], col=col_list2a[1:4], bty='n')
+
+
+
+#####
+dev.off()
+
+
+
+
+
+
+######### SHOW ITERATIONS #########
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\Iters_Base_WORM_SSBSSBMSY.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=300)
+#####
+OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
+
+o=1
+
+if(o==1) { OM_Plot=OM_Base_Concept } 
+if(o==2) { OM_Plot=OM_BH_Concept } 
+if(o==3) { OM_Plot=OM_Hih_Concept } 
+if(o==4) { OM_Plot=OM_Loh_Concept } 
+if(o==5) { OM_Plot=OM_lnR0_Concept }
+if(o==6) { OM_Plot=OM_M_BH_Concept } 
+
+par(mfrow=c(3,3),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 1.5, 1.5, 0))
+for(i in 2:10){
+  # if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0.25, 1.25), ylab="")
+  abline(v=c(seq(from=2015, to=2115, by=5)), lty=3, col='grey75')
+  abline(v=c(seq(from=2015, to=2115, by=10)), lty=2, col='grey75')
+  abline(v=c(seq(from=2015, to=2115, by=15)), lty=1, col='grey75')
+  # if(o==1) {  mtext("Concept", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list2[which(flist==h)],lty=1)
+    # } # end if
+  } # end for h
+} # end for i
+# abline(h=1)
+legend("bottomright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2,  col=col_list2a[1:4], bty='n')
+
+mtext(expression("SSB/SSB"["MSY"])  , side=2, outer = TRUE, cex = 1, line=0)
+mtext("Base"  , side=3, outer = TRUE, cex = 1, line=0)
+#######
+dev.off()
+
+
+
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\Iters_BH_WORM_SSBSSBMSY.png",
+    type="cairo",
+    units="mm",
+    width=300,
+    height=200,
+    pointsize=18,
+    res=300)
+#####
+OM_labs = c("Base","BH","Hi h","Lo h", "2*R0","M/2 & BH")
+
+o=2
+
+if(o==1) { OM_Plot=OM_Base_Concept } 
+if(o==2) { OM_Plot=OM_BH_Concept } 
+if(o==3) { OM_Plot=OM_Hih_Concept } 
+if(o==4) { OM_Plot=OM_Loh_Concept } 
+if(o==5) { OM_Plot=OM_lnR0_Concept }
+if(o==6) { OM_Plot=OM_M_BH_Concept } 
+
+par(mfrow=c(3,3),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 1.5, 1.5, 0))
+for(i in 2:10){
+  # if(i <= ncol(OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY) ){                     # to skip over missing iterations
+  plot(years, OM_Plot$FRQ_1$SSB_SSBMSY[,1], type='l', col="white", ylim=c(0.4, 1.4), ylab="")
+  abline(v=c(seq(from=2015, to=2115, by=5)), lty=3, col='grey75')
+  abline(v=c(seq(from=2015, to=2115, by=10)), lty=2, col='grey75')
+  abline(v=c(seq(from=2015, to=2115, by=15)), lty=1, col='grey75')
+  # if(o==1) {  mtext("Concept", side=2, cex = 1, line=1) }
+  abline(h=1)
+  for(h in rev(hlist)){
+    lines(years, OM_Plot[[paste0("FRQ_",h)]]$SSB_SSBMSY[,i], col=col_list2[which(flist==h)],lty=1)
+    # } # end if
+  } # end for h
+} # end for i
+# abline(h=1)
+legend("bottomright",c("FRQ1","FRQ5","FRQ10","FRQ15"), lwd=2,  col=col_list2a[1:4], bty='n')
+
+mtext(expression("SSB/SSB"["MSY"])  , side=2, outer = TRUE, cex = 1, line=0)
+mtext("BH"  , side=3, outer = TRUE, cex = 1, line=0)
+#######
+dev.off()
+
+
+
+
+
+### VIOLIN PLOTS -----
+# SSB/SSBMSY #
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\Base_VIOPLOT_SSBMSY_ManyYears.png",
+    type="cairo",
+    units="mm",
+    width=400,
+    height=200,
+    pointsize=18,
+    res=300)
+#####
+
+# CONCEPT
+o=1
+if(o==1) { OM_Plot=OM_Base_Concept } 
+if(o==2) { OM_Plot=OM_BH_Concept } 
+if(o==3) { OM_Plot=OM_Hih_Concept } 
+if(o==4) { OM_Plot=OM_Loh_Concept } 
+if(o==5) { OM_Plot=OM_lnR0_Concept }
+if(o==6) { OM_Plot=OM_M_BH_Concept } 
+
+par(mfrow=c(2,5),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 1.5, 1.5, 0))
+for(i in seq(2025,2115, by=10)){
+  vioplot(
+    unlist(OM_Plot$FRQ_1$SSB_SSBMSY[as.character(i),]),
+    unlist(OM_Plot$FRQ_5$SSB_SSBMSY[as.character(i),]),
+    unlist(OM_Plot$FRQ_10$SSB_SSBMSY[as.character(i),]),
+    unlist(OM_Plot$FRQ_15$SSB_SSBMSY[as.character(i),]), 
+    col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0.25, 1.5)) 
+  abline(h=1)
+  abline(h=0.9, col="grey45")
+  mtext(as.character(i), side=3, line=-1.5)
+}
+
+mtext("Base Concept", side=3, cex = 1, line=0, outer=TRUE)
+mtext(expression("SSB/SSB"["MSY"]) , side=2, cex = 1, line=0, outer=TRUE)
+
+
+
+#####
+dev.off()
+
+
+# SSB/SSBMSY #
+png(filename="D:\\MSE_Run\\Assessment_Frequency\\AssessFreq_Results\\Plots\\BH_VIOPLOT_SSBMSY_ManyYears.png",
+    type="cairo",
+    units="mm",
+    width=400,
+    height=200,
+    pointsize=18,
+    res=300)
+#####
+
+# CONCEPT
+o=2
+if(o==1) { OM_Plot=OM_Base_Concept } 
+if(o==2) { OM_Plot=OM_BH_Concept } 
+if(o==3) { OM_Plot=OM_Hih_Concept } 
+if(o==4) { OM_Plot=OM_Loh_Concept } 
+if(o==5) { OM_Plot=OM_lnR0_Concept }
+if(o==6) { OM_Plot=OM_M_BH_Concept } 
+
+par(mfrow=c(2,5),  mar=c(1.1, 1.1, 0.3, 0.3),tcl = -0.1, mgp = c(0.8, 0.1, 0), cex=0.7, oma = c(0, 1.5, 1.5, 0))
+for(i in seq(2025,2115, by=10)){
+  vioplot(
+    unlist(OM_Plot$FRQ_1$SSB_SSBMSY[as.character(i),]),
+    unlist(OM_Plot$FRQ_5$SSB_SSBMSY[as.character(i),]),
+    unlist(OM_Plot$FRQ_10$SSB_SSBMSY[as.character(i),]),
+    unlist(OM_Plot$FRQ_15$SSB_SSBMSY[as.character(i),]), 
+    col=c("dimgrey","deepskyblue3","forestgreen","darkorchid"), ylim=c(0.25, 1.5)) 
+  abline(h=1)
+  abline(h=0.9, col="grey45")
+  mtext(as.character(i), side=3, line=-1.5)
+}
+
+mtext("BH Concept", side=3, cex = 1, line=0, outer=TRUE)
+mtext(expression("SSB/SSB"["MSY"]) , side=2, cex = 1, line=0, outer=TRUE)
+
+
+
+#####
+dev.off()
