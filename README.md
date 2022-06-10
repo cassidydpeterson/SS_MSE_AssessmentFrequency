@@ -86,15 +86,6 @@ Additional scripts that were created to analyze MSE results are included in the 
 This script contains functions modified from `r4ss` to extract data from saved report files.
 
 
-### GLM 
-
-This script contains the code that was used to apply generalized linear models (GLMs) to the MSE results to quantitatively determine the impact that assessment frequency had on management performance.  
-
-
-### Plotting scripts
-`Plotting_Helper.R` and `GLM_Plotting_Helper.R` contain script to plot MSE results that have been run through `SS_ReadReportResults.R`. 
-
-
 
 
 
@@ -102,3 +93,6 @@ This script contains the code that was used to apply generalized linear models (
 
 * Maunder MN (2014) Management strategy evaluation (MSE) implementation in Stock Synthesis: application to Pacific bluefin tuna. IATTC Stock Assessment Report. 15: 100-117.
 * Peterson CD. Wilberg MJ. Cortes E. Courtney DL. Latour RJ. (2022) Effects of unregulated international fishing on recovery potential of the sandbar shark within the southeast United States. Canadian Journal of Fisheries and Aquatic Sciences. DOI: [10.1139/cjfas-2021-0345](10.1139/cjfas-2021-0345)
+
+
+

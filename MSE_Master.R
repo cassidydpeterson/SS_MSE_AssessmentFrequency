@@ -87,11 +87,11 @@ MSE_func_FRQ <- function(MCMCdir, OMdir, EMdir, StoreResults, FRQ = 5,
   source(file.path(sourcedir, "HCR.R")) # HCR
   source(file.path(sourcedir, "EditStarterFile.R")) # ImplementHCR
 
-  if (implement == "default") {
+  if (implement == "HiMexRec") {
     source(file.path(sourcedir, "ImplementHCR.R")) # ImplementHCR
     source(file.path(sourcedir, "UpdateCatchesAnnual.R")) # Annual
   }
-  if (implement == "MexRec") {
+  if (implement == "Concept") {
     source(file.path(sourcedir, "ImplementHCR_MexRec.R")) # ImplementHCR
     source(file.path(sourcedir, "UpdateCatchesAnnual_MexRec.R")) # ImplementHCR
   }
